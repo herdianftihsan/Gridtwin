@@ -1,0 +1,16 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+allowBuilds:
+  sharp: set this to true or false
+
+# Dependencies allowed to run postinstall build scripts (pnpm 10+ policy).
+# - esbuild: required by vitest/vite bundling.
+onlyBuiltDependencies:
+  - esbuild
+
+# sharp is Next.js' optional image optimizer. Removing it from the graph
+# avoids its blocked postinstall script on MVP; Next.js works fine without it.
+overrides:
+  sharp: npm:empty-npm-package@1.0.1

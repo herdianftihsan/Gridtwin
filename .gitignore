@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Environment — never commit secrets
+.env
+.env.*
+!.env.example
+
+# Builds
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Testing
+coverage/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

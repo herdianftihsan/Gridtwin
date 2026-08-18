@@ -1,0 +1,29 @@
+{
+  "name": "gridtwin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GRIDTWIN AI — Energy Decision Platform for Building Owners",
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev:api": "pnpm --filter @gridtwin/api dev",
+    "dev:web": "pnpm --filter @gridtwin/web dev",
+    "lint": "eslint .",
+    "typecheck": "pnpm --filter @gridtwin/shared build && pnpm --filter @gridtwin/shared --filter @gridtwin/api --filter @gridtwin/web run typecheck",
+    "test": "pnpm --filter @gridtwin/shared build && vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.0",
+    "eslint": "^9.30.0",
+    "globals": "^16.2.0",
+    "prettier": "^3.6.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.0",
+    "vitest": "^3.2.4"
+  }
+}
