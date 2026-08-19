@@ -1,5 +1,5 @@
 {
-  "name": "gridtwin-backend",
+  "name": "@gridtwin/api",
   "version": "1.0.0",
   "description": "GridTwin AI - Energy Decision Platform for Building Owners Backend API",
   "main": "dist/server.js",

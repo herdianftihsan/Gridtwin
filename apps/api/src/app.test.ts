@@ -1,20 +1,22 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import request from 'supertest';
 import { createApp } from './app.js';
+import { supabaseAdmin } from './config/supabase.js';
 import type { Express } from 'express';
 
 describe('Backend Foundation Endpoints & Envelopes', () => {
   let app: Express;
 
   beforeAll(() => {
-    process.env.SUPABASE_URL = 'https://mock.supabase.co';
-    process.env.SUPABASE_ANON_KEY = 'mock-anon-key';
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-key';
-    process.env.GEMINI_API_KEY = 'mock-gemini-key';
     app = createApp();
   });
 
   it('GET /api/health returns 200 with standard success envelope', async () => {
+    vi.spyOn(supabaseAdmin, 'from').mockReturnValueOnce({
+      select: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValueOnce({ data: [], error: null }),
+    } as never);
+
     const res = await request(app).get('/api/health');
 
     expect(res.status).toBe(200);

@@ -5,6 +5,10 @@ node_modules/
 .env
 .env.*
 !.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Builds
 dist/
