@@ -1,11 +1,7 @@
-import { Router } from "express";
+import { Router } from 'express';
+import { getHealth } from '../controllers/health.controller.js';
 
-export const healthRouter = Router();
+const router = Router();
+router.get('/health', getHealth);
 
-healthRouter.get("/", (_req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "gridtwin-api",
-    timestamp: new Date().toISOString(),
-  });
-});
+export const healthRouter = router;

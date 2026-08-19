@@ -3,6 +3,7 @@ packages:
   - "packages/*"
 
 allowBuilds:
+  esbuild: false
   sharp: set this to true or false
 
 # Dependencies allowed to run postinstall build scripts (pnpm 10+ policy).
