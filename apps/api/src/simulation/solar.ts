@@ -2,12 +2,17 @@ import { DEFAULT_ASSUMPTIONS } from './constants.js';
 import { SolarGenerationResult } from './types.js';
 
 export const calculatePvConstraints = (
-  roofArea: number | null
+  roofArea: number | null | undefined
 ): { maxPvPhysical: number; maxPvAllowed: number } => {
+  // Only null or undefined falls back to default 50 m²
   const effectiveRoofArea =
-    roofArea !== null && roofArea > 0
+    roofArea !== null && roofArea !== undefined
       ? roofArea
       : DEFAULT_ASSUMPTIONS.DEFAULT_ROOF_AREA;
+
+  if (effectiveRoofArea <= 0) {
+    return { maxPvPhysical: 0, maxPvAllowed: 0 };
+  }
 
   const maxPvPhysical = effectiveRoofArea / DEFAULT_ASSUMPTIONS.ROOF_M2_PER_KWP;
   const maxPvAllowed = Math.min(

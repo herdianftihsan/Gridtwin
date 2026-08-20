@@ -35,17 +35,28 @@ export const simulate = (
   config: SimulationConfig,
   context: SimulationContext
 ): SimulationResult => {
-  // 1. Boundary & Input Validation
-  if (context.monthly_bill <= 0) {
-    throw new InvalidSimulationInputError('Monthly bill must be greater than 0.');
+  // 1. Boundary & Strict Input Validation
+  if (!Number.isFinite(context.monthly_bill) || context.monthly_bill <= 0) {
+    throw new InvalidSimulationInputError('Monthly bill must be a positive finite number.');
   }
 
   if (
+    !Number.isFinite(config.solar_kwp) ||
     config.solar_kwp < 0 ||
+    !Number.isFinite(config.battery_kwh) ||
     config.battery_kwh < 0 ||
+    !Number.isFinite(config.ac_units) ||
     config.ac_units < 0
   ) {
-    throw new InvalidSimulationInputError('Asset configurations cannot be negative.');
+    throw new InvalidSimulationInputError('Asset configurations must be non-negative finite numbers.');
+  }
+
+  if (
+    context.roof_area !== null &&
+    context.roof_area !== undefined &&
+    (!Number.isFinite(context.roof_area) || context.roof_area < 0)
+  ) {
+    throw new InvalidSimulationInputError('Roof area must be a non-negative finite number when provided.');
   }
 
   const { maxPvAllowed } = calculatePvConstraints(context.roof_area);
@@ -60,7 +71,7 @@ export const simulate = (
     );
   }
 
-  // 2. Resolve Assumptions
+  // 2. Resolve Assumptions (Pure in-memory lookup)
   const resolvedPsh =
     context.assumptions?.psh ?? lookupPsh(context.location);
 
@@ -98,7 +109,7 @@ export const simulate = (
     baseline.monthly_kwh
   );
 
-  // 5. Representative Day Load Profile
+  // 5. Representative Day Load Profile (50:50 Day/Night)
   const loadProfile = calculateRepresentativeDay(
     efficiency.monthly_demand_post_efficiency,
     DEFAULT_ASSUMPTIONS.DAYS_IN_MONTH
@@ -112,7 +123,7 @@ export const simulate = (
     DEFAULT_ASSUMPTIONS.DAYS_IN_MONTH
   );
 
-  // 7. Battery Dispatch & Self-Consumption
+  // 7. Battery Dispatch & Self-Consumption (Daily reset, zero cross-day SOC)
   const batteryDispatch = calculateBatteryDispatch(
     solar.solar_daily,
     loadProfile.day_load,
