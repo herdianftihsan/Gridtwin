@@ -1,4 +1,3 @@
-// apps/api/src/middlewares/error-handlers.ts
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
 import { AppError, ApiErrorEnvelope } from '../utils/errors.js';

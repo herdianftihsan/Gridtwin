@@ -1,6 +1,5 @@
-// apps/api/src/repositories/simulation-result.repository.ts
 import { supabaseAdmin } from "../config/supabase.js";
-import { DatabaseSimulationResultRow } from "../mappers/simulation.mapper.js";
+import { DatabaseSimulationResultRow } from "../mappers/simulation.maper.js";
 
 export class SimulationResultRepository {
   async create(

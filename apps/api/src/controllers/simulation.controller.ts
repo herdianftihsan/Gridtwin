@@ -1,4 +1,3 @@
-// apps/api/src/controllers/simulation.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import { simulationService } from '../services/simulation.service.js';
 import { SimulateInput, OptimizeInput } from '../schemas/project.schema.js';

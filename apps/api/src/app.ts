@@ -1,9 +1,8 @@
-// apps/api/src/app.ts
 import express, { Express } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import { config } from './config/env.js';
-import { healthRouter } from './routes/health.routes.js';
+import { healthRouter } from './routes/health.router.js';
 import { projectRouter } from './routes/project.routes.js';
 import { errorHandler } from './middlewares/error-handlers.js';
 import { NotFoundError } from './utils/errors.js';

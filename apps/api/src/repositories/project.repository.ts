@@ -1,4 +1,3 @@
-// apps/api/src/repositories/project.repository.ts
 import { supabaseAdmin } from "../config/supabase.js";
 import { CreateProjectInput, UpdateProjectInput } from "../schemas/project.schema.js";
 

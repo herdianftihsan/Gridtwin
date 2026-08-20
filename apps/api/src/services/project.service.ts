@@ -1,7 +1,6 @@
-// apps/api/src/services/project.service.ts
 import { projectRepository, ProjectRecord } from "../repositories/project.repository.js";
 import { scenarioRepository } from "../repositories/scenario.repository.js";
-import { toSimulationResultContract } from "../mappers/simulation.mapper.js";
+import { toSimulationResultContract } from "../mappers/simulation.maper.js";
 import {
   CreateProjectInput,
   UpdateProjectInput,

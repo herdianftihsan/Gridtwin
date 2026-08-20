@@ -1,4 +1,3 @@
-// apps/api/src/controllers/project.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import { projectService } from '../services/project.service.js';
 import { CreateProjectInput, UpdateProjectInput, ProjectQueryInput } from '../schemas/project.schema.js';

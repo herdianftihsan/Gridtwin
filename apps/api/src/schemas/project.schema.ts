@@ -1,4 +1,3 @@
-// apps/api/src/schemas/project.schema.ts
 import { z } from "zod";
 
 export const createProjectSchema = z

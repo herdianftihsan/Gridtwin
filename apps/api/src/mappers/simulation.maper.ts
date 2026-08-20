@@ -1,4 +1,3 @@
-// apps/api/src/mappers/simulation.mapper.ts
 import { SimulationResult } from '../simulation/types.js';
 
 export interface DatabaseScenarioRow {

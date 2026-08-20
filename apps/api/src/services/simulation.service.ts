@@ -1,8 +1,7 @@
-// apps/api/src/services/simulation.service.ts
 import { projectService } from "./project.service.js";
 import { scenarioRepository } from "../repositories/scenario.repository.js";
 import { simulationResultRepository } from "../repositories/simulation-result.repository.js";
-import { toDatabaseSimulationResultPayload } from "../mappers/simulation.mapper.js";
+import { toDatabaseSimulationResultPayload } from "../mappers/simulation.maper.js";
 import { simulate } from "../simulation/simulate.js";
 import { optimize } from "../optimization/optimize.js";
 import { SimulateInput, OptimizeInput } from "../schemas/project.schema.js";

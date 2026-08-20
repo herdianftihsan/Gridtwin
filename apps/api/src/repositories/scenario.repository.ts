@@ -1,6 +1,5 @@
-// apps/api/src/repositories/scenario.repository.ts
-import { supabaseAdmin } from "../config/supabase.js";
-import { DatabaseScenarioRow, DatabaseSimulationResultRow } from "../mappers/simulation.mapper.js";
+import { supabaseAdmin } from '../config/supabase.js';
+import { DatabaseScenarioRow, DatabaseSimulationResultRow } from '../mappers/simulation.maper.js';
 
 export interface ScenarioWithResult extends DatabaseScenarioRow {
   simulation_results: DatabaseSimulationResultRow | null;
@@ -9,7 +8,7 @@ export interface ScenarioWithResult extends DatabaseScenarioRow {
 export class ScenarioRepository {
   async create(payload: {
     project_id: string;
-    scenario_type: "baseline" | "recommended" | "custom" | "what_if";
+    scenario_type: 'baseline' | 'recommended' | 'custom' | 'what_if';
     solar_kwp: number;
     battery_kwh: number;
     ac_units: number;
@@ -18,7 +17,7 @@ export class ScenarioRepository {
     name?: string | null;
   }): Promise<DatabaseScenarioRow> {
     const { data, error } = await supabaseAdmin
-      .from("scenarios")
+      .from('scenarios')
       .insert({
         project_id: payload.project_id,
         scenario_type: payload.scenario_type,
@@ -41,10 +40,10 @@ export class ScenarioRepository {
 
   async findRecommended(projectId: string): Promise<ScenarioWithResult | null> {
     const { data, error } = await supabaseAdmin
-      .from("scenarios")
-      .select("*, simulation_results(*)")
-      .eq("project_id", projectId)
-      .eq("is_recommended", true)
+      .from('scenarios')
+      .select('*, simulation_results(*)')
+      .eq('project_id', projectId)
+      .eq('is_recommended', true)
       .maybeSingle();
 
     if (error) {
@@ -56,10 +55,10 @@ export class ScenarioRepository {
 
   async findRecent(projectId: string, limit = 10): Promise<ScenarioWithResult[]> {
     const { data, error } = await supabaseAdmin
-      .from("scenarios")
-      .select("*, simulation_results(*)")
-      .eq("project_id", projectId)
-      .order("created_at", { ascending: false })
+      .from('scenarios')
+      .select('*, simulation_results(*)')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -71,10 +70,10 @@ export class ScenarioRepository {
 
   async deactivateRecommended(projectId: string): Promise<void> {
     const { error } = await supabaseAdmin
-      .from("scenarios")
+      .from('scenarios')
       .update({ is_recommended: false, updated_at: new Date().toISOString() })
-      .eq("project_id", projectId)
-      .eq("is_recommended", true);
+      .eq('project_id', projectId)
+      .eq('is_recommended', true);
 
     if (error) {
       throw new Error(`Failed to deactivate existing recommended scenario: ${error.message}`);
@@ -82,7 +81,7 @@ export class ScenarioRepository {
   }
 
   async deleteById(scenarioId: string): Promise<void> {
-    await supabaseAdmin.from("scenarios").delete().eq("id", scenarioId);
+    await supabaseAdmin.from('scenarios').delete().eq('id', scenarioId);
   }
 }
 
