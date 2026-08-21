@@ -1,40 +1,35 @@
-import { supabaseAdmin } from '../config/supabase.js';
-import { NotFoundError, ForbiddenError, InternalError } from '../utils/errors.js';
+// apps/api/src/services/project-ownership.service.ts
+import { projectRepository, ProjectRecord } from '../repositories/project.repository.js';
+import { NotFoundError, ForbiddenError } from '../utils/errors.js';
 
-export interface ProjectContext {
-  id: string;
-  user_id: string;
-  building_type: 'Ruko' | 'Residential' | 'Office';
-  location: string;
-  roof_area: number | null;
-  monthly_bill: number;
-  budget: number;
-  objective: 'save_money' | 'reduce_co2' | 'independence';
-  created_at: string;
-  updated_at: string;
-}
+export type ProjectOwnershipRecord = ProjectRecord;
 
+/**
+ * Asserts project ownership.
+ * @param projectId - The target project ID (Param 1 from auth.test.ts)
+ * @param userId - The authenticated user ID (Param 2 from auth.test.ts)
+ */
 export const assertProjectOwnership = async (
   projectId: string,
   userId: string
-): Promise<ProjectContext> => {
-  const { data, error } = await supabaseAdmin
-    .from('projects')
-    .select('id, user_id, building_type, location, roof_area, monthly_bill, budget, objective, created_at, updated_at')
-    .eq('id', projectId)
-    .maybeSingle();
+): Promise<ProjectRecord> => {
+  const project = await projectRepository.findById(projectId);
 
-  if (error) {
-    throw new InternalError('Database query failed during project ownership verification');
-  }
-
-  if (!data) {
+  if (!project) {
     throw new NotFoundError('Project not found');
   }
 
-  if (data.user_id !== userId) {
+  if (project.user_id !== userId) {
     throw new ForbiddenError('You do not have permission to access this project');
   }
 
-  return data as ProjectContext;
+  return project;
 };
+
+export class ProjectOwnershipService {
+  async verifyOwnership(userId: string, projectId: string): Promise<ProjectRecord> {
+    return assertProjectOwnership(projectId, userId);
+  }
+}
+
+export const projectOwnershipService = new ProjectOwnershipService();

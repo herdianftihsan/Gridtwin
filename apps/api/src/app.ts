@@ -4,6 +4,7 @@ import cors from 'cors';
 import { config } from './config/env.js';
 import { healthRouter } from './routes/health.router.js';
 import { projectRouter } from './routes/project.routes.js';
+import { aiRouter } from './routes/ai.routes.js';
 import { errorHandler } from './middlewares/error-handlers.js';
 import { NotFoundError } from './utils/errors.js';
 
@@ -22,6 +23,7 @@ export const createApp = (): Express => {
   // Mount API Endpoints
   app.use('/api/health', healthRouter);
   app.use('/api/projects', projectRouter);
+  app.use('/api/ai', aiRouter);
 
   // 404 Route Catcher
   app.use((_req, _res, next) => {

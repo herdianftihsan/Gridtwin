@@ -1,19 +1,20 @@
-export type StandardErrorCode =
+export type ApiErrorCode =
   | 'VALIDATION_ERROR'
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'CONFLICT'
   | 'INFEASIBLE_EFFICIENCY_CONFIGURATION'
+  | 'PV_CONSTRAINT_EXCEEDED'
+  | 'INVALID_SIMULATION_INPUT'
   | 'NO_FEASIBLE_SCENARIO'
-  | 'SIMULATION_ERROR'
   | 'AI_ERROR'
+  | 'RATE_LIMIT_EXCEEDED'
   | 'INTERNAL_ERROR';
 
-// Interface envelope error sesuai API Contract v1.0.2
 export interface ApiErrorEnvelope {
   error: {
-    code: StandardErrorCode | string;
+    code: ApiErrorCode;
     message: string;
     details: Record<string, unknown>;
   };
@@ -21,17 +22,17 @@ export interface ApiErrorEnvelope {
 
 export class AppError extends Error {
   public readonly statusCode: number;
-  public readonly code: StandardErrorCode;
+  public readonly code: ApiErrorCode;
   public readonly details: Record<string, unknown>;
 
   constructor(
     statusCode: number,
-    code: StandardErrorCode,
+    code: ApiErrorCode,
     message: string,
     details: Record<string, unknown> = {}
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = this.constructor.name;
     this.statusCode = statusCode;
     this.code = code;
     this.details = details;
@@ -46,52 +47,40 @@ export class ValidationError extends AppError {
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message = 'Authentication token is required and must be valid') {
-    super(401, 'UNAUTHORIZED', message);
+  constructor(message = 'Unauthorized access', details: Record<string, unknown> = {}) {
+    super(401, 'UNAUTHORIZED', message, details);
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message = 'You do not have permission to access this project') {
-    super(403, 'FORBIDDEN', message);
+  constructor(message = 'Access forbidden', details: Record<string, unknown> = {}) {
+    super(403, 'FORBIDDEN', message, details);
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(message = 'The requested resource was not found') {
-    super(404, 'NOT_FOUND', message);
+  constructor(message = 'Resource not found', details: Record<string, unknown> = {}) {
+    super(404, 'NOT_FOUND', message, details);
   }
 }
 
-export class InfeasibleEfficiencyError extends AppError {
-  constructor(message = 'AC and LED efficiency savings exceed baseline demand.') {
-    super(400, 'INFEASIBLE_EFFICIENCY_CONFIGURATION', message);
+export class ConflictError extends AppError {
+  constructor(message = 'Resource conflict', details: Record<string, unknown> = {}) {
+    super(409, 'CONFLICT', message, details);
   }
 }
 
-export class NoFeasibleScenarioError extends AppError {
+export class RateLimitError extends AppError {
   constructor(
-    message = 'Budget terlalu rendah untuk konfigurasi sistem yang tersedia.',
+    message = 'Too many AI requests. Please wait a moment before trying again.',
     details: Record<string, unknown> = {}
   ) {
-    super(422, 'NO_FEASIBLE_SCENARIO', message, details);
+    super(429, 'RATE_LIMIT_EXCEEDED', message, details);
   }
 }
 
-export class SimulationError extends AppError {
-  constructor(message = 'Simulation calculation failed', details: Record<string, unknown> = {}) {
-    super(500, 'SIMULATION_ERROR', message, details);
-  }
-}
-
-export class AiError extends AppError {
-  constructor(message = 'AI generation upstream error', details: Record<string, unknown> = {}) {
-    super(502, 'AI_ERROR', message, details);
-  }
-}
-
-export class InternalError extends AppError {
-  constructor(message = 'An unexpected internal error occurred') {
-    super(500, 'INTERNAL_ERROR', message);
+export class InternalServerError extends AppError {
+  constructor(message = 'An unexpected internal error occurred', details: Record<string, unknown> = {}) {
+    super(500, 'INTERNAL_ERROR', message, details);
   }
 }

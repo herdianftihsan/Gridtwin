@@ -1,5 +1,7 @@
+import { ApiErrorCode } from '../utils/errors.js';
+
 export abstract class OptimizationDomainError extends Error {
-  public abstract readonly code: string;
+  public abstract readonly code: ApiErrorCode;
   public readonly details: Readonly<Record<string, unknown>>;
 
   constructor(message: string, details: Record<string, unknown> = {}) {
@@ -11,7 +13,7 @@ export abstract class OptimizationDomainError extends Error {
 }
 
 export class NoFeasibleScenarioDomainError extends OptimizationDomainError {
-  public readonly code = 'NO_FEASIBLE_SCENARIO';
+  public readonly code: ApiErrorCode = 'NO_FEASIBLE_SCENARIO';
 
   constructor(
     message = 'Budget terlalu rendah untuk konfigurasi sistem yang tersedia.',

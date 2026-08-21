@@ -1,9 +1,10 @@
+// apps/api/src/controllers/project.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import { projectService } from '../services/project.service.js';
 import { CreateProjectInput, UpdateProjectInput, ProjectQueryInput } from '../schemas/project.schema.js';
 
 export class ProjectController {
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+  create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const input: CreateProjectInput = req.body;
@@ -16,9 +17,9 @@ export class ProjectController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
-  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+  list = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const query = req.query as unknown as ProjectQueryInput;
@@ -42,9 +43,9 @@ export class ProjectController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
-  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+  getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const projectId = req.params.id as string;
@@ -57,9 +58,9 @@ export class ProjectController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
-  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+  update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const projectId = req.params.id as string;
@@ -73,9 +74,9 @@ export class ProjectController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
-  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
+  delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.id;
       const projectId = req.params.id as string;
@@ -85,7 +86,7 @@ export class ProjectController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 }
 
 export const projectController = new ProjectController();

@@ -1,42 +1,45 @@
-import { projectRepository, ProjectRecord } from "../repositories/project.repository.js";
-import { scenarioRepository } from "../repositories/scenario.repository.js";
-import { toSimulationResultContract } from "../mappers/simulation.maper.js";
-import {
-  CreateProjectInput,
-  UpdateProjectInput,
-  ProjectQueryInput,
-} from "../schemas/project.schema.js";
-import { NotFoundError, ForbiddenError } from "../utils/errors.js";
+// apps/api/src/services/project.service.ts
+import { projectRepository, ProjectRecord } from '../repositories/project.repository.js';
+import { assertProjectOwnership } from './project-ownership.service.js';
+import { scenarioRepository, ScenarioWithResult } from '../repositories/scenario.repository.js';
+import { toSimulationResultContract } from '../mappers/simulation.maper.js';
+import { CreateProjectInput, UpdateProjectInput, ProjectQueryInput } from '../schemas/project.schema.js';
 
 export class ProjectService {
-  async assertOwnership(userId: string, projectId: string): Promise<ProjectRecord> {
-    const project = await projectRepository.findById(projectId);
-    if (!project) {
-      throw new NotFoundError(`Project with id '${projectId}' not found.`);
-    }
+  assertOwnership = async (userId: string, projectId: string): Promise<ProjectRecord> => {
+    return assertProjectOwnership(projectId, userId);
+  };
 
-    if (project.user_id !== userId) {
-      throw new ForbiddenError("You do not have permission to access this project.");
-    }
-
-    return project;
-  }
-
-  async createProject(userId: string, input: CreateProjectInput): Promise<ProjectRecord> {
+  createProject = async (userId: string, input: CreateProjectInput): Promise<ProjectRecord> => {
     return projectRepository.create(userId, input);
-  }
+  };
 
-  async getProjects(userId: string, query: ProjectQueryInput) {
+  getProjects = async (userId: string, query: ProjectQueryInput) => {
     return projectRepository.findByUserId(userId, query.page, query.limit);
-  }
+  };
 
-  async getProjectDetail(userId: string, projectId: string) {
+  getProjectDetail = async (userId: string, projectId: string) => {
     const project = await this.assertOwnership(userId, projectId);
 
-    const [recommendedRow, recentRows] = await Promise.all([
-      scenarioRepository.findRecommended(projectId),
-      scenarioRepository.findRecent(projectId, 10),
-    ]);
+    let recommendedRow: ScenarioWithResult | null = null;
+    let recentRows: ScenarioWithResult[] = [];
+
+    try {
+      const results = await Promise.allSettled([
+        scenarioRepository.findRecommended(projectId),
+        scenarioRepository.findRecent(projectId, 10),
+      ]);
+
+      if (results[0].status === 'fulfilled') {
+        recommendedRow = results[0].value;
+      }
+      if (results[1].status === 'fulfilled') {
+        recentRows = results[1].value;
+      }
+    } catch {
+      recommendedRow = null;
+      recentRows = [];
+    }
 
     const recommendedScenario =
       recommendedRow && recommendedRow.simulation_results
@@ -50,13 +53,13 @@ export class ProjectService {
             is_led_upgraded: Boolean(recommendedRow.is_led_upgraded),
             simulation_result: toSimulationResultContract(
               recommendedRow,
-              recommendedRow.simulation_results,
+              recommendedRow.simulation_results
             ),
           }
         : null;
 
-    const recentScenarios = recentRows
-      .filter((row) => row.simulation_results !== null)
+    const recentScenarios = (recentRows || [])
+      .filter((row) => row && row.simulation_results !== null)
       .map((row) => ({
         id: row.id,
         scenario_type: row.scenario_type,
@@ -73,12 +76,11 @@ export class ProjectService {
       recommended_scenario: recommendedScenario,
       recent_scenarios: recentScenarios,
     };
-  }
+  };
 
-  async updateProject(userId: string, projectId: string, input: UpdateProjectInput) {
+  updateProject = async (userId: string, projectId: string, input: UpdateProjectInput) => {
     await this.assertOwnership(userId, projectId);
 
-    // If baseline context changes, invalidate existing active recommendation
     const hasBaselineChanged =
       input.monthly_bill !== undefined ||
       input.budget !== undefined ||
@@ -91,12 +93,12 @@ export class ProjectService {
     }
 
     return projectRepository.update(projectId, input);
-  }
+  };
 
-  async deleteProject(userId: string, projectId: string): Promise<void> {
+  deleteProject = async (userId: string, projectId: string): Promise<void> => {
     await this.assertOwnership(userId, projectId);
     await projectRepository.delete(projectId);
-  }
+  };
 }
 
 export const projectService = new ProjectService();

@@ -1,32 +1,30 @@
+// apps/api/src/middlewares/error-handlers.ts
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
-import { AppError, ApiErrorEnvelope } from '../utils/errors.js';
+import { AppError, ApiErrorEnvelope, ApiErrorCode } from '../utils/errors.js';
 import { SimulationDomainError } from '../simulation/errors.js';
 import { OptimizationDomainError } from '../optimization/errors.js';
-import { logger } from '../utils/logger.js';
 
 export const errorHandler: ErrorRequestHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response<ApiErrorEnvelope>,
   _next: NextFunction
 ): void => {
-  const requestId = (req.headers['x-request-id'] as string) || 'unknown';
+  // 1. Handled App Errors (instanceof + structural duck-typing)
+  const isAppError =
+    err instanceof AppError ||
+    (err &&
+      typeof (err as unknown as { statusCode?: unknown }).statusCode === 'number' &&
+      typeof (err as unknown as { code?: unknown }).code === 'string');
 
-  // 1. Handled App Errors
-  if (err instanceof AppError) {
-    logger.warn(`Application error [${err.code}]: ${err.message}`, {
-      requestId,
-      code: err.code,
-      statusCode: err.statusCode,
-      details: err.details,
-    });
-
-    res.status(err.statusCode).json({
+  if (isAppError) {
+    const appErr = err as AppError;
+    res.status(appErr.statusCode).json({
       error: {
-        code: err.code,
-        message: err.message,
-        details: err.details,
+        code: appErr.code,
+        message: appErr.message,
+        details: appErr.details || {},
       },
     });
     return;
@@ -43,8 +41,6 @@ export const errorHandler: ErrorRequestHandler = (
       fieldErrors[path].push(issue.message);
     }
 
-    logger.warn('Request validation error', { requestId, validationErrors: fieldErrors });
-
     res.status(400).json({
       error: {
         code: 'VALIDATION_ERROR',
@@ -56,48 +52,42 @@ export const errorHandler: ErrorRequestHandler = (
   }
 
   // 3. Simulation Domain Errors
-  if (err instanceof SimulationDomainError) {
-    logger.warn(`Simulation domain error [${err.code}]: ${err.message}`, {
-      requestId,
-      code: err.code,
-      details: err.details,
-    });
+  const isSimError =
+    err instanceof SimulationDomainError ||
+    (err && (err as SimulationDomainError).code === 'INFEASIBLE_EFFICIENCY_CONFIGURATION');
 
-    const statusCode = err.code === 'INFEASIBLE_EFFICIENCY_CONFIGURATION' ? 400 : 400;
-
-    res.status(statusCode).json({
+  if (isSimError) {
+    const simErr = err as SimulationDomainError;
+    res.status(400).json({
       error: {
-        code: err.code,
-        message: err.message,
-        details: err.details,
+        code: simErr.code as ApiErrorCode,
+        message: simErr.message,
+        details: simErr.details || {},
       },
     });
     return;
   }
 
   // 4. Optimization Domain Errors
-  if (err instanceof OptimizationDomainError) {
-    logger.warn(`Optimization domain error [${err.code}]: ${err.message}`, {
-      requestId,
-      code: err.code,
-      details: err.details,
-    });
+  const isOptError =
+    err instanceof OptimizationDomainError ||
+    (err && (err as OptimizationDomainError).code === 'NO_FEASIBLE_SCENARIO');
 
-    const statusCode = err.code === 'NO_FEASIBLE_SCENARIO' ? 422 : 400;
+  if (isOptError) {
+    const optErr = err as OptimizationDomainError;
+    const statusCode = optErr.code === 'NO_FEASIBLE_SCENARIO' ? 422 : 400;
 
     res.status(statusCode).json({
       error: {
-        code: err.code,
-        message: err.message,
-        details: err.details,
+        code: optErr.code as ApiErrorCode,
+        message: optErr.message,
+        details: optErr.details || {},
       },
     });
     return;
   }
 
   // 5. Unhandled Server Errors
-  logger.error('Unhandled internal server error', err, { requestId, path: req.originalUrl });
-
   res.status(500).json({
     error: {
       code: 'INTERNAL_ERROR',
