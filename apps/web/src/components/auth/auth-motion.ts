@@ -1,10 +1,7 @@
-// apps/web/src/components/auth/auth-motion.ts
 import type { Variants } from 'motion/react';
 
-// Kurva transisi cubic-bezier
 export const SMOOTH_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-// 1. Animasi Panel Kiri (Meluncur dari Kiri ke Kanan)
 export const leftPanelVariants: Variants = {
   initial: { opacity: 0, x: -60 },
   animate: {
@@ -18,7 +15,6 @@ export const leftPanelVariants: Variants = {
   },
 };
 
-// 2. Animasi Panel Kanan (Meluncur dari Kanan ke Kiri)
 export const rightPanelVariants: Variants = {
   initial: { opacity: 0, x: 60 },
   animate: {
@@ -32,7 +28,6 @@ export const rightPanelVariants: Variants = {
   },
 };
 
-// 3. Elemen Internal Panel Kiri
 export const leftItemVariants: Variants = {
   initial: { opacity: 0, x: -25 },
   animate: {
@@ -42,7 +37,6 @@ export const leftItemVariants: Variants = {
   },
 };
 
-// 4. Input & Elemen Form Panel Kanan
 export const formItemVariants: Variants = {
   initial: { opacity: 0, y: 16 },
   animate: {
@@ -70,7 +64,6 @@ export const formContainerVariants: Variants = {
   },
 };
 
-// 6. Animasi Error Shake
 export const errorShakeVariants: Variants = {
   initial: { opacity: 0, y: -4, x: 0 },
   animate: {
@@ -90,7 +83,6 @@ export const errorShakeVariants: Variants = {
   },
 };
 
-// 7. Props Interaksi Tombol (Hover & Press)
 export const buttonMotionProps = {
   whileHover: { scale: 1.012, y: -1 },
   whileTap: { scale: 0.985, y: 0 },

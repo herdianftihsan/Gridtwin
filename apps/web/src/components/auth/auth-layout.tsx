@@ -38,7 +38,6 @@ export function AuthLayout({
 
   return (
     <main className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#FFFFFF] overflow-x-hidden">
-      {/* Panel Kiri: Animasi Masuk dari Kiri ke Kanan */}
       <motion.div
         variants={shouldReduceMotion ? undefined : leftPanelVariants}
         initial="initial"
@@ -89,7 +88,6 @@ export function AuthLayout({
           </span>
         </motion.div>
 
-        {/* Telemetry HUD */}
         {telemetry && (
           <motion.div
             variants={shouldReduceMotion ? undefined : leftItemVariants}
@@ -142,7 +140,6 @@ export function AuthLayout({
         </motion.div>
       </motion.div>
 
-      {/* Panel Kanan: Animasi Masuk dari Kanan ke Kiri */}
       <motion.div
         variants={shouldReduceMotion ? undefined : rightPanelVariants}
         initial="initial"
