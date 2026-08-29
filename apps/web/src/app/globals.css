@@ -4,22 +4,17 @@
   --color-bg: #F8FAFC;
   --color-surface: #FFFFFF;
   --color-surface-hover: #F1F5F9;
-
   --color-text-primary: #0F172A;
   --color-text-secondary: #64748B;
-
   --color-brand-primary: #0F172A;
   --color-brand-accent: #0EA5E9;
-
   --color-energy-solar: #F59E0B;
   --color-energy-grid: #6366F1;
   --color-energy-battery: #14B8A6;
   --color-energy-load: #64748B;
-
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
-
   --border-subtle: #E2E8F0;
 }
 
@@ -29,4 +24,34 @@ body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   SVG Energy Flow Stream Animation
+   ========================================================================== */
+
+@keyframes energy-flow-forward {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-energy-flow {
+  animation: energy-flow-forward 1.2s linear infinite;
+}
+
+.animate-energy-flow-fast {
+  animation: energy-flow-forward 0.8s linear infinite;
+}
+
+/* Accessibility: Matikan animasi otomatis jika pengguna mengaktifkan prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-energy-flow,
+  .animate-energy-flow-fast {
+    animation: none !important;
+    stroke-dasharray: none !important;
+  }
 }
