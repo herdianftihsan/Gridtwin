@@ -16,10 +16,6 @@ export function FinancialImpactCard({ result, isSimulating = false }: FinancialI
     return `Rp ${inMillions.toFixed(2).replace(/\.00$/, '')}M`;
   };
 
-  const formatIDR = (val: number): string => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
-  };
-
   return (
     <div className={`p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-6 text-left transition-opacity duration-200 ${isSimulating ? 'opacity-70' : 'opacity-100'}`}>
       <div className="space-y-1">

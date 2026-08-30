@@ -59,8 +59,7 @@ describe('Phase 12: Decision Workspace Integration Suite', () => {
     vi.restoreAllMocks();
     vi.mocked(apiClient.get).mockResolvedValue({
       data: mockProjectDetail,
-      error: null,
-    });
+    }as never);
   });
 
   it('1. hydrates workspace and renders Energy Canvas with Recommended Scenario', async () => {
@@ -85,8 +84,7 @@ describe('Phase 12: Decision Workspace Integration Suite', () => {
           configuration: { pv_kwp: 6, battery_kwh: 5, ac_units: 2, led_upgraded: true },
         },
       },
-      error: null,
-    });
+    }as never);
 
     render(<WorkspaceContainer projectId="proj-123" />);
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { SimulationResult, Scenario } from '../../../types/api';
+import { SimulationResult} from '../../../types/api';
 import { ComparisonMetric } from './comparison-metric';
 
 interface ScenarioComparisonModalProps {

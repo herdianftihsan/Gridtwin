@@ -10,7 +10,7 @@ import { SimulationControls } from './simulation-controls/simulation-controls';
 import { ScenarioTabs } from './scenario-tabs';
 import { DecisionSummaryModal } from './decision-summary-modal';
 
-interface WorkspaceContainerProps {
+export interface WorkspaceContainerProps {
   projectId: string;
 }
 

@@ -275,7 +275,7 @@ export default function DemoPage() {
             <ScenarioTabs
               activeTab={activeTab}
               onTabSelect={handleTabSelect}
-              recommendedScenario={scenarios[0]}
+              recommendedScenario={scenarios[0] ?? null}
             />
             <ScenarioList
               scenarios={scenarios}

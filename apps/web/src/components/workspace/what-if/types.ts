@@ -1,4 +1,4 @@
-import { SimulationResult, Scenario } from '../../../types/api';
+import { SimulationResult} from '../../../types/api';
 
 export type WhatIfStatus = 'idle' | 'input' | 'loading' | 'result' | 'error' | 'saved';
 
