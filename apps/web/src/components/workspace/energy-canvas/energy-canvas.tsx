@@ -61,6 +61,8 @@ export function EnergyCanvas({
 
   useEffect(() => {
     calculateAutoFit();
+    if (typeof ResizeObserver === 'undefined') return;
+
     const observer = new ResizeObserver(calculateAutoFit);
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
@@ -77,7 +79,7 @@ export function EnergyCanvas({
       <div className="flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs">
           <span className="text-xs sm:text-sm font-bold tracking-tight text-slate-900">
-            Energy Twin Topology
+            Energy Canvas
           </span>
           <span className="text-[11px] text-slate-400 font-medium">
             ({displayLocation})
