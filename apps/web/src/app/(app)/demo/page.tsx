@@ -1,8 +1,9 @@
+// apps/web/src/app/demo/page.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { SimulationResult, Project, Scenario } from '../../../types/api';
-import { EnergyCanvas } from '../../../components/workspace/energy-canvas/energy-canvas';
+import { EnergyCanvas } from '../../../components/workspace/energy-canvas';
 import { FinancialImpactCard } from '../../../components/workspace/metric-panels/financial-impact-card';
 import { SimulationControls } from '../../../components/workspace/simulation-controls/simulation-controls';
 import { ScenarioTabs } from '../../../components/workspace/scenario-tabs';
@@ -80,6 +81,7 @@ export default function DemoPage() {
   const [currentResult, setCurrentResult] = useState<SimulationResult>(INITIAL_RESULT);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
+  // Kalkulasi instan lokal khusus lingkungan demo preview
   const applySimulation = (updated: SimulationConfig, targetTab?: WorkspaceTab) => {
     if (targetTab) {
       setActiveTab(targetTab);
@@ -88,10 +90,13 @@ export default function DemoPage() {
 
     const pv = updated.solar_kwp;
     const bat = updated.battery_kwh;
-    const estCapex = pv * 15000000 + bat * 5000000 + updated.ac_units * 5000000 + (updated.is_led_upgraded ? 1500000 : 0);
+    const estCapex =
+      pv * 15000000 + bat * 5000000 + updated.ac_units * 5000000 + (updated.is_led_upgraded ? 1500000 : 0);
     const newCost = Math.max(300000, 4500000 - pv * 650000 - bat * 120000);
     const savings = 4500000 - newCost;
     const payback = savings > 0 && estCapex > 0 ? estCapex / (savings * 12) : null;
+    const solarYield = pv * 101.25;
+    const gridImport = Math.max(0, 2796 - solarYield - bat * 30);
 
     setCurrentResult({
       ...currentResult,
@@ -100,6 +105,12 @@ export default function DemoPage() {
         battery_kwh: bat,
         ac_units: updated.ac_units,
         led_upgraded: updated.is_led_upgraded,
+      },
+      energy: {
+        monthly_demand_kwh: 2796,
+        solar_yield_monthly: solarYield,
+        grid_import_monthly: gridImport,
+        wasted_surplus_monthly: 0,
       },
       financial: {
         capex: estCapex,
@@ -167,9 +178,8 @@ export default function DemoPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div className="lg:col-span-8 space-y-6">
             <EnergyCanvas
-              buildingType={MOCK_PROJECT.building_type}
-              location={MOCK_PROJECT.location}
               result={currentResult}
+              project={MOCK_PROJECT}
             />
             <SimulationControls
               config={currentConfig}
