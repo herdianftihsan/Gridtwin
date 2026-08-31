@@ -42,3 +42,28 @@ Object.defineProperty(globalThis, 'ResizeObserver', {
   configurable: true,
   value: MockResizeObserver,
 });
+
+// 3. Robust IntersectionObserver Polyfill untuk Framer Motion (whileInView)
+class MockIntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+});
+
+Object.defineProperty(globalThis, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+});

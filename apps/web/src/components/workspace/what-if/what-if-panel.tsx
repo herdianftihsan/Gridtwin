@@ -49,22 +49,20 @@ export function WhatIfPanel({
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
           role="dialog"
           aria-modal="true"
-          aria-label="What-if Decision Exploration"
+          aria-labelledby="whatif-panel-title"
           className="relative w-full max-w-md bg-slate-50 h-full border-l border-slate-200 shadow-2xl flex flex-col justify-between overflow-hidden text-left"
         >
-          {/* Header */}
+
           <div className="px-6 pt-6 pb-4 bg-white border-b border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-600">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+              <div className="w-8 h-8 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-600 font-bold text-sm">
+                ✦
               </div>
               <div>
-                <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
+                <h2 id="whatif-panel-title" className="text-base font-extrabold text-slate-900 tracking-tight">
                   What if?
                 </h2>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-xs text-slate-400">
                   Explore how a different decision changes the outcome.
                 </p>
               </div>
@@ -79,11 +77,14 @@ export function WhatIfPanel({
             </button>
           </div>
 
+          {/* Drawer Body */}
           <div className="flex-1 overflow-y-auto p-6 space-y-5">
+
             <div className="space-y-2">
               <WhatIfInput onSubmit={executeWhatIf} isLoading={status === 'loading'} />
               <WhatIfSuggestions onSelect={executeWhatIf} disabled={status === 'loading'} />
             </div>
+
 
             {status === 'loading' && (
               <div className="p-8 rounded-2xl bg-white border border-slate-200/80 text-center space-y-3 shadow-2xs">
@@ -96,6 +97,7 @@ export function WhatIfPanel({
                 </p>
               </div>
             )}
+
 
             {status === 'error' && error && (
               <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-left space-y-2 shadow-2xs">
@@ -114,6 +116,7 @@ export function WhatIfPanel({
               </div>
             )}
 
+
             {(status === 'result' || status === 'saved') && result && (
               <div className="space-y-4">
                 <WhatIfChanges currentResult={currentResult} whatIfResult={result} />
@@ -123,6 +126,7 @@ export function WhatIfPanel({
               </div>
             )}
           </div>
+
 
           <div className="p-5 bg-white border-t border-slate-200 space-y-2">
             {(status === 'result' || status === 'saved') ? (

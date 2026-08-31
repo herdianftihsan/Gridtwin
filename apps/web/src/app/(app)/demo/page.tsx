@@ -1,18 +1,21 @@
+// apps/web/src/app/demo/page.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { SimulationResult, Project, Scenario } from '../../../types/api';
-import { SimulationConfig, WorkspaceTab } from '../../../components/workspace/types';
-
-// Import langsung ke nama file .tsx masing-masing
 import { EnergyCanvas } from '../../../components/workspace/energy-canvas/energy-canvas';
 import { FinancialImpactCard } from '../../../components/workspace/metric-panels/financial-impact-card';
 import { SimulationControls } from '../../../components/workspace/simulation-controls/simulation-controls';
 import { ScenarioTabs } from '../../../components/workspace/scenario-tabs';
 import { DecisionSummaryModal } from '../../../components/workspace/decision-summary/decision-summary-modal';
-import { ScenarioList } from '../../../components/workspace/scenarios/scenario-list';
-import { ScenarioComparisonModal } from '../../../components/workspace/scenarios/scenario-comparison-modal';
-import { SaveScenarioButton } from '../../../components/workspace/scenarios/save-scenario-button';
+import {
+  ScenarioList,
+  ScenarioComparisonModal,
+  SaveScenarioButton,
+} from '../../../components/workspace/scenarios';
+import { WhatIfPanel } from '../../../components/workspace/what-if/what-if-panel';
+import { ExplanationPanel } from '../../../components/workspace/ai/explanation-panel';
+import { SimulationConfig, WorkspaceTab } from '../../../components/workspace/types';
 
 const MOCK_PROJECT: Project = {
   id: 'demo-ruko-01',
@@ -102,8 +105,9 @@ export default function DemoPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  // Modal States (Phase 14)
+  // Modals & Panels State (Phase 14 & 15)
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
   const [compareScenario, setCompareScenario] = useState<Scenario | null>(null);
 
   // Kalkulasi instan simulasi lokal khusus mode demo
@@ -170,7 +174,6 @@ export default function DemoPage() {
     }
   };
 
-  // Phase 14: Simpan Skenario Lokal
   const handleSaveScenario = (cfg: SimulationConfig) => {
     if (isSaving) return;
     setIsSaving(true);
@@ -193,7 +196,11 @@ export default function DemoPage() {
       setScenarios((prev) => [newScenario, ...prev.slice(0, 9)]);
       setIsSaving(false);
       setIsSaved(true);
-    }, 450);
+    }, 400);
+  };
+
+  const handleWhatIfSaved = (newScenario: Scenario) => {
+    setScenarios((prev) => [newScenario, ...prev.slice(0, 9)]);
   };
 
   const handleSelectSavedScenario = (sc: Scenario) => {
@@ -217,10 +224,10 @@ export default function DemoPage() {
         <div className="flex items-center justify-between p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-900 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-            <span>Mode Demo Aktif: Menampilkan preview antarmuka Phase 13 & Phase 14 tanpa database.</span>
+            <span>Mode Demo Aktif: Menampilkan preview lengkap Energy Canvas, Skenario & What-If AI.</span>
           </div>
           <span className="font-bold text-sky-700 uppercase tracking-wider text-[10px] bg-sky-100 px-2 py-0.5 rounded">
-            Full Feature Preview
+            Phase 15 Preview
           </span>
         </div>
 
@@ -237,13 +244,24 @@ export default function DemoPage() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Tombol Akses Fitur What-If (Phase 15) */}
+            <button
+              type="button"
+              onClick={() => setIsWhatIfOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-50 text-sky-700 border border-sky-300 hover:bg-sky-100 text-xs font-bold transition-all shadow-xs cursor-pointer"
+            >
+              <span className="text-sm">✦</span>
+              <span>What if?</span>
+            </button>
+
             <SaveScenarioButton
               config={currentConfig}
               onSave={handleSaveScenario}
               isSaving={isSaving}
               isSaved={isSaved}
             />
+
             <button
               type="button"
               onClick={() => setIsSummaryOpen(true)}
@@ -269,14 +287,19 @@ export default function DemoPage() {
             />
           </div>
 
-          {/* Kolom Kanan: Financial KPI, Tabs, & Scenario List */}
+          {/* Kolom Kanan: Financial KPI, Tabs, AI Explanation & Scenario List */}
           <div className="lg:col-span-4 space-y-6">
             <FinancialImpactCard result={currentResult} />
+
+            {/* AI Explanation Card (Phase 15) */}
+            <ExplanationPanel scenarioId={scenarios[0]?.id} />
+
             <ScenarioTabs
               activeTab={activeTab}
               onTabSelect={handleTabSelect}
               recommendedScenario={scenarios[0] ?? null}
             />
+
             <ScenarioList
               scenarios={scenarios}
               selectedScenarioId={
@@ -310,6 +333,15 @@ export default function DemoPage() {
             }
           />
         )}
+
+        {/* Drawer 3: What-if Decision Exploration Panel (Phase 15) */}
+        <WhatIfPanel
+          isOpen={isWhatIfOpen}
+          onClose={() => setIsWhatIfOpen(false)}
+          projectId="demo-ruko-01"
+          currentResult={currentResult}
+          onScenarioSaved={handleWhatIfSaved}
+        />
       </div>
     </main>
   );
