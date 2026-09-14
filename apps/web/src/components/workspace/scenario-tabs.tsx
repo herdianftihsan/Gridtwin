@@ -12,9 +12,9 @@ interface ScenarioTabsProps {
 }
 
 const TABS: { id: WorkspaceTab; label: string }[] = [
-  { id: 'baseline', label: 'Baseline' },
-  { id: 'recommended', label: 'Fastest Payback' },
-  { id: 'custom', label: 'Custom' },
+  { id: 'baseline', label: 'Awal' },
+  { id: 'recommended', label: 'Pengembalian Tercepat' },
+  { id: 'custom', label: 'Kustom' },
 ];
 
 export function ScenarioTabs({
@@ -52,26 +52,26 @@ export function ScenarioTabs({
 
       <p className="text-xs text-slate-500 leading-relaxed min-h-[32px]">
         {activeTab === 'recommended'
-          ? 'Scenario prioritizes Payback by optimizing Solar PV size against daytime load curves.'
+          ? 'Skenario memprioritaskan Pengembalian Modal dengan mengoptimalkan ukuran Panel Surya terhadap kurva beban siang hari.'
           : activeTab === 'baseline'
-          ? 'Baseline profile reflects current electricity bill with 100% grid dependency.'
-          : 'Live custom configuration. Adjust simulator controls to preview outcomes.'}
+          ? 'Profil Awal mencerminkan tagihan listrik saat ini dengan ketergantungan 100% pada jaringan PLN.'
+          : 'Konfigurasi kustom langsung. Sesuaikan kontrol simulator untuk melihat hasilnya.'}
       </p>
 
       {/* Snapshot Details Table */}
       {recommendedScenario && activeTab === 'recommended' && (
         <div className="space-y-1.5 pt-2 border-t border-slate-100 text-xs font-medium">
           <div className="flex justify-between text-slate-600">
-            <span>Solar PV Capacity</span>
+            <span>Kapasitas Panel Surya</span>
             <span className="font-bold text-slate-900">{recommendedScenario.solar_kwp} kWp</span>
           </div>
           <div className="flex justify-between text-slate-600">
-            <span>Battery Storage</span>
+            <span>Penyimpanan Baterai</span>
             <span className="font-bold text-slate-900">{recommendedScenario.battery_kwh} kWh</span>
           </div>
           <div className="flex justify-between text-slate-600">
-            <span>AC Inverter Upgrades</span>
-            <span className="font-bold text-slate-900">{recommendedScenario.ac_units} Units</span>
+            <span>Peningkatan Inverter AC</span>
+            <span className="font-bold text-slate-900">{recommendedScenario.ac_units} Unit</span>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import { SimulationResult, Project } from '../../../types/api';
 
-export type NodeKey = 'solar' | 'building' | 'battery' | 'grid' | 'ac' | 'led';
+export type NodeKey = 'solar' | 'building' | 'battery' | 'grid' | 'ac' | 'led' | 'refrigerator' | 'pump';
 
 export interface NodePosition {
   x: number;

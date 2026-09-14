@@ -23,7 +23,7 @@ export function ExplanationPanel({ scenarioId, className = '' }: ExplanationPane
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-sky-500" />
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-            WHY GRIDTWIN RECOMMENDS THIS
+            MENGAPA GRIDTWIN MEREKOMENDASIKAN INI
           </span>
         </div>
         {scenarioId && (
@@ -33,7 +33,7 @@ export function ExplanationPanel({ scenarioId, className = '' }: ExplanationPane
             disabled={isLoading}
             className="text-[11px] font-semibold text-sky-600 hover:text-sky-700 disabled:opacity-50 cursor-pointer"
           >
-            {isLoading ? 'Analyzing...' : 'Refresh AI'}
+            {isLoading ? 'Menganalisis...' : 'Segarkan AI'}
           </button>
         )}
       </div>
@@ -53,7 +53,7 @@ export function ExplanationPanel({ scenarioId, className = '' }: ExplanationPane
         </p>
       ) : (
         <p className="text-xs text-slate-400">
-          Select or simulate a scenario to generate a contextual AI investment insight.
+          Pilih atau simulasikan skenario untuk menghasilkan wawasan investasi AI kontekstual.
         </p>
       )}
     </div>

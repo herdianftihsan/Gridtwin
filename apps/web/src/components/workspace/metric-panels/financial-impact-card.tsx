@@ -13,17 +13,17 @@ export function FinancialImpactCard({ result, isSimulating = false }: FinancialI
 
   const formatMillions = (val: number): string => {
     const inMillions = val / 1_000_000;
-    return `Rp ${inMillions.toFixed(2).replace(/\.00$/, '')}M`;
+    return `Rp ${inMillions.toFixed(2).replace(/\.00$/, '')} Jt`;
   };
 
   return (
     <div className={`p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-6 text-left transition-opacity duration-200 ${isSimulating ? 'opacity-70' : 'opacity-100'}`}>
       <div className="space-y-1">
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          FINANCIAL IMPACT
+          DAMPAK FINANSIAL
         </span>
         <div className="text-xs text-slate-500 font-medium">
-          Monthly Electricity Cost
+          Biaya Listrik Bulanan
         </div>
         <div className="flex items-baseline gap-3 pt-1">
           <span className="text-2xl font-semibold text-slate-400 line-through tracking-tight">
@@ -38,28 +38,28 @@ export function FinancialImpactCard({ result, isSimulating = false }: FinancialI
 
       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
         <div>
-          <div className="text-xs text-slate-400 font-medium">Payback Period</div>
+          <div className="text-xs text-slate-400 font-medium">Masa Pengembalian</div>
           <div className="text-xl font-bold text-slate-900 mt-0.5">
-            {financial.payback_years !== null ? `${financial.payback_years.toFixed(1)} Years` : 'No Payback'}
+            {financial.payback_years !== null ? `${financial.payback_years.toFixed(1)} Tahun` : 'Tidak Ada Pengembalian'}
           </div>
         </div>
 
         <div>
-          <div className="text-xs text-slate-400 font-medium">CAPEX Investment</div>
+          <div className="text-xs text-slate-400 font-medium">Investasi CAPEX</div>
           <div className="text-xl font-bold text-slate-900 mt-0.5">
             {formatMillions(financial.capex)}
           </div>
         </div>
 
         <div>
-          <div className="text-xs text-slate-400 font-medium">Annual Savings</div>
+          <div className="text-xs text-slate-400 font-medium">Penghematan Tahunan</div>
           <div className="text-lg font-bold text-emerald-600 mt-0.5">
             {formatMillions(financial.monthly_savings * 12)}
           </div>
         </div>
 
         <div>
-          <div className="text-xs text-slate-400 font-medium">Grid Autonomy</div>
+          <div className="text-xs text-slate-400 font-medium">Otonomi Jaringan</div>
           <div className="text-lg font-bold text-indigo-600 mt-0.5">
             ↑ {grid.independence_pct.toFixed(1)}%
           </div>

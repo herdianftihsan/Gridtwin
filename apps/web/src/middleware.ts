@@ -1,24 +1,28 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const AUTH_PROTECTED_ROUTES = ['/projects', '/workspace', '/dashboard'];
-const PUBLIC_AUTH_ROUTES = ['/login', '/register', '/forgot-password'];
+const AUTH_PROTECTED_ROUTES = ['/projects', '/workspace', '/dashboard', '/setup', '/demo'];
+const PUBLIC_AUTH_ROUTES = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('sb-access-token')?.value || request.cookies.get('supabase-auth-token')?.value;
+  const token = request.cookies.get('sb-access-token')?.value;
 
   const isProtectedRoute = AUTH_PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
   const isAuthRoute = PUBLIC_AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
+  if (pathname === '/' && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
   if (isProtectedRoute && !token) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
+    loginUrl.searchParams.set('next', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL('/projects', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();

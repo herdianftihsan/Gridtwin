@@ -17,44 +17,44 @@ const NODE_DETAILS: Record<NonNullable<EnergyNodeType>, NodeDetail> = {
   solar: {
     id: 'solar',
     title: 'Solar PV Array',
-    badge: 'Proposed Generation',
-    metric: '4 kWp (405 kWh/mo)',
-    roleDescription: 'Supplies daytime building loads directly and routes surplus energy to battery storage.',
+    badge: 'Usulan Produksi',
+    metric: '4 kWp (405 kWh/bln)',
+    roleDescription: 'Menyuplai beban bangunan siang hari secara langsung dan menyalurkan surplus energi ke penyimpanan baterai.',
   },
   building: {
     id: 'building',
-    title: 'Building Load',
-    badge: 'Anchor Demand',
-    metric: '2,796 kWh/mo',
-    roleDescription: 'Commercial Ruko consumption profile combining daytime cooling and baseline appliances.',
+    title: 'Beban Bangunan',
+    badge: 'Beban Utama',
+    metric: '2.796 kWh/bln',
+    roleDescription: 'Profil konsumsi Ruko komersial yang menggabungkan pendinginan siang hari dan peralatan dasar.',
   },
   battery: {
     id: 'battery',
-    title: 'Battery Storage',
-    badge: 'Storage & Peak Shift',
-    metric: '5 kWh Capacity',
-    roleDescription: 'Stores daytime solar surplus to power evening loads, cutting nighttime PLN grid draw.',
+    title: 'Penyimpanan Baterai',
+    badge: 'Penyimpanan & Beban Puncak',
+    metric: 'Kapasitas 5 kWh',
+    roleDescription: 'Menyimpan surplus solar siang hari untuk menyuplai beban malam, mengurangi tarikan jaringan PLN malam hari.',
   },
   grid: {
     id: 'grid',
-    title: 'PLN Utility Grid',
-    badge: 'Residual Supply',
-    metric: '946 kWh/mo Draw',
-    roleDescription: 'Supplies remaining electrical deficit under ESDM 2/2024 non-export regulation.',
+    title: 'Jaringan PLN',
+    badge: 'Suplai Tambahan',
+    metric: 'Tarikan 946 kWh/bln',
+    roleDescription: 'Menyuplai sisa defisit listrik sesuai regulasi non-ekspor ESDM 2/2024.',
   },
   ac: {
     id: 'ac',
-    title: 'Inverter AC Units',
-    badge: 'Efficiency Upgrade',
-    metric: '2 Units (-144 kWh/mo)',
-    roleDescription: 'Variable-speed cooling compressor reduces daytime building baseline demand by 30%.',
+    title: 'AC Inverter',
+    badge: 'Peningkatan Efisiensi',
+    metric: '2 Unit (-144 kWh/bln)',
+    roleDescription: 'Kompresor pendingin variable-speed mengurangi beban dasar bangunan siang hari sebesar 30%.',
   },
   led: {
     id: 'led',
-    title: 'Smart LED Lighting',
-    badge: 'Efficiency Upgrade',
-    metric: 'Upgraded (-60 kWh/mo)',
-    roleDescription: 'High-efficiency solid-state luminaires reduce lighting energy consumption by 60%.',
+    title: 'Lampu Smart LED',
+    badge: 'Peningkatan Efisiensi',
+    metric: 'Peningkatan (-60 kWh/bln)',
+    roleDescription: 'Lampu efisiensi tinggi mengurangi konsumsi energi pencahayaan sebesar 60%.',
   },
 };
 
@@ -85,13 +85,13 @@ export function MarketingEnergyTwin() {
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs z-10">
         <div className="flex items-center gap-2.5 bg-slate-900/90 px-4 py-2 rounded-full border border-slate-700 shadow-xs">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-white font-bold tracking-tight">Interactive Energy Topology</span>
+          <span className="text-white font-bold tracking-tight">Topologi Energi Interaktif</span>
           <span className="text-slate-400 font-medium hidden sm:inline">· Arahkan kursor ke node untuk melihat aliran</span>
         </div>
         <div className="flex items-center gap-4 text-xs font-semibold text-slate-300">
           <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Solar PV</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-teal-400" /> Battery</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-indigo-400" /> PLN Grid</span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-teal-400" /> Baterai</span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-indigo-400" /> Jaringan PLN</span>
         </div>
       </div>
 
@@ -190,8 +190,8 @@ export function MarketingEnergyTwin() {
           style={{ opacity: getNodeOpacity('building') }}
           className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 p-4 rounded-3xl bg-slate-900 border-2 border-slate-500 text-center shadow-2xl cursor-pointer hover:border-sky-400 hover:scale-105 transition-all z-30 min-w-[155px]"
         >
-          <span className="text-xs text-slate-300 font-bold uppercase block tracking-wider">🏢 RUKO LOAD</span>
-          <span className="text-base font-black text-white">2,796 kWh/mo</span>
+          <span className="text-xs text-slate-300 font-bold uppercase block tracking-wider">🏢 BEBAN RUKO</span>
+          <span className="text-base font-black text-white">2.796 kWh/bln</span>
         </div>
 
         <div
@@ -200,7 +200,7 @@ export function MarketingEnergyTwin() {
           style={{ opacity: getNodeOpacity('battery') }}
           className="absolute top-[28%] left-[82%] -translate-x-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-slate-900 border border-teal-500/60 text-center shadow-lg cursor-pointer hover:border-teal-400 hover:scale-105 transition-all z-20 min-w-[125px]"
         >
-          <span className="text-[11px] text-teal-400 font-bold uppercase block tracking-wider">⚡ BATTERY</span>
+          <span className="text-[11px] text-teal-400 font-bold uppercase block tracking-wider">⚡ BATERAI</span>
           <span className="text-sm font-extrabold text-white">5 kWh</span>
         </div>
 
@@ -210,8 +210,8 @@ export function MarketingEnergyTwin() {
           style={{ opacity: getNodeOpacity('grid') }}
           className="absolute top-[84%] left-[50%] -translate-x-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-slate-900 border border-indigo-500/60 text-center shadow-lg cursor-pointer hover:border-indigo-400 hover:scale-105 transition-all z-20 min-w-[135px]"
         >
-          <span className="text-[11px] text-indigo-400 font-bold uppercase block tracking-wider">🔌 PLN GRID</span>
-          <span className="text-sm font-extrabold text-white">946 kWh/mo</span>
+          <span className="text-[11px] text-indigo-400 font-bold uppercase block tracking-wider">🔌 JARINGAN PLN</span>
+          <span className="text-sm font-extrabold text-white">946 kWh/bln</span>
         </div>
 
         <div
@@ -221,7 +221,7 @@ export function MarketingEnergyTwin() {
           className="absolute top-[28%] left-[18%] -translate-x-1/2 -translate-y-1/2 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-sky-500/60 text-center shadow-lg cursor-pointer hover:border-sky-400 hover:scale-105 transition-all z-20 min-w-[120px]"
         >
           <span className="text-[11px] text-sky-400 font-bold uppercase block tracking-wider">❄️ AC INVERTER</span>
-          <span className="text-sm font-extrabold text-white">2 Units</span>
+          <span className="text-sm font-extrabold text-white">2 Unit</span>
         </div>
 
         <div
@@ -231,7 +231,7 @@ export function MarketingEnergyTwin() {
           className="absolute top-[72%] left-[18%] -translate-x-1/2 -translate-y-1/2 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-sky-500/60 text-center shadow-lg cursor-pointer hover:border-sky-400 hover:scale-105 transition-all z-20 min-w-[120px]"
         >
           <span className="text-[11px] text-sky-400 font-bold uppercase block tracking-wider">💡 SMART LED</span>
-          <span className="text-sm font-extrabold text-white">Upgraded</span>
+          <span className="text-sm font-extrabold text-white">Peningkatan</span>
         </div>
       </div>
 
@@ -249,23 +249,23 @@ export function MarketingEnergyTwin() {
       ) : (
         <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between text-center text-xs">
           <div className="flex-1">
-            <span className="text-xs text-slate-400 block font-semibold">Monthly Demand</span>
-            <span className="font-extrabold text-white text-sm mt-0.5 block">2,796 kWh</span>
+            <span className="text-xs text-slate-400 block font-semibold">Beban Bulanan</span>
+            <span className="font-extrabold text-white text-sm mt-0.5 block">2.796 kWh</span>
           </div>
           <div className="w-[1px] h-6 bg-slate-800" />
           <div className="flex-1">
-            <span className="text-xs text-amber-400 block font-semibold">Solar Yield</span>
+            <span className="text-xs text-amber-400 block font-semibold">Produksi Solar</span>
             <span className="font-extrabold text-amber-300 text-sm mt-0.5 block">405 kWh</span>
           </div>
           <div className="w-[1px] h-6 bg-slate-800" />
           <div className="flex-1">
-            <span className="text-xs text-indigo-400 block font-semibold">PLN Draw</span>
+            <span className="text-xs text-indigo-400 block font-semibold">Tarikan PLN</span>
             <span className="font-extrabold text-indigo-300 text-sm mt-0.5 block">946 kWh</span>
           </div>
           <div className="w-[1px] h-6 bg-slate-800" />
           <div className="flex-1">
-            <span className="text-xs text-emerald-400 block font-semibold">Grid Autonomy</span>
-            <span className="font-extrabold text-emerald-400 text-sm mt-0.5 block">66.2%</span>
+            <span className="text-xs text-emerald-400 block font-semibold">Kemandirian dari Grid</span>
+            <span className="font-extrabold text-emerald-400 text-sm mt-0.5 block">66,2%</span>
           </div>
         </div>
       )}

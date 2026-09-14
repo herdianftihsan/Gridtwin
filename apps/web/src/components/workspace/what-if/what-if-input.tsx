@@ -35,7 +35,7 @@ export function WhatIfInput({ onSubmit, isLoading, disabled = false }: WhatIfInp
           onChange={(e) => setInputVal(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading || disabled}
-          placeholder="e.g. Add 5 kWh battery or What if budget is Rp30M?"
+          placeholder="cth. Tambah baterai 5 kWh atau Bagaimana jika anggaran Rp30 Juta?"
           aria-label="What-if Natural Language Question"
           className="w-full resize-none border-0 bg-transparent p-0 text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-0 leading-relaxed pr-10"
         />

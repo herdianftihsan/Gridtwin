@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { AuthLayout } from '../../../components/auth/auth-layout';
 import { LoginForm } from '../../../components/auth/login-form';
 
@@ -23,7 +24,9 @@ export default function LoginPage() {
         co2Reduction: '-42.5%',
       }}
     >
-      <LoginForm />
+      <Suspense fallback={<div className="h-64 flex items-center justify-center"><div className="w-8 h-8 border-3 border-sky-500 border-t-transparent rounded-full animate-spin" /></div>}>
+        <LoginForm />
+      </Suspense>
     </AuthLayout>
   );
 }

@@ -36,6 +36,8 @@ export interface SimulationConfiguration {
   battery_kwh: number;
   ac_units: number;
   led_upgraded: boolean;
+  refrigerator_units: number;
+  water_pump_upgraded: boolean;
 }
 
 export interface SimulationBaseline {
@@ -108,6 +110,8 @@ export interface Scenario {
   battery_kwh: number;
   ac_units: number;
   is_led_upgraded: boolean;
+  refrigerator_units: number;
+  water_pump_upgraded: boolean;
   simulation_result?: SimulationResult;
   what_if_query?: string;
   created_at?: string;

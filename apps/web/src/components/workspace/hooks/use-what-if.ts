@@ -16,6 +16,7 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [explanationStatus, setExplanationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -66,16 +67,16 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
           setStatus('error');
           if (err instanceof ApiClientError) {
             if (err.statusCode === 422 || err.code === 'NO_FEASIBLE_SCENARIO') {
-              setError('No feasible energy configuration found within these constraints. Try relaxing the budget or roof area.');
+              setError('Tidak ditemukan konfigurasi energi yang layak dalam batasan ini. Cobalah melonggarkan anggaran atau luas atap.');
             } else if (err.statusCode === 401 || err.statusCode === 403) {
-              setError('Your session has expired. Please log in again to run What-if analysis.');
+              setError('Sesi Anda telah kedaluwarsa. Silakan masuk kembali untuk menjalankan analisis Bagaimana-jika.');
             } else if (err.statusCode === 502 || err.code === 'AI_ERROR') {
-              setError('The AI service is temporarily unavailable. Please adjust configuration controls manually.');
+              setError('Layanan AI sedang tidak tersedia. Silakan sesuaikan kontrol konfigurasi secara manual.');
             } else {
-              setError(err.message || 'What-if exploration could not be completed.');
+              setError(err.message || 'Eksplorasi skenario tidak dapat diselesaikan.');
             }
           } else {
-            setError((err as Error).message || 'A network error occurred while exploring scenario.');
+            setError((err as Error).message || 'Terjadi kesalahan jaringan saat mengeksplorasi skenario.');
           }
         }
       } finally {
@@ -93,8 +94,10 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
     signal: AbortSignal,
     seq: number
   ) => {
+    setExplanationStatus('loading');
+    setAiExplanation(null);
     try {
-      const explainRes = await apiClient.post<{ scenario_id: string; explanation: string }>(
+      const explainRes = await apiClient.post<{ scenario_id: string; explanation: string; explanationUnavailable: boolean }>(
         '/api/ai/explain',
         {
           scenario_id: targetScenarioId,
@@ -103,15 +106,32 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
         { signal }
       );
 
-      if (seq === requestSeqRef.current && explainRes.data?.explanation) {
-        setAiExplanation(explainRes.data.explanation);
+      if (seq === requestSeqRef.current) {
+        if (explainRes.data?.explanation) {
+          setAiExplanation(explainRes.data.explanation);
+        }
+        if (explainRes.data?.explanationUnavailable) {
+          setExplanationStatus('error');
+        } else {
+          setExplanationStatus('success');
+        }
       }
     } catch {
       if (seq === requestSeqRef.current) {
-        setAiExplanation('Contextual AI explanation is temporarily unavailable. Numerical simulation is verified and complete.');
+        setAiExplanation('Penjelasan AI sedang tidak tersedia. Simulasi numerik telah terverifikasi dan selesai.');
+        setExplanationStatus('error');
       }
     }
   };
+
+  const retryExplanation = useCallback(() => {
+    if (!scenarioId || !query || explanationStatus === 'loading') return;
+    
+    // We do NOT abort the main abort controller here because it might be tracking a simulation.
+    // Instead we just fire a detached request.
+    const controller = new AbortController();
+    fetchExplanation(scenarioId, query, controller.signal, requestSeqRef.current);
+  }, [scenarioId, query, explanationStatus]);
 
   const resetWhatIf = useCallback(() => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
@@ -121,27 +141,38 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
     setScenarioId(null);
     setResult(null);
     setAiExplanation(null);
+    setExplanationStatus('idle');
     setError(null);
   }, []);
 
-  const markAsSaved = useCallback(() => {
+  const markAsSaved = useCallback(async (name: string) => {
     if (!result || !scenarioId) return;
     setStatus('saved');
 
-    const savedScenario: Scenario = {
-      id: scenarioId,
-      project_id: projectId,
-      scenario_type: 'what_if',
-      is_recommended: false,
-      solar_kwp: result.configuration.pv_kwp,
-      battery_kwh: result.configuration.battery_kwh,
-      ac_units: result.configuration.ac_units,
-      is_led_upgraded: result.configuration.led_upgraded,
-      simulation_result: result,
-      created_at: new Date().toISOString(),
-    };
+    try {
+      await apiClient.patch(`/api/scenarios/${scenarioId}`, { name });
 
-    onScenarioSaved?.(savedScenario);
+      const savedScenario: Scenario = {
+        id: scenarioId,
+        project_id: projectId,
+        name,
+        scenario_type: 'what_if',
+        is_recommended: false,
+        solar_kwp: result.configuration.pv_kwp,
+        battery_kwh: result.configuration.battery_kwh,
+        ac_units: result.configuration.ac_units,
+        is_led_upgraded: result.configuration.led_upgraded,
+        refrigerator_units: result.configuration.refrigerator_units,
+        water_pump_upgraded: result.configuration.water_pump_upgraded,
+        simulation_result: result,
+        created_at: new Date().toISOString(),
+      };
+
+      onScenarioSaved?.(savedScenario);
+    } catch (err) {
+      setError((err as Error).message || 'Gagal menyimpan skenario.');
+      setStatus('error');
+    }
   }, [result, scenarioId, projectId, onScenarioSaved]);
 
   useEffect(() => {
@@ -156,8 +187,10 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
     scenarioId,
     result,
     aiExplanation,
+    explanationStatus,
     error,
     executeWhatIf,
+    retryExplanation,
     resetWhatIf,
     markAsSaved,
     isSubmitting: isSubmittingRef.current,

@@ -149,6 +149,8 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
           battery_kwh: 5,
           ac_units: 1,
           is_led_upgraded: true,
+          refrigerator_units: 0,
+          water_pump_upgraded: false,
           persist: false,
         });
 
@@ -322,6 +324,8 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
           battery_kwh: 5,
           ac_units: 2,
           is_led_upgraded: true,
+          refrigerator_units: 0,
+          water_pump_upgraded: false,
           persist: false,
         });
 
@@ -351,6 +355,8 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
           battery_kwh: 5,
           ac_units: 2,
           is_led_upgraded: true,
+          refrigerator_units: 0,
+          water_pump_upgraded: false,
           persist: true,
         });
 
@@ -379,6 +385,8 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
           battery_kwh: 5,
           ac_units: 2,
           is_led_upgraded: true,
+          refrigerator_units: 0,
+          water_pump_upgraded: false,
           persist: true,
         });
 
@@ -400,6 +408,8 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
           battery_kwh: 0,
           ac_units: 5,
           is_led_upgraded: true,
+          refrigerator_units: 0,
+          water_pump_upgraded: false,
           persist: false,
         });
 

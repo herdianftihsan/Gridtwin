@@ -18,6 +18,13 @@ export const DEFAULT_ASSUMPTIONS = {
   BATTERY_CAPEX_PER_KWH: 5_000_000, // Rp/kWh
   AC_CAPEX_PER_UNIT: 5_000_000, // Rp/unit
   LED_CAPEX_PER_LOT: 1_500_000, // Rp/lot
+  REFRIGERATOR_STANDARD_CONSUMPTION: 0.2, // kWh/h (commercial/residential fridge)
+  REFRIGERATOR_OPERATING_HOURS: 24, // h/day
+  REFRIGERATOR_REDUCTION_FACTOR: 0.30, // 30% reduction with high-efficiency unit
+  REFRIGERATOR_CAPEX_PER_UNIT: 5_000_000, // Rp/unit
+  BASELINE_PUMP_MONTHLY: 150, // kWh/month
+  PUMP_REDUCTION_FACTOR: 0.20, // 20% reduction with VSD
+  PUMP_CAPEX_PER_UNIT: 3_000_000, // Rp/unit
   SOURCE_VERSION: 'mvp-1.0',
 } as const;
 
@@ -38,7 +45,10 @@ export const STATIC_PSH_MAP: Readonly<Record<string, number>> = Object.freeze({
 });
 
 export const lookupPsh = (location: string): number => {
-  const normalized = location.trim().toLowerCase();
+  let normalized = location.trim().toLowerCase();
+  if (normalized.startsWith('loc_')) {
+    normalized = normalized.slice(4);
+  }
   const matched = STATIC_PSH_MAP[normalized];
   return matched !== undefined ? matched : DEFAULT_ASSUMPTIONS.DEFAULT_PSH;
 };

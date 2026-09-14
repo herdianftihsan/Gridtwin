@@ -7,33 +7,33 @@ import { WhatIfScenarioExample } from './types';
 const EXAMPLES: WhatIfScenarioExample[] = [
   {
     id: 'battery-5kwh',
-    query: 'What if I add 5 kWh battery?',
+    query: 'Bagaimana jika saya menambah baterai 5 kWh?',
     solarKwp: 4,
     batteryKwh: 5,
-    monthlyBill: 'Rp 1.42M',
-    paybackYears: '3.8 yrs',
+    monthlyBill: 'Rp 1,42 Jt',
+    paybackYears: '3,8 thn',
     gridIndependence: '66.2%',
     independenceDelta: '+51.7%',
     tradeoffText: 'Penambahan baterai 5 kWh meningkatkan kemandirian listrik malam hari, namun meningkatkan CAPEX awal dan memperpanjang masa payback modal.',
   },
   {
     id: 'budget-30m',
-    query: 'What if budget is Rp30M?',
+    query: 'Bagaimana jika budget saya Rp 30 Juta?',
     solarKwp: 2,
     batteryKwh: 0,
-    monthlyBill: 'Rp 3.10M',
-    paybackYears: '2.9 yrs',
+    monthlyBill: 'Rp 3,10 Jt',
+    paybackYears: '2,9 thn',
     gridIndependence: '28.0%',
     independenceDelta: '+28.0%',
     tradeoffText: 'Sistem mengutamakan payback modal cepat dengan kapasitas solar PV lebih kecil tanpa baterai agar pengeluaran berada di bawah budget Rp 30 Juta.',
   },
   {
     id: 'solar-6kwp',
-    query: 'What if increase solar to 6 kWp?',
+    query: 'Bagaimana jika kapasitas solar ditambah jadi 6 kWp?',
     solarKwp: 6,
     batteryKwh: 0,
-    monthlyBill: 'Rp 2.65M',
-    paybackYears: '4.8 yrs',
+    monthlyBill: 'Rp 2,65 Jt',
+    paybackYears: '4,8 thn',
     gridIndependence: '42.5%',
     independenceDelta: '+42.5%',
     tradeoffText: 'Produksi siang hari meningkat, namun surplus listrik tengah hari tidak menghasilkan kompensasi tagihan jika tidak diserap beban pendingin gedung.',
@@ -58,10 +58,10 @@ export function WhatIfShowcase() {
           className="max-w-xl space-y-3"
         >
           <span className="text-xs font-bold uppercase tracking-widest text-sky-600">
-            SCENARIO EXPLORATION
+            EKSPLORASI SKENARIO
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Interactive scenarios & What-if exploration
+            Skenario Interaktif & Eksplorasi What-if
           </h2>
           <p className="text-sm text-slate-600 font-normal leading-relaxed">
             Eksplorasi keputusan alternatif secara fleksibel tanpa kehilangan konteks data awal.
@@ -71,7 +71,7 @@ export function WhatIfShowcase() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-5 space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
-              SAMPLE SCENARIO QUERIES
+              CONTOH QUERY SKENARIO
             </span>
             {EXAMPLES.map((ex) => (
               <motion.button
@@ -88,7 +88,7 @@ export function WhatIfShowcase() {
               >
                 <div className="text-sm font-bold text-slate-900">{ex.query}</div>
                 <div className="text-xs text-slate-500 mt-1 font-medium">
-                  {ex.solarKwp} kWp Solar · {ex.batteryKwh} kWh Battery
+                  {ex.solarKwp} kWp Solar · {ex.batteryKwh} kWh Baterai
                 </div>
               </motion.button>
             ))}
@@ -103,28 +103,28 @@ export function WhatIfShowcase() {
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                  SIMULATED OUTCOME
+                  HASIL SIMULASI
                 </span>
                 <div className="text-base font-extrabold text-slate-900 mt-0.5">
                   &quot;{activeExample.query}&quot;
                 </div>
               </div>
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-950 text-white">
-                Verified Scenario
+                Skenario Terverifikasi
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                <span className="text-xs text-slate-400 font-semibold block">Monthly Bill</span>
+                <span className="text-xs text-slate-400 font-semibold block">Tagihan Bulanan</span>
                 <span className="text-base font-extrabold text-slate-900 mt-0.5 block">{activeExample.monthlyBill}</span>
               </div>
               <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                <span className="text-xs text-slate-400 font-semibold block">Payback</span>
+                <span className="text-xs text-slate-400 font-semibold block">Balik Modal</span>
                 <span className="text-base font-extrabold text-slate-900 mt-0.5 block">{activeExample.paybackYears}</span>
               </div>
               <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                <span className="text-xs text-slate-400 font-semibold block">Autonomy</span>
+                <span className="text-xs text-slate-400 font-semibold block">Kemandirian</span>
                 <span className="text-base font-extrabold text-emerald-600 mt-0.5 block">{activeExample.gridIndependence}</span>
               </div>
             </div>
@@ -132,7 +132,7 @@ export function WhatIfShowcase() {
             <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 space-y-1.5">
               <div className="text-xs font-bold uppercase tracking-wider text-sky-950 flex items-center gap-1.5">
                 <span>⚖️</span>
-                <span>KEY TRADE-OFF</span>
+                <span>TRADE-OFF UTAMA</span>
               </div>
               <p className="text-xs text-sky-900 leading-relaxed font-normal">
                 {activeExample.tradeoffText}

@@ -5,10 +5,12 @@ export const SEARCH_SPACE_STEPS = {
   BATTERY_KWH_OPTIONS: [0, 5, 10, 15, 20] as const, // 5 options
   AC_UNITS_OPTIONS: [0, 1, 2, 3, 4, 5] as const, // 6 options
   LED_OPTIONS: [false, true] as const, // 2 options
+  REFRIGERATOR_OPTIONS: [0, 1, 2] as const, // 3 options
+  WATER_PUMP_OPTIONS: [false, true] as const, // 2 options
 } as const;
 
-export const TOTAL_RAW_CANDIDATE_COUNT = 660; // 11 * 5 * 6 * 2
-export const MAX_PROPOSED_CANDIDATE_COUNT = 659; // 660 - 1 (Baseline excluded)
+export const TOTAL_RAW_CANDIDATE_COUNT = 3960; // 11 * 5 * 6 * 2 * 3 * 2
+export const MAX_PROPOSED_CANDIDATE_COUNT = 3959; // 3960 - 1 (Baseline excluded)
 
 export interface ObjectiveWeights {
   readonly cost: number;

@@ -3,7 +3,9 @@ packages:
   - "packages/*"
 
 allowBuilds:
+  '@google/genai': false
   esbuild: false
+  protobufjs: false
   sharp: set this to true or false
 
 # Dependencies allowed to run postinstall build scripts (pnpm 10+ policy).

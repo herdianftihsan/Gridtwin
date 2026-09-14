@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { AuthLayout } from '../../../components/auth/auth-layout';
 import { ForgotPasswordForm } from '../../../components/auth/forgot-password-form';
 
@@ -14,7 +15,9 @@ export default function ForgotPasswordPage() {
       quote="Secure access to your energy twin."
       subquote="Professional decision intelligence platform for evaluating climate-tech and grid investments."
     >
-      <ForgotPasswordForm />
+      <Suspense fallback={<div className="h-64 flex items-center justify-center"><div className="w-8 h-8 border-3 border-sky-500 border-t-transparent rounded-full animate-spin" /></div>}>
+        <ForgotPasswordForm />
+      </Suspense>
     </AuthLayout>
   );
 }

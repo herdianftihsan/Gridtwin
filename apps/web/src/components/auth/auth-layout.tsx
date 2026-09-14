@@ -126,7 +126,6 @@ export function AuthLayout({
           </motion.div>
         )}
 
-        {/* Quote Bottom */}
         <motion.div
           variants={shouldReduceMotion ? undefined : leftItemVariants}
           className="relative z-10 max-w-lg space-y-2.5"

@@ -16,35 +16,47 @@ export function WhatIfChanges({
 
   const items: ConfigChangeItem[] = [
     {
-      assetLabel: 'Solar PV',
+      assetLabel: 'Panel Surya',
       currentDisplay: `${cur.pv_kwp} kWp`,
       whatIfDisplay: `${next.pv_kwp} kWp`,
       hasChanged: cur.pv_kwp !== next.pv_kwp,
     },
     {
-      assetLabel: 'Battery Storage',
+      assetLabel: 'Penyimpanan Baterai',
       currentDisplay: `${cur.battery_kwh} kWh`,
       whatIfDisplay: `${next.battery_kwh} kWh`,
       hasChanged: cur.battery_kwh !== next.battery_kwh,
     },
     {
-      assetLabel: 'Air Conditioner',
-      currentDisplay: `${cur.ac_units} Units`,
-      whatIfDisplay: `${next.ac_units} Units`,
+      assetLabel: 'Pendingin Ruangan (AC)',
+      currentDisplay: `${cur.ac_units} Unit`,
+      whatIfDisplay: `${next.ac_units} Unit`,
       hasChanged: cur.ac_units !== next.ac_units,
     },
     {
-      assetLabel: 'Smart LED',
-      currentDisplay: cur.led_upgraded ? 'Upgraded' : 'Standard',
-      whatIfDisplay: next.led_upgraded ? 'Upgraded' : 'Standard',
+      assetLabel: 'LED Pintar',
+      currentDisplay: cur.led_upgraded ? 'Ditingkatkan' : 'Standar',
+      whatIfDisplay: next.led_upgraded ? 'Ditingkatkan' : 'Standar',
       hasChanged: cur.led_upgraded !== next.led_upgraded,
+    },
+    {
+      assetLabel: 'Kulkas Hemat',
+      currentDisplay: `${cur.refrigerator_units || 0} Unit`,
+      whatIfDisplay: `${next.refrigerator_units || 0} Unit`,
+      hasChanged: cur.refrigerator_units !== next.refrigerator_units,
+    },
+    {
+      assetLabel: 'Pompa Air Pintar',
+      currentDisplay: cur.water_pump_upgraded ? 'Ya' : 'Tidak',
+      whatIfDisplay: next.water_pump_upgraded ? 'Ya' : 'Tidak',
+      hasChanged: cur.water_pump_upgraded !== next.water_pump_upgraded,
     },
   ];
 
   return (
     <div className="space-y-2 text-left">
       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-        WHAT CHANGED
+        APA YANG BERUBAH
       </span>
       <div className="grid grid-cols-2 gap-2">
         {items.map((item) => (

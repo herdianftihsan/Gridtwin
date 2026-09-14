@@ -20,7 +20,8 @@ export const explainRequestSchema = z
 
 export const whatIfIntentSchema = z
   .object({
-    action: z.enum(['optimize', 'simulate']),
+    action: z.enum(['optimize', 'simulate', 'reject']),
+    rejection_reason: z.string().nullable().optional(),
     budget: z.number().positive().nullable().optional(),
     objective: z.enum(['save_money', 'reduce_co2', 'independence']).nullable().optional(),
     solar_kwp: z.number().min(0).max(10).nullable().optional(),
@@ -36,6 +37,8 @@ export const whatIfIntentSchema = z
       .optional(),
     ac_units: z.number().int().min(0).max(5).nullable().optional(),
     is_led_upgraded: z.boolean().nullable().optional(),
+    refrigerator_units: z.number().int().min(0).max(2).nullable().optional(),
+    water_pump_upgraded: z.boolean().nullable().optional(),
   })
   .strict();
 

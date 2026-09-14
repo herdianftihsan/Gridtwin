@@ -7,6 +7,8 @@ export interface SimulationConfig {
   battery_kwh: number;
   ac_units: number;
   is_led_upgraded: boolean;
+  refrigerator_units: number;
+  water_pump_upgraded: boolean;
 }
 
 export interface WorkspaceState {

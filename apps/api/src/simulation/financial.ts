@@ -11,7 +11,9 @@ export const calculateFinancials = (
     config.solar_kwp * DEFAULT_ASSUMPTIONS.SOLAR_CAPEX_PER_KWP +
     config.battery_kwh * DEFAULT_ASSUMPTIONS.BATTERY_CAPEX_PER_KWH +
     config.ac_units * DEFAULT_ASSUMPTIONS.AC_CAPEX_PER_UNIT +
-    (config.is_led_upgraded ? DEFAULT_ASSUMPTIONS.LED_CAPEX_PER_LOT : 0);
+    (config.is_led_upgraded ? DEFAULT_ASSUMPTIONS.LED_CAPEX_PER_LOT : 0) +
+    config.refrigerator_units * DEFAULT_ASSUMPTIONS.REFRIGERATOR_CAPEX_PER_UNIT +
+    (config.water_pump_upgraded ? DEFAULT_ASSUMPTIONS.PUMP_CAPEX_PER_UNIT : 0);
 
   const newMonthlyCost = gridImportMonthly * tariff;
   const monthlySavings = baselineMonthlyBill - newMonthlyCost;

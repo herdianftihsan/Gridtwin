@@ -11,12 +11,18 @@ export const generateRawCandidates = (): SimulationConfig[] => {
     for (const battery_kwh of SEARCH_SPACE_STEPS.BATTERY_KWH_OPTIONS) {
       for (const ac_units of SEARCH_SPACE_STEPS.AC_UNITS_OPTIONS) {
         for (const is_led_upgraded of SEARCH_SPACE_STEPS.LED_OPTIONS) {
-          candidates.push({
-            solar_kwp,
-            battery_kwh,
-            ac_units,
-            is_led_upgraded,
-          });
+          for (const refrigerator_units of SEARCH_SPACE_STEPS.REFRIGERATOR_OPTIONS) {
+            for (const water_pump_upgraded of SEARCH_SPACE_STEPS.WATER_PUMP_OPTIONS) {
+              candidates.push({
+                solar_kwp,
+                battery_kwh,
+                ac_units,
+                is_led_upgraded,
+                refrigerator_units,
+                water_pump_upgraded,
+              });
+            }
+          }
         }
       }
     }

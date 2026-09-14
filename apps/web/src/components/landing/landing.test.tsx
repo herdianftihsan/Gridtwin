@@ -25,8 +25,8 @@ describe('Phase 16: SCR-01 Landing Page Unit Suite', () => {
     const startProjectLink = screen.getByRole('link', { name: /Start Project/i });
     const exploreDemoLink = screen.getByRole('link', { name: /Explore Demo Project/i });
 
-    expect(startProjectLink.getAttribute('href')).toBe('/setup');
-    expect(exploreDemoLink.getAttribute('href')).toBe('/demo');
+    expect(startProjectLink.getAttribute('href')).toBe('/login?next=/setup');
+    expect(exploreDemoLink.getAttribute('href')).toBe('/login?next=/demo');
   });
 
   it('3. renders How It Works 3-step decision workflow', () => {

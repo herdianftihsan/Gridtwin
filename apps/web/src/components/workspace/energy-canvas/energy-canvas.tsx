@@ -12,17 +12,21 @@ import { BatteryNode } from './nodes/battery-node';
 import { GridNode } from './nodes/grid-node';
 import { HvacNode } from './nodes/hvac-node';
 import { LightingNode } from './nodes/lighting-node';
+import { RefrigerationNode } from './nodes/refrigeration-node';
+import { PumpNode } from './nodes/pump-node';
 
 const VIRTUAL_WIDTH = 980;
 const VIRTUAL_HEIGHT = 600;
 
 const DEFAULT_POSITIONS: Record<NodeKey, NodePosition> = {
-  solar: { x: 390, y: 40, w: 200, h: 92 },
-  building: { x: 375, y: 235, w: 230, h: 112 },
-  battery: { x: 695, y: 245, w: 195, h: 92 },
-  grid: { x: 390, y: 455, w: 200, h: 92 },
-  ac: { x: 85, y: 155, w: 185, h: 78 },
-  led: { x: 85, y: 345, w: 185, h: 78 },
+  solar: { x: 410, y: 40, w: 200, h: 92 },
+  building: { x: 395, y: 235, w: 230, h: 112 },
+  battery: { x: 715, y: 245, w: 195, h: 92 },
+  grid: { x: 410, y: 455, w: 200, h: 92 },
+  ac: { x: 65, y: 65, w: 185, h: 78 },
+  led: { x: 65, y: 185, w: 185, h: 78 },
+  refrigerator: { x: 65, y: 305, w: 185, h: 78 },
+  pump: { x: 65, y: 425, w: 185, h: 78 },
 };
 
 export function EnergyCanvas({
@@ -79,7 +83,7 @@ export function EnergyCanvas({
       <div className="flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs">
           <span className="text-xs sm:text-sm font-bold tracking-tight text-slate-900">
-            Energy Canvas
+            Canvas Energi
           </span>
           <span className="text-[11px] text-slate-400 font-medium">
             ({displayLocation})
@@ -89,15 +93,15 @@ export function EnergyCanvas({
         <div className="hidden sm:flex items-center gap-3 text-[11px] font-semibold text-slate-600 bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs pointer-events-auto">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-indigo-500" />
-            <span>Grid Import</span>
+            <span>Impor Jaringan Listrik</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-amber-500" />
-            <span>Solar Generation</span>
+            <span>Produksi Panel Surya</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-teal-500" />
-            <span>Battery Dispatch</span>
+            <span>Penggunaan Baterai</span>
           </div>
         </div>
       </div>
@@ -150,6 +154,14 @@ export function EnergyCanvas({
             isSelected={selectedNodeId === 'grid'}
             onSelect={setSelectedNodeId}
           />
+          {/* Efficiency Opportunities Grouping */}
+          <div 
+            className="absolute border-2 border-dashed border-slate-200/60 rounded-3xl bg-slate-50/30 flex items-start justify-center pt-2"
+            style={{ left: 45, top: 25, width: 225, height: 505 }}
+          >
+            <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Pengurangan Permintaan</span>
+          </div>
+
           <HvacNode
             telemetry={viewModel.nodes.ac}
             position={positions.ac}
@@ -160,6 +172,18 @@ export function EnergyCanvas({
             telemetry={viewModel.nodes.led}
             position={positions.led}
             isSelected={selectedNodeId === 'led'}
+            onSelect={setSelectedNodeId}
+          />
+          <RefrigerationNode
+            telemetry={viewModel.nodes.refrigerator}
+            position={positions.refrigerator}
+            isSelected={selectedNodeId === 'refrigerator'}
+            onSelect={setSelectedNodeId}
+          />
+          <PumpNode
+            telemetry={viewModel.nodes.pump}
+            position={positions.pump}
+            isSelected={selectedNodeId === 'pump'}
             onSelect={setSelectedNodeId}
           />
         </motion.div>
@@ -179,7 +203,7 @@ export function EnergyCanvas({
           >
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-                {selectedNode.label} TELEMETRY
+                TELEMETRI {selectedNode.label}
               </span>
               <button
                 type="button"
@@ -207,7 +231,7 @@ export function EnergyCanvas({
         <div className="absolute inset-0 bg-white/35 backdrop-blur-[1px] flex items-center justify-center z-40 transition-opacity">
           <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-950 text-white text-xs font-semibold shadow-xl">
             <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            <span>Recalculating Energy Flows...</span>
+            <span>Menghitung Ulang Aliran Energi...</span>
           </div>
         </div>
       )}

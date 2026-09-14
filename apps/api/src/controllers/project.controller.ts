@@ -87,6 +87,42 @@ export class ProjectController {
       next(err);
     }
   };
+
+  listScenarios = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.id;
+      const projectId = req.params.id as string;
+      
+      const scenarios = await projectService.getProjectScenarios(userId, projectId);
+
+      res.status(200).json({
+        data: scenarios,
+        meta: { timestamp: new Date().toISOString() },
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getRoadmap = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.id;
+      const projectId = req.params.id as string;
+
+      // We will need to import simulationService, or move getRoadmap to projectService. 
+      // Actually, since it uses simulate(), I put it in simulationService.
+      // So I will call simulationService.getRoadmap(userId, projectId)
+      // I will need to import simulationService at the top of this file.
+      const roadmap = await (await import('../services/simulation.service.js')).simulationService.getRoadmap(userId, projectId);
+
+      res.status(200).json({
+        data: roadmap,
+        meta: { timestamp: new Date().toISOString() },
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 export const projectController = new ProjectController();

@@ -3,10 +3,10 @@
 import React from 'react';
 
 const SUGGESTIONS = [
-  '+ Add 5 kWh battery',
-  '+ Increase solar to 6 kWp',
-  '+ Budget Rp30M',
-  '+ Maximize CO2 reduction',
+  '+ Tambah baterai 5 kWh',
+  '+ Tingkatkan surya ke 6 kWp',
+  '+ Anggaran Rp30 Jt',
+  '+ Maksimalkan pengurangan CO2',
 ];
 
 interface WhatIfSuggestionsProps {

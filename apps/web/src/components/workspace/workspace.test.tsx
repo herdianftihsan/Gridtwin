@@ -17,6 +17,17 @@ vi.mock('../../lib/api/api-client', () => ({
   },
 }));
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/projects/proj-123/workspace',
+}));
+
 const mockProjectDetail = {
   project: {
     id: 'proj-123',

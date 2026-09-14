@@ -7,7 +7,9 @@ export const isBaseline = (config: SimulationConfig): boolean => {
     config.solar_kwp === 0 &&
     config.battery_kwh === 0 &&
     config.ac_units === 0 &&
-    !config.is_led_upgraded
+    !config.is_led_upgraded &&
+    config.refrigerator_units === 0 &&
+    !config.water_pump_upgraded
   );
 };
 
@@ -16,7 +18,9 @@ export const calculateCandidateCapex = (config: SimulationConfig): number => {
     config.solar_kwp * DEFAULT_ASSUMPTIONS.SOLAR_CAPEX_PER_KWP +
     config.battery_kwh * DEFAULT_ASSUMPTIONS.BATTERY_CAPEX_PER_KWH +
     config.ac_units * DEFAULT_ASSUMPTIONS.AC_CAPEX_PER_UNIT +
-    (config.is_led_upgraded ? DEFAULT_ASSUMPTIONS.LED_CAPEX_PER_LOT : 0)
+    (config.is_led_upgraded ? DEFAULT_ASSUMPTIONS.LED_CAPEX_PER_LOT : 0) +
+    config.refrigerator_units * DEFAULT_ASSUMPTIONS.REFRIGERATOR_CAPEX_PER_UNIT +
+    (config.water_pump_upgraded ? DEFAULT_ASSUMPTIONS.PUMP_CAPEX_PER_UNIT : 0)
   );
 };
 
@@ -56,8 +60,19 @@ export const filterFeasibleCandidates = (
       ? DEFAULT_ASSUMPTIONS.BASELINE_LIGHTING_MONTHLY *
         DEFAULT_ASSUMPTIONS.LED_REDUCTION_FACTOR
       : 0;
+    
+    const estimatedFridgeLoad =
+      candidate.refrigerator_units *
+      DEFAULT_ASSUMPTIONS.REFRIGERATOR_OPERATING_HOURS *
+      DEFAULT_ASSUMPTIONS.DAYS_IN_MONTH *
+      DEFAULT_ASSUMPTIONS.REFRIGERATOR_STANDARD_CONSUMPTION;
+    const fridgeSaving = estimatedFridgeLoad * DEFAULT_ASSUMPTIONS.REFRIGERATOR_REDUCTION_FACTOR;
+    
+    const pumpSaving = candidate.water_pump_upgraded
+      ? DEFAULT_ASSUMPTIONS.BASELINE_PUMP_MONTHLY * DEFAULT_ASSUMPTIONS.PUMP_REDUCTION_FACTOR
+      : 0;
 
-    if (acSaving + ledSaving > baselineMonthlyKwh) {
+    if (acSaving + ledSaving + fridgeSaving + pumpSaving > baselineMonthlyKwh) {
       return false;
     }
 

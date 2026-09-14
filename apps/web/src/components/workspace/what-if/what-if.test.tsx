@@ -19,7 +19,7 @@ vi.mock('../../../lib/api/api-client', () => ({
 }));
 
 const mockCurrentResult: SimulationResult = {
-  configuration: { pv_kwp: 4, battery_kwh: 0, ac_units: 2, led_upgraded: false },
+  configuration: { pv_kwp: 4, battery_kwh: 0, ac_units: 2, led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: false },
   baseline: { monthly_cost: 4500000, monthly_kwh: 3000 },
   energy: { monthly_demand_kwh: 2796, solar_yield_monthly: 405, grid_import_monthly: 2391, wasted_surplus_monthly: 0 },
   financial: { capex: 60000000, new_monthly_cost: 3586500, monthly_savings: 913500, payback_years: 5.5 },
@@ -30,7 +30,7 @@ const mockCurrentResult: SimulationResult = {
 
 const mockWhatIfResult: SimulationResult = {
   ...mockCurrentResult,
-  configuration: { pv_kwp: 4, battery_kwh: 5, ac_units: 2, led_upgraded: false },
+  configuration: { pv_kwp: 4, battery_kwh: 5, ac_units: 2, led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: false },
   financial: { capex: 85000000, new_monthly_cost: 2800000, monthly_savings: 1700000, payback_years: 4.2 },
   grid: { independence_pct: 38.0 },
 };
@@ -50,8 +50,8 @@ describe('Phase 15: What-if & AI Explanation UI', () => {
       />
     );
 
-    expect(screen.getByText('What if?')).toBeDefined();
-    expect(screen.getByText('+ Add 5 kWh battery')).toBeDefined();
+    expect(screen.getByText('Bagaimana jika?')).toBeDefined();
+    expect(screen.getByText('+ Tambah baterai 5 kWh')).toBeDefined();
   });
 
   it('2. sends natural-language query to POST /api/ai/what-if and renders result', async () => {
@@ -60,7 +60,7 @@ describe('Phase 15: What-if & AI Explanation UI', () => {
         data: {
           scenario_id: 'sc-what-if-1',
           scenario_type: 'what_if',
-          what_if_query: 'Add 5 kWh battery',
+          what_if_query: 'Tambah baterai 5 kWh',
           simulation_result: mockWhatIfResult,
         },
       } as never)
@@ -80,15 +80,15 @@ describe('Phase 15: What-if & AI Explanation UI', () => {
       />
     );
 
-    const shortcutBtn = screen.getByText('+ Add 5 kWh battery');
+    const shortcutBtn = screen.getByText('+ Tambah baterai 5 kWh');
     fireEvent.click(shortcutBtn);
 
     await waitFor(() => {
       expect(apiClient.post).toHaveBeenCalledWith('/api/ai/what-if', {
         project_id: 'proj-123',
-        message: 'Add 5 kWh battery',
+        message: 'Tambah baterai 5 kWh',
       }, expect.any(Object));
-      expect(screen.getByText('WHAT CHANGED')).toBeDefined();
+      expect(screen.getByText('APA YANG BERUBAH')).toBeDefined();
     });
   });
 
@@ -102,8 +102,8 @@ describe('Phase 15: What-if & AI Explanation UI', () => {
   it('4. displays presentation deltas for monthly cost, capex, and independence', () => {
     render(<WhatIfMetrics currentResult={mockCurrentResult} whatIfResult={mockWhatIfResult} />);
 
-    expect(screen.getByText('Rp 3.59M')).toBeDefined();
-    expect(screen.getByText('Rp 2.80M')).toBeDefined();
+    expect(screen.getByText('Rp 3.59 Jt')).toBeDefined();
+    expect(screen.getByText('Rp 2.80 Jt')).toBeDefined();
     expect(screen.getByText('38%')).toBeDefined();
   });
 
@@ -121,12 +121,12 @@ describe('Phase 15: What-if & AI Explanation UI', () => {
       />
     );
 
-    const shortcut = screen.getByText('+ Budget Rp30M');
+    const shortcut = screen.getByText('+ Anggaran Rp30 Jt');
     fireEvent.click(shortcut);
 
     await waitFor(() => {
-      expect(screen.getByText('Scenario Exploration Issue')).toBeDefined();
-      expect(screen.getByText(/No feasible energy configuration found/i)).toBeDefined();
+      expect(screen.getByText('Masalah Eksplorasi Skenario')).toBeDefined();
+      expect(screen.getByText(/Tidak ditemukan konfigurasi energi yang layak/i)).toBeDefined();
     });
   });
 

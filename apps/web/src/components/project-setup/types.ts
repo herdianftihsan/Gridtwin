@@ -6,29 +6,20 @@ export interface ProjectSetupFormData {
   building_type: BuildingType | '';
   roof_area: number | null;
   monthly_bill: number | null;
-  budget: number;
-  objective: ProjectObjective;
+  budget: number | null;
+  objective: ProjectObjective | '';
 }
 
 export const INITIAL_FORM_DATA: ProjectSetupFormData = {
-  location: 'Surabaya',
-  building_type: 'Ruko',
+  location: '',
+  building_type: '',
   roof_area: null,
-  monthly_bill: 4500000,
-  budget: 50000000,
-  objective: 'save_money',
+  monthly_bill: null,
+  budget: null,
+  objective: '',
 };
 
-export const AVAILABLE_LOCATIONS = [
-  'Surabaya',
-  'Jakarta',
-  'Bandung',
-  'Semarang',
-  'Yogyakarta',
-  'Denpasar',
-  'Medan',
-  'Makassar',
-] as const;
+
 
 export const BUILDING_TYPES: { value: BuildingType; label: string }[] = [
   { value: 'Ruko', label: 'Ruko / Small Commercial' },

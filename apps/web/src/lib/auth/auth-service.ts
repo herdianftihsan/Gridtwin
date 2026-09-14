@@ -1,6 +1,6 @@
-import { supabase } from './supabase';
-import { useAuthStore } from '../../store/auth.store';
-import type { AuthError } from '@supabase/supabase-js';
+import { supabase } from "./supabase";
+import { useAuthStore } from "../../store/auth.store";
+import type { AuthError } from "@supabase/supabase-js";
 
 export interface AuthResult<T = unknown> {
   data: T | null;
@@ -10,22 +10,22 @@ export interface AuthResult<T = unknown> {
 export class AuthService {
   private static mapAuthError(error: AuthError | Error): string {
     const msg = error.message.toLowerCase();
-    if (msg.includes('invalid login credentials') || msg.includes('invalid_grant')) {
-      return 'Invalid email or password. Please try again.';
+    if (msg.includes("invalid login credentials") || msg.includes("invalid_grant")) {
+      return "Invalid email or password. Please try again.";
     }
-    if (msg.includes('user already registered') || msg.includes('user_already_exists')) {
-      return 'An account with this email already exists.';
+    if (msg.includes("user already registered") || msg.includes("user_already_exists")) {
+      return "An account with this email already exists.";
     }
-    if (msg.includes('rate limit') || msg.includes('over_email_send_rate_limit')) {
-      return 'Too many attempts. Please wait a few minutes before trying again.';
+    if (msg.includes("rate limit") || msg.includes("over_email_send_rate_limit")) {
+      return "Too many attempts. Please wait a few minutes before trying again.";
     }
-    if (msg.includes('email not confirmed')) {
-      return 'Please verify your email address before signing in.';
+    if (msg.includes("email not confirmed")) {
+      return "Please verify your email address before signing in.";
     }
-    if (msg.includes('network') || msg.includes('fetch')) {
-      return 'Network connection error. Please check your internet connection.';
+    if (msg.includes("network") || msg.includes("fetch")) {
+      return "Network connection error. Please check your internet connection.";
     }
-    return 'An unexpected error occurred. Please try again.';
+    return "An unexpected error occurred. Please try again.";
   }
 
   static async signInWithEmail(email: string, password: string): Promise<AuthResult> {
@@ -73,9 +73,9 @@ export class AuthService {
   static async sendPasswordResetEmail(email: string): Promise<AuthResult> {
     try {
       const redirectUrl =
-        typeof window !== 'undefined'
+        typeof window !== "undefined"
           ? `${window.location.origin}/login`
-          : 'http://localhost:3000/login';
+          : "http://localhost:3000/login";
 
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: redirectUrl,
@@ -91,18 +91,20 @@ export class AuthService {
     }
   }
 
-  static async signInWithGoogle(): Promise<AuthResult> {
+  // Parameter nextUrl ditambahkan di sini
+  static async signInWithGoogle(nextUrl: string = "/setup"): Promise<AuthResult> {
     try {
-      const redirectUrl =
-        typeof window !== 'undefined'
-          ? `${window.location.origin}/projects`
-          : 'http://localhost:3000/projects';
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+
+      // Mengarahkan ke route callback yang membawa query param ?next=...
+      const redirectUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: redirectUrl,
-          queryParams: { access_type: 'offline', prompt: 'consent' },
+          queryParams: { access_type: "offline", prompt: "consent" },
         },
       });
 

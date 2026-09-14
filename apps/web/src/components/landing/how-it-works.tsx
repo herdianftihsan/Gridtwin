@@ -7,19 +7,19 @@ import { WorkflowStep } from './types';
 const STEPS: WorkflowStep[] = [
   {
     number: '01',
-    title: 'Describe',
+    title: 'Deskripsikan',
     description: 'Masukkan profil bangunan, lokasi, tagihan bulanan, dan batas anggaran investasi dalam empat langkah mudah.',
     iconName: 'describe',
   },
   {
     number: '02',
-    title: 'Simulate',
+    title: 'Simulasikan',
     description: 'Engine matematis mengevaluasi kombinasi perangkat terhadap radiasi matahari lokal dan aturan ESDM No. 2/2024.',
     iconName: 'simulate',
   },
   {
     number: '03',
-    title: 'Decide',
+    title: 'Ambil Keputusan',
     description: 'Bandingkan kalkulasi finansial, estimasi payback, dan trade-off untuk mengambil keputusan investasi energi terbaik.',
     iconName: 'decide',
   },
@@ -37,10 +37,10 @@ export function HowItWorks() {
           className="text-center max-w-xl mx-auto space-y-3"
         >
           <span className="text-xs font-bold uppercase tracking-widest text-sky-600">
-            THE DECISION WORKFLOW
+            ALUR KEPUTUSAN
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            From context to decision in three steps
+            Dari konteks hingga keputusan dalam tiga langkah
           </h2>
           <p className="text-sm text-slate-600 font-normal leading-relaxed">
             Kalkulasi deterministik dan AI domain energi menyajikan kejelasan hasil investasi secara transparan.

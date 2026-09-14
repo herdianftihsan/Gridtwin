@@ -1,8 +1,12 @@
 // apps/api/src/config/env.ts
 import dotenv from 'dotenv';
 import { z } from 'zod';
+import path from 'path';
 
-dotenv.config();
+// Load from apps/api/.env deterministically
+const apiEnvPath = path.resolve(__dirname, '../../.env');
+
+dotenv.config({ path: apiEnvPath });
 
 const isTest = process.env.NODE_ENV === 'test';
 
@@ -22,7 +26,25 @@ const envSchema = z.object({
     : z.string().min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
   GEMINI_API_KEY: isTest
     ? z.string().default('mock-gemini-api-key')
-    : z.string().min(1, 'GEMINI_API_KEY is required'),
+    : z.string().optional(),
+  GEMINI_MODEL: isTest
+    ? z.string().default('gemini-3.5-flash-lite')
+    : z.string().optional(),
+  GEMINI_TIMEOUT_MS: z
+    .string()
+    .default('15000')
+    .transform((val) => parseInt(val, 10))
+    .pipe(z.number().min(1000).max(60000)),
+  GEMINI_MAX_INPUT_CHARS: z
+    .string()
+    .default('2000')
+    .transform((val) => parseInt(val, 10))
+    .pipe(z.number().min(100).max(10000)),
+  GEMINI_MAX_OUTPUT_TOKENS: z
+    .string()
+    .default('500')
+    .transform((val) => parseInt(val, 10))
+    .pipe(z.number().min(50).max(4000)),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -32,7 +54,7 @@ const parseEnv = (): Env => {
 
   if (!result.success) {
     const formattedErrors = result.error.errors
-      .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+      .map((err) => `Missing required environment variable: ${err.path.join('.')}`)
       .join('\n');
     
     console.error(`CRITICAL: Environment validation failed:\n${formattedErrors}`);

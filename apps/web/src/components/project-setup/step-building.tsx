@@ -3,10 +3,10 @@
 import React from 'react';
 import {
   ProjectSetupFormData,
-  AVAILABLE_LOCATIONS,
   BUILDING_TYPES,
   BuildingType,
 } from './types';
+import { LocationSearch } from './location-search';
 
 interface StepBuildingProps {
   formData: ProjectSetupFormData;
@@ -19,43 +19,27 @@ export function StepBuilding({ formData, updateFormData, errors }: StepBuildingP
     <div className="space-y-6 text-left">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-          Describe your building
+          Jelaskan bangunan Anda
         </h2>
         <p className="text-sm text-slate-500">
-          GridTwin uses these details to accurately model your energy potential.
+          GridTwin menggunakan detail ini untuk membuat model potensi energi Anda secara akurat.
         </p>
       </div>
 
       <div className="space-y-5">
-        {/* Location Dropdown */}
+        {/* Location Search Component */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-700">Location</label>
-          <div className="relative">
-            <select
-              value={formData.location}
-              onChange={(e) => updateFormData({ location: e.target.value })}
-              className={`w-full appearance-none px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all cursor-pointer ${
-                errors['location'] ? 'border-red-500' : 'border-slate-200'
-              }`}
-            >
-              <option value="" disabled>Select location</option>
-              {AVAILABLE_LOCATIONS.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
+          <label className="block text-xs font-semibold text-slate-700">Lokasi</label>
+          <LocationSearch 
+            value={formData.location}
+            onChange={(id) => updateFormData({ location: id })}
+            error={errors['location']}
+          />
           {errors['location'] && <p className="text-xs text-red-500">{errors['location']}</p>}
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-700">Building Type</label>
+          <label className="block text-xs font-semibold text-slate-700">Jenis Bangunan</label>
           <div className="relative">
             <select
               value={formData.building_type}
@@ -64,7 +48,7 @@ export function StepBuilding({ formData, updateFormData, errors }: StepBuildingP
                 errors['building_type'] ? 'border-red-500' : 'border-slate-200'
               }`}
             >
-              <option value="" disabled>Select building type</option>
+              <option value="" disabled>Pilih jenis bangunan</option>
               {BUILDING_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
                   {type.label}
@@ -82,8 +66,8 @@ export function StepBuilding({ formData, updateFormData, errors }: StepBuildingP
 
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <label className="block text-xs font-semibold text-slate-700">Roof Area</label>
-            <span className="text-[11px] text-slate-400">Optional</span>
+            <label className="block text-xs font-semibold text-slate-700">Luas Atap</label>
+            <span className="text-[11px] text-slate-400">Opsional</span>
           </div>
           <div className="relative">
             <input
@@ -101,7 +85,7 @@ export function StepBuilding({ formData, updateFormData, errors }: StepBuildingP
               m²
             </span>
           </div>
-          <p className="text-[11px] text-slate-400">Estimated available area for solar panels.</p>
+          <p className="text-[11px] text-slate-400">Perkiraan luas yang tersedia untuk panel surya.</p>
         </div>
       </div>
     </div>

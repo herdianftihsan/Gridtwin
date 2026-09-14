@@ -32,7 +32,10 @@ export const simulateSchema = z
     battery_kwh: z.union([z.literal(0), z.literal(5), z.literal(10), z.literal(15), z.literal(20)]),
     ac_units: z.number().int().min(0).max(5),
     is_led_upgraded: z.boolean(),
+    refrigerator_units: z.number().int().min(0).max(2),
+    water_pump_upgraded: z.boolean(),
     persist: z.boolean().default(false),
+    name: z.string().trim().max(100).optional(),
   })
   .strict();
 

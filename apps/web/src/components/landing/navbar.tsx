@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
+import { useAuthStore } from '../../store/auth.store';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { session } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +18,9 @@ export function Navbar() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const demoHref = session ? '/demo' : '/login?next=/demo';
+  const setupHref = session ? '/setup' : '/login?next=/setup';
 
   return (
     <header
@@ -42,28 +47,28 @@ export function Navbar() {
 
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-7 text-xs font-semibold text-slate-600" aria-label="Main Navigation">
-          <a href="#workflow" className="hover:text-slate-900 transition-colors py-1">Workflow</a>
-          <a href="#consequences" className="hover:text-slate-900 transition-colors py-1">Consequences</a>
+          <a href="#workflow" className="hover:text-slate-900 transition-colors py-1">Alur Kerja</a>
+          <a href="#consequences" className="hover:text-slate-900 transition-colors py-1">Dampak</a>
           <a href="#energy-twin" className="hover:text-slate-900 transition-colors py-1">Energy Twin</a>
-          <a href="#scenarios" className="hover:text-slate-900 transition-colors py-1">What-if Scenarios</a>
-          <a href="#principles" className="hover:text-slate-900 transition-colors py-1">Intelligence</a>
+          <a href="#scenarios" className="hover:text-slate-900 transition-colors py-1">Skenario What-if</a>
+          <a href="#principles" className="hover:text-slate-900 transition-colors py-1">Kecerdasan</a>
         </nav>
 
         <div className="hidden sm:flex items-center gap-3">
           <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
             <Link
-              href="/demo"
+              href={demoHref}
               className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              Explore Demo
+              Lihat Demo
             </Link>
           </motion.div>
           <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
             <Link
-              href="/setup"
+              href={setupHref}
               className="px-4.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-xs transition-all cursor-pointer"
             >
-              Start Project
+              Mulai Proyek
             </Link>
           </motion.div>
         </div>
@@ -87,16 +92,16 @@ export function Navbar() {
 
       {isMobileOpen && (
         <div className="sm:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3 text-sm font-semibold text-left">
-          <a href="#workflow" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Workflow</a>
-          <a href="#consequences" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Consequences</a>
+          <a href="#workflow" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Alur Kerja</a>
+          <a href="#consequences" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Dampak</a>
           <a href="#energy-twin" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Energy Twin</a>
-          <a href="#scenarios" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">What-if Scenarios</a>
+          <a href="#scenarios" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Skenario What-if</a>
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            <Link href="/demo" className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold">
-              Explore Demo Project
+            <Link href={demoHref} className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold">
+              Lihat Proyek Demo
             </Link>
-            <Link href="/setup" className="w-full text-center py-2.5 rounded-xl bg-slate-950 text-white text-xs font-semibold">
-              Start Project
+            <Link href={setupHref} className="w-full text-center py-2.5 rounded-xl bg-slate-950 text-white text-xs font-semibold">
+              Mulai Proyek
             </Link>
           </div>
         </div>

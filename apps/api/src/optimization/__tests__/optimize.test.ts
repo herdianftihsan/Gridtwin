@@ -21,7 +21,7 @@ describe('Phase 5: Deterministic Optimization Engine', () => {
     expect(candidates.length).toBe(TOTAL_RAW_CANDIDATE_COUNT);
   });
 
-  it('2. excludes baseline and yields at most 659 proposed candidates', () => {
+  it('2. excludes baseline and yields at most 3959 proposed candidates', () => {
     const unconstrainedContext: OptimizationContext = {
       ...baseContext,
       roof_area: 100,
@@ -30,14 +30,16 @@ describe('Phase 5: Deterministic Optimization Engine', () => {
     const raw = generateRawCandidates();
     const feasible = filterFeasibleCandidates(raw, unconstrainedContext);
 
-    expect(feasible.length).toBe(659);
+    expect(feasible.length).toBe(3959);
     expect(
       feasible.some(
         (c) =>
           c.solar_kwp === 0 &&
           c.battery_kwh === 0 &&
           c.ac_units === 0 &&
-          !c.is_led_upgraded
+          !c.is_led_upgraded &&
+          c.refrigerator_units === 0 &&
+          !c.water_pump_upgraded
       )
     ).toBe(false);
   });

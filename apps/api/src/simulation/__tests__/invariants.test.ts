@@ -13,11 +13,11 @@ describe('Phase 4: Mathematical Invariant & Property Tests', () => {
   };
 
   const candidateCombinations: SimulationConfig[] = [
-    { solar_kwp: 0, battery_kwh: 0, ac_units: 0, is_led_upgraded: false },
-    { solar_kwp: 2, battery_kwh: 0, ac_units: 1, is_led_upgraded: false },
-    { solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true },
-    { solar_kwp: 7, battery_kwh: 10, ac_units: 3, is_led_upgraded: true },
-    { solar_kwp: 0, battery_kwh: 20, ac_units: 0, is_led_upgraded: false },
+    { solar_kwp: 0, battery_kwh: 0, ac_units: 0, is_led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: false },
+    { solar_kwp: 2, battery_kwh: 0, ac_units: 1, is_led_upgraded: false, refrigerator_units: 1, water_pump_upgraded: false },
+    { solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true, refrigerator_units: 0, water_pump_upgraded: false },
+    { solar_kwp: 7, battery_kwh: 10, ac_units: 3, is_led_upgraded: true, refrigerator_units: 2, water_pump_upgraded: true },
+    { solar_kwp: 0, battery_kwh: 20, ac_units: 0, is_led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: true },
   ];
 
   it('preserves all physical and economic invariants across diverse candidate mixes', () => {
@@ -54,6 +54,8 @@ describe('Phase 4: Mathematical Invariant & Property Tests', () => {
       battery_kwh: 5,
       ac_units: 2,
       is_led_upgraded: true,
+      refrigerator_units: 0,
+      water_pump_upgraded: false,
     });
 
     const frozenContext: SimulationContext = Object.freeze({

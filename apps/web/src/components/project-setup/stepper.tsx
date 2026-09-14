@@ -9,10 +9,10 @@ interface StepperProps {
 }
 
 const STEPS = [
-  { step: 1, label: 'BUILDING' },
-  { step: 2, label: 'ENERGY' },
-  { step: 3, label: 'BUDGET' },
-  { step: 4, label: 'OBJECTIVE' },
+  { step: 1, label: 'BANGUNAN' },
+  { step: 2, label: 'ENERGI' },
+  { step: 3, label: 'ANGGARAN' },
+  { step: 4, label: 'TUJUAN' },
 ];
 
 export function Stepper({ currentStep }: StepperProps) {

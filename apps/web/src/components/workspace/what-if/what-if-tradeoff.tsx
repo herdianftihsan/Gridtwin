@@ -16,13 +16,13 @@ export function WhatIfTradeoff({
   const nextPv = whatIfResult.configuration.pv_kwp;
 
   // Construct grounded trade-off narrative derived purely from verified backend changes
-  let narrative = 'Exploring alternative system configuration balances upfront investment against long-term energy savings.';
+  let narrative = 'Mengeksplorasi konfigurasi sistem alternatif menyeimbangkan investasi awal terhadap penghematan energi jangka panjang.';
   if (nextBat > curBat) {
-    narrative = `Adding ${nextBat - curBat} kWh of battery storage increases grid autonomy and peak shifting, but raises initial CAPEX and extends the payback period.`;
+    narrative = `Menambahkan penyimpanan baterai sebesar ${nextBat - curBat} kWh meningkatkan otonomi jaringan dan pergeseran beban puncak, tetapi meningkatkan CAPEX awal dan memperpanjang masa pengembalian.`;
   } else if (nextPv > curPv) {
-    narrative = `Increasing Solar PV to ${nextPv} kWp maximizes daytime generation, but surplus power is uncredited under ESDM No. 2/2024 regulations without sufficient storage.`;
+    narrative = `Meningkatkan Panel Surya menjadi ${nextPv} kWp memaksimalkan produksi listrik di siang hari, tetapi kelebihan daya tidak akan mendapat kredit di bawah regulasi ESDM No. 2/2024 tanpa penyimpanan yang cukup.`;
   } else if (whatIfResult.financial.capex < currentResult.financial.capex) {
-    narrative = 'Lowering upfront CAPEX reduces initial capital commitment, but yields lower monthly electricity bill savings.';
+    narrative = 'Menurunkan CAPEX awal mengurangi komitmen modal awal, tetapi menghasilkan penghematan tagihan listrik bulanan yang lebih rendah.';
   }
 
   return (
@@ -30,7 +30,7 @@ export function WhatIfTradeoff({
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-bold text-sky-950 uppercase tracking-wider flex items-center gap-1.5">
           <span>⚖️</span>
-          <span>KEY TRADE-OFF</span>
+          <span>KOMPROMI UTAMA</span>
         </span>
       </div>
       <p className="text-xs text-sky-900 leading-relaxed">

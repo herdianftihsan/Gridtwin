@@ -1,30 +1,31 @@
 // apps/web/src/app/demo/page.tsx
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { SimulationResult, Project, Scenario } from '../../../types/api';
-import { EnergyCanvas } from '../../../components/workspace/energy-canvas/energy-canvas';
-import { FinancialImpactCard } from '../../../components/workspace/metric-panels/financial-impact-card';
-import { SimulationControls } from '../../../components/workspace/simulation-controls/simulation-controls';
-import { ScenarioTabs } from '../../../components/workspace/scenario-tabs';
-import { DecisionSummaryModal } from '../../../components/workspace/decision-summary/decision-summary-modal';
+import React, { useState } from "react";
+import { SimulationResult, Project, Scenario } from "../../../types/api";
+import { EnergyCanvas } from "../../../components/workspace/energy-canvas/energy-canvas";
+import { FinancialImpactCard } from "../../../components/workspace/metric-panels/financial-impact-card";
+import { SimulationControls } from "../../../components/workspace/simulation-controls/simulation-controls";
+import { ScenarioTabs } from "../../../components/workspace/scenario-tabs";
+import { DecisionSummaryModal } from "../../../components/workspace/decision-summary-modal";
 import {
   ScenarioList,
   ScenarioComparisonModal,
   SaveScenarioButton,
-} from '../../../components/workspace/scenarios';
-import { WhatIfPanel } from '../../../components/workspace/what-if/what-if-panel';
-import { ExplanationPanel } from '../../../components/workspace/ai/explanation-panel';
-import { SimulationConfig, WorkspaceTab } from '../../../components/workspace/types';
+} from "../../../components/workspace/scenarios";
+import { WhatIfPanel } from "../../../components/workspace/what-if/what-if-panel";
+import { ExplanationPanel } from "../../../components/workspace/ai/explanation-panel";
+import { SimulationConfig, WorkspaceTab } from "../../../components/workspace/types";
+import { AuthGuard } from "../../../components/auth/auth-guard";
 
 const MOCK_PROJECT: Project = {
-  id: 'demo-ruko-01',
-  building_type: 'Ruko',
-  location: 'Surabaya',
+  id: "demo-ruko-01",
+  building_type: "Ruko",
+  location: "Surabaya",
   roof_area: 50,
   monthly_bill: 4500000,
   budget: 50000000,
-  objective: 'save_money',
+  objective: "save_money",
 };
 
 const INITIAL_RESULT: SimulationResult = {
@@ -33,6 +34,8 @@ const INITIAL_RESULT: SimulationResult = {
     battery_kwh: 5,
     ac_units: 2,
     led_upgraded: true,
+    refrigerator_units: 1,
+    water_pump_upgraded: false,
   },
   baseline: {
     monthly_cost: 4500000,
@@ -63,14 +66,19 @@ const INITIAL_RESULT: SimulationResult = {
     performance_ratio: 0.75,
     battery_charge_efficiency: 0.95,
     battery_discharge_efficiency: 0.95,
-    source_version: 'mvp-1.0',
+    source_version: "mvp-1.0",
   },
 };
 
 const BASELINE_RESULT: SimulationResult = {
-  configuration: { pv_kwp: 0, battery_kwh: 0, ac_units: 0, led_upgraded: false },
+  configuration: { pv_kwp: 0, battery_kwh: 0, ac_units: 0, led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: false },
   baseline: { monthly_cost: 4500000, monthly_kwh: 3000 },
-  energy: { monthly_demand_kwh: 3000, solar_yield_monthly: 0, grid_import_monthly: 3000, wasted_surplus_monthly: 0 },
+  energy: {
+    monthly_demand_kwh: 3000,
+    solar_yield_monthly: 0,
+    grid_import_monthly: 3000,
+    wasted_surplus_monthly: 0,
+  },
   financial: { capex: 0, new_monthly_cost: 4500000, monthly_savings: 0, payback_years: null },
   environmental: { co2_reduction_kg_yr: 0, co2_reduction_pct: 0 },
   grid: { independence_pct: 0 },
@@ -79,38 +87,40 @@ const BASELINE_RESULT: SimulationResult = {
 
 const INITIAL_SCENARIOS: Scenario[] = [
   {
-    id: 'demo-rec-01',
-    project_id: 'demo-ruko-01',
-    scenario_type: 'recommended',
+    id: "demo-rec-01",
+    project_id: "demo-ruko-01",
+    scenario_type: "recommended",
     is_recommended: true,
     solar_kwp: 4,
     battery_kwh: 5,
     ac_units: 2,
     is_led_upgraded: true,
+    refrigerator_units: 1,
+    water_pump_upgraded: false,
     simulation_result: INITIAL_RESULT,
     created_at: new Date().toISOString(),
   },
 ];
 
 export default function DemoPage() {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('recommended');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("recommended");
   const [currentConfig, setCurrentConfig] = useState<SimulationConfig>({
     solar_kwp: 4,
     battery_kwh: 5,
     ac_units: 2,
     is_led_upgraded: true,
+    refrigerator_units: 1,
+    water_pump_upgraded: false,
   });
   const [currentResult, setCurrentResult] = useState<SimulationResult>(INITIAL_RESULT);
   const [scenarios, setScenarios] = useState<Scenario[]>(INITIAL_SCENARIOS);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  // Modals & Panels State (Phase 14 & 15)
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
   const [compareScenario, setCompareScenario] = useState<Scenario | null>(null);
 
-  // Kalkulasi instan simulasi lokal khusus mode demo
   const computeSimulation = (cfg: SimulationConfig): SimulationResult => {
     const pv = cfg.solar_kwp;
     const bat = cfg.battery_kwh;
@@ -128,6 +138,8 @@ export default function DemoPage() {
         battery_kwh: bat,
         ac_units: cfg.ac_units,
         led_upgraded: cfg.is_led_upgraded,
+        refrigerator_units: cfg.refrigerator_units ?? 0,
+        water_pump_upgraded: cfg.water_pump_upgraded ?? false,
       },
       baseline: { monthly_cost: 4500000, monthly_kwh: 3000 },
       energy: {
@@ -156,19 +168,19 @@ export default function DemoPage() {
   const handleConfigChange = (partial: Partial<SimulationConfig>) => {
     const updated = { ...currentConfig, ...partial };
     setCurrentConfig(updated);
-    setActiveTab('custom');
+    setActiveTab("custom");
     setIsSaved(false);
     setCurrentResult(computeSimulation(updated));
   };
 
   const handleTabSelect = (tab: WorkspaceTab) => {
     setActiveTab(tab);
-    if (tab === 'recommended') {
-      const recCfg = { solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true };
+    if (tab === "recommended") {
+      const recCfg = { solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true, refrigerator_units: 1, water_pump_upgraded: false };
       setCurrentConfig(recCfg);
       setCurrentResult(INITIAL_RESULT);
-    } else if (tab === 'baseline') {
-      const baseCfg = { solar_kwp: 0, battery_kwh: 0, ac_units: 0, is_led_upgraded: false };
+    } else if (tab === "baseline") {
+      const baseCfg = { solar_kwp: 0, battery_kwh: 0, ac_units: 0, is_led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: false };
       setCurrentConfig(baseCfg);
       setCurrentResult(BASELINE_RESULT);
     }
@@ -182,13 +194,15 @@ export default function DemoPage() {
       const simRes = computeSimulation(cfg);
       const newScenario: Scenario = {
         id: `demo-sc-${Date.now()}`,
-        project_id: 'demo-ruko-01',
-        scenario_type: 'custom',
+        project_id: "demo-ruko-01",
+        scenario_type: "custom",
         is_recommended: false,
         solar_kwp: cfg.solar_kwp,
         battery_kwh: cfg.battery_kwh,
         ac_units: cfg.ac_units,
         is_led_upgraded: cfg.is_led_upgraded,
+        refrigerator_units: cfg.refrigerator_units ?? 0,
+        water_pump_upgraded: cfg.water_pump_upgraded ?? false,
         simulation_result: simRes,
         created_at: new Date().toISOString(),
       };
@@ -210,139 +224,143 @@ export default function DemoPage() {
         battery_kwh: sc.battery_kwh,
         ac_units: sc.ac_units,
         is_led_upgraded: sc.is_led_upgraded,
+        refrigerator_units: sc.refrigerator_units,
+        water_pump_upgraded: sc.water_pump_upgraded,
       });
       setCurrentResult(sc.simulation_result);
-      setActiveTab(sc.is_recommended ? 'recommended' : 'custom');
+      setActiveTab(sc.is_recommended ? "recommended" : "custom");
       setIsSaved(true);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC]">
-      <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* Banner Demo Mode */}
-        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-900 font-medium">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-            <span>Mode Demo Aktif: Menampilkan preview lengkap Energy Canvas, Skenario & What-If AI.</span>
-          </div>
-          <span className="font-bold text-sky-700 uppercase tracking-wider text-[10px] bg-sky-100 px-2 py-0.5 rounded">
-            Phase 15 Preview
-          </span>
-        </div>
-
-        {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              <span>{MOCK_PROJECT.building_type}</span>
-              <span>•</span>
-              <span>{MOCK_PROJECT.location}</span>
+    <AuthGuard>
+      <main className="min-h-screen bg-[#F8FAFC]">
+        <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-900 font-medium">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+              <span>
+                Mode Demo Aktif: Menampilkan preview lengkap Energy Canvas, Skenario & What-If AI.
+              </span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
-              Decision Workspace
-            </h1>
+            <span className="font-bold text-sky-700 uppercase tracking-wider text-[10px] bg-sky-100 px-2 py-0.5 rounded">
+              Phase 15 Preview
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Tombol Akses Fitur What-If (Phase 15) */}
-            <button
-              type="button"
-              onClick={() => setIsWhatIfOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-50 text-sky-700 border border-sky-300 hover:bg-sky-100 text-xs font-bold transition-all shadow-xs cursor-pointer"
-            >
-              <span className="text-sm">✦</span>
-              <span>What if?</span>
-            </button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <span>{MOCK_PROJECT.building_type}</span>
+                <span>•</span>
+                <span>{MOCK_PROJECT.location}</span>
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
+                Decision Workspace
+              </h1>
+            </div>
 
-            <SaveScenarioButton
-              config={currentConfig}
-              onSave={handleSaveScenario}
-              isSaving={isSaving}
-              isSaved={isSaved}
-            />
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsWhatIfOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-50 text-sky-700 border border-sky-300 hover:bg-sky-100 text-xs font-bold transition-all shadow-xs cursor-pointer"
+              >
+                <span className="text-sm">✦</span>
+                <span>What if?</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setIsSummaryOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-sm transition-all cursor-pointer"
-            >
-              Export Decision Summary
-            </button>
-          </div>
-        </div>
+              <SaveScenarioButton
+                config={currentConfig}
+                onSave={handleSaveScenario}
+                isSaving={isSaving}
+                isSaved={isSaved}
+              />
 
-        {/* 2 Kolom Layout Asimetris (65% Canvas & Controls / 35% Panels & Scenarios) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Kolom Kiri: Canvas & Slider Controls */}
-          <div className="lg:col-span-8 space-y-6">
-            <EnergyCanvas
-              result={currentResult}
-              project={MOCK_PROJECT}
-            />
-            <SimulationControls
-              config={currentConfig}
-              maxRoofPv={7}
-              onChange={handleConfigChange}
-            />
+              <button
+                type="button"
+                onClick={() => setIsSummaryOpen(true)}
+                className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-sm transition-all cursor-pointer"
+              >
+                Export Decision Summary
+              </button>
+            </div>
           </div>
 
-          {/* Kolom Kanan: Financial KPI, Tabs, AI Explanation & Scenario List */}
-          <div className="lg:col-span-4 space-y-6">
-            <FinancialImpactCard result={currentResult} />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Kolom Kiri: Canvas & Slider Controls */}
+            <div className="lg:col-span-8 space-y-6">
+              <EnergyCanvas result={currentResult} project={MOCK_PROJECT} />
+              <SimulationControls
+                config={currentConfig}
+                maxRoofPv={7}
+                onChange={handleConfigChange}
+              />
+            </div>
 
-            {/* AI Explanation Card (Phase 15) */}
-            <ExplanationPanel scenarioId={scenarios[0]?.id} />
+            <div className="lg:col-span-4 space-y-6">
+              <FinancialImpactCard result={currentResult} />
 
-            <ScenarioTabs
-              activeTab={activeTab}
-              onTabSelect={handleTabSelect}
-              recommendedScenario={scenarios[0] ?? null}
-            />
+              {/* AI Explanation Card (Phase 15) */}
+              <ExplanationPanel scenarioId={scenarios[0]?.id} />
 
-            <ScenarioList
-              scenarios={scenarios}
-              selectedScenarioId={
-                activeTab === 'recommended' ? scenarios[0]?.id : undefined
-              }
-              onSelectScenario={handleSelectSavedScenario}
-              onCompareScenario={(sc) => setCompareScenario(sc)}
-            />
+              <ScenarioTabs
+                activeTab={activeTab}
+                onTabSelect={handleTabSelect}
+                recommendedScenario={scenarios[0] ?? null}
+              />
+
+              <ScenarioList
+                scenarios={scenarios}
+                selectedScenarioId={activeTab === "recommended" ? scenarios[0]?.id : undefined}
+                onSelectScenario={handleSelectSavedScenario}
+                onCompareScenario={(sc) => setCompareScenario(sc)}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Modal 1: Decision Summary (Phase 14) */}
-        <DecisionSummaryModal
-          isOpen={isSummaryOpen}
-          onClose={() => setIsSummaryOpen(false)}
-          project={MOCK_PROJECT}
-          result={currentResult}
-          onSaveScenario={() => handleSaveScenario(currentConfig)}
-          isSaving={isSaving}
-        />
-
-        {/* Modal 2: Scenario Comparison Matrix (Phase 14) */}
-        {compareScenario && compareScenario.simulation_result && (
-          <ScenarioComparisonModal
-            isOpen={Boolean(compareScenario)}
-            onClose={() => setCompareScenario(null)}
-            baselineResult={BASELINE_RESULT}
-            targetResult={compareScenario.simulation_result}
-            targetScenarioTitle={
-              compareScenario.is_recommended ? 'Recommended Scenario' : 'Custom Saved Scenario'
-            }
+          <DecisionSummaryModal
+            isOpen={isSummaryOpen}
+            onClose={() => setIsSummaryOpen(false)}
+            project={MOCK_PROJECT}
+            result={currentResult}
           />
-        )}
 
-        {/* Drawer 3: What-if Decision Exploration Panel (Phase 15) */}
-        <WhatIfPanel
-          isOpen={isWhatIfOpen}
-          onClose={() => setIsWhatIfOpen(false)}
-          projectId="demo-ruko-01"
-          currentResult={currentResult}
-          onScenarioSaved={handleWhatIfSaved}
-        />
-      </div>
-    </main>
+          {compareScenario && compareScenario.simulation_result && (
+            <ScenarioComparisonModal
+              isOpen={Boolean(compareScenario)}
+              onClose={() => setCompareScenario(null)}
+              scenarios={[
+                {
+                  id: 'baseline-demo',
+                  project_id: MOCK_PROJECT.id,
+                  name: 'Baseline',
+                  scenario_type: 'custom',
+                  solar_kwp: 0,
+                  battery_kwh: 0,
+                  ac_units: 0,
+                  is_led_upgraded: false,
+                  refrigerator_units: 0,
+                  water_pump_upgraded: false,
+                  simulation_result: BASELINE_RESULT,
+                  is_recommended: false,
+                  created_at: new Date().toISOString()
+                },
+                compareScenario
+              ]}
+            />
+          )}
+
+          <WhatIfPanel
+            isOpen={isWhatIfOpen}
+            onClose={() => setIsWhatIfOpen(false)}
+            projectId="demo-ruko-01"
+            currentResult={currentResult}
+            onScenarioSaved={handleWhatIfSaved}
+          />
+        </div>
+      </main>
+    </AuthGuard>
   );
 }

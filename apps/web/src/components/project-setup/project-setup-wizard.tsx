@@ -38,15 +38,19 @@ export function ProjectSetupWizard() {
     const err: Record<string, string> = {};
 
     if (currentStep === 1) {
-      if (!formData.location) err['location'] = 'Please select a location.';
-      if (!formData.building_type) err['building_type'] = 'Please select a building type.';
+      if (!formData.location) err['location'] = 'Lokasi harus dipilih dari hasil pencarian.';
+      if (!formData.building_type) err['building_type'] = 'Harap pilih jenis bangunan.';
     } else if (currentStep === 2) {
       if (!formData.monthly_bill || formData.monthly_bill <= 0) {
-        err['monthly_bill'] = 'Monthly bill must be greater than Rp 0.';
+        err['monthly_bill'] = 'Tagihan bulanan harus lebih besar dari Rp 0.';
       }
     } else if (currentStep === 3) {
       if (!formData.budget || formData.budget < 1000000) {
-        err['budget'] = 'Minimum budget is Rp 1.000.000.';
+        err['budget'] = 'Anggaran minimum adalah Rp 1.000.000.';
+      }
+    } else if (currentStep === 4) {
+      if (!formData.objective) {
+        err['objective'] = 'Harap pilih tujuan proyek Anda.';
       }
     }
 
@@ -93,7 +97,7 @@ export function ProjectSetupWizard() {
       if (err instanceof ApiClientError) {
         setApiError(err.message);
       } else {
-        setApiError('An unexpected error occurred while creating your project.');
+        setApiError('Terjadi kesalahan tak terduga saat membuat proyek Anda.');
       }
       setIsLoading(false);
     }
@@ -161,6 +165,7 @@ export function ProjectSetupWizard() {
               <StepObjective
                 formData={formData}
                 updateFormData={updateFormData}
+                errors={errors}
               />
             )}
           </motion.div>
@@ -177,7 +182,7 @@ export function ProjectSetupWizard() {
             step === 1 ? 'invisible' : 'visible'
           }`}
         >
-          ← Back
+          ← Kembali
         </button>
 
         {step < 4 ? (
@@ -187,7 +192,7 @@ export function ProjectSetupWizard() {
             {...buttonMotionProps}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition-colors shadow-sm cursor-pointer"
           >
-            <span>Continue</span>
+            <span>Lanjutkan</span>
             <span>→</span>
           </motion.button>
         ) : (
@@ -201,11 +206,11 @@ export function ProjectSetupWizard() {
             {isLoading ? (
               <span className="inline-flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Optimizing...</span>
+                <span>Mengoptimalkan...</span>
               </span>
             ) : (
               <>
-                <span>Generate My Energy Twin</span>
+                <span>Buat Energy Twin Saya</span>
                 <span>✨</span>
               </>
             )}

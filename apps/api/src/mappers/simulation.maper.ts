@@ -9,6 +9,8 @@ export interface DatabaseScenarioRow {
   battery_kwh: number;
   ac_units: number;
   is_led_upgraded: boolean;
+  refrigerator_units: number;
+  water_pump_upgraded: boolean;
   is_recommended: boolean;
   what_if_query: string | null;
   ai_explanation: string | null;
@@ -47,6 +49,8 @@ export const toSimulationResultContract = (
       battery_kwh: Number(scenario.battery_kwh),
       ac_units: Number(scenario.ac_units),
       led_upgraded: Boolean(scenario.is_led_upgraded),
+      refrigerator_units: scenario.refrigerator_units != null ? Number(scenario.refrigerator_units) : 0,
+      water_pump_upgraded: scenario.water_pump_upgraded != null ? Boolean(scenario.water_pump_upgraded) : false,
     },
     baseline: {
       monthly_cost: Number(simResult.baseline_monthly_cost),

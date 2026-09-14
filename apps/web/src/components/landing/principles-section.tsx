@@ -6,22 +6,22 @@ import { ProductPrinciple } from './types';
 
 const PRINCIPLES: ProductPrinciple[] = [
   {
-    title: 'Deterministic Simulation',
+    title: 'Simulasi Deterministik',
     description: 'Pemodelan matematis murni berdasarkan rumus fisika energi yang terpisah penuh dari generasi teks AI.',
     iconType: 'math',
   },
   {
-    title: 'Transparent Assumptions',
+    title: 'Asumsi Transparan',
     description: 'Mengacu pada tarif resmi ESDM, data radiasi Global Solar Atlas, dan faktor efisiensi baterai realistis.',
     iconType: 'shield',
   },
   {
-    title: 'Financial & Energy Trade-offs',
+    title: 'Trade-off Finansial & Energi',
     description: 'Evaluasi jujur terhadap batasan non-ekspor Permen ESDM No. 2/2024 guna memaksimalkan konsumsi mandiri.',
     iconType: 'balance',
   },
   {
-    title: 'Explainable Decision AI',
+    title: 'AI untuk Keputusan Transparan',
     description: 'Analisis AI kontekstual yang menjabarkan alasan pemilihan konfigurasi tanpa mengubah angka simulasi.',
     iconType: 'ai',
   },
@@ -39,10 +39,10 @@ export function PrinciplesSection() {
           className="text-center max-w-xl mx-auto space-y-3"
         >
           <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
-            ENGINEERING CREDIBILITY
+            KREDIBILITAS TEKNIS
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Engineering-grade intelligence
+            Analisis setara ahli teknis
           </h2>
           <p className="text-sm text-slate-600 font-normal leading-relaxed">
             Dirancang bagi pemilik gedung dan pengambil keputusan yang membutuhkan kalkulasi finansial terverifikasi.

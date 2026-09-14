@@ -22,6 +22,9 @@ router.get('/:id', projectController.getById);
 router.patch('/:id', validateBody(updateProjectSchema), projectController.update);
 router.delete('/:id', projectController.delete);
 
+router.get('/:id/scenarios', projectController.listScenarios);
+router.get('/:id/roadmap', projectController.getRoadmap);
+
 router.post('/:id/simulate', validateBody(simulateSchema), simulationController.simulate);
 router.post('/:id/optimize', validateBody(optimizeSchema), simulationController.optimize);
 

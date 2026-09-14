@@ -6,7 +6,7 @@ import { mapSimulationToCanvas } from './energy-status';
 import { SimulationResult } from '../../../types/api';
 
 const mockBaseResult: SimulationResult = {
-  configuration: { pv_kwp: 4, battery_kwh: 5, ac_units: 2, led_upgraded: true },
+  configuration: { pv_kwp: 4, battery_kwh: 5, ac_units: 2, led_upgraded: true, refrigerator_units: 0, water_pump_upgraded: false },
   baseline: { monthly_cost: 4500000, monthly_kwh: 3000 },
   energy: { monthly_demand_kwh: 2796, solar_yield_monthly: 405, grid_import_monthly: 2391, wasted_surplus_monthly: 0 },
   financial: { capex: 96500000, new_monthly_cost: 3586500, monthly_savings: 913500, payback_years: 8.8 },
@@ -48,7 +48,7 @@ describe('Phase 13: Energy Canvas & Telemetry Mapping', () => {
     expect(gridConn?.isActive).toBe(true);
   });
 
-  it('4. renders all 6 required node elements on the canvas', () => {
+  it('4. renders all 8 required node elements on the canvas', () => {
     render(<EnergyCanvas result={mockBaseResult} />);
 
     expect(screen.getByText('SOLAR PV')).toBeDefined();
@@ -57,6 +57,8 @@ describe('Phase 13: Energy Canvas & Telemetry Mapping', () => {
     expect(screen.getByText('PLN GRID')).toBeDefined();
     expect(screen.getByText('AIR CONDITIONER')).toBeDefined();
     expect(screen.getByText('SMART LED')).toBeDefined();
+    expect(screen.getByText('REFRIGERATION')).toBeDefined();
+    expect(screen.getByText('WATER PUMP')).toBeDefined();
   });
 
   it('5. opens telemetry inspector when a node is clicked', async () => {

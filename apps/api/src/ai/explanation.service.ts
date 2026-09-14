@@ -1,17 +1,20 @@
-import { geminiClient, GeminiClient } from './gemini.client.js';
+import { geminiClient, AIProvider } from './gemini.client.js';
 import { buildExplainPrompt } from './prompts/explain.js';
 import { AiExplainInputPayload } from './types.js';
 import { AiError } from './errors.js';
 
 export class ExplanationService {
-  constructor(private readonly client: GeminiClient = geminiClient) {}
+  constructor(private readonly provider: AIProvider = geminiClient) {}
 
   async generateExplanation(payload: AiExplainInputPayload): Promise<string> {
-    const prompt = buildExplainPrompt(payload);
+    const messages = buildExplainPrompt(payload);
     let explanation: string;
 
     try {
-      explanation = await this.client.generateContent(prompt);
+      explanation = await this.provider.generateText({
+        messages,
+        maxTokens: 250,
+      });
     } catch (err) {
       if (err instanceof AiError) {
         throw err;

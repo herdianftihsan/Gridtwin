@@ -1,3 +1,4 @@
+import { AiError } from '../ai/errors.js';
 import { projectService } from './project.service.js';
 import { scenarioRepository } from '../repositories/scenario.repository.js';
 import { simulationResultRepository } from '../repositories/simulation-result.repository.js';
@@ -39,6 +40,8 @@ export class AiService {
         battery_kwh: intent.battery_kwh ?? 0,
         ac_units: intent.ac_units ?? 0,
         is_led_upgraded: intent.is_led_upgraded ?? false,
+        refrigerator_units: intent.refrigerator_units ?? 0,
+        water_pump_upgraded: intent.water_pump_upgraded ?? false,
       };
       simulationResult = simulate(finalConfig, context);
     } else {
@@ -55,6 +58,8 @@ export class AiService {
       battery_kwh: finalConfig.battery_kwh,
       ac_units: finalConfig.ac_units,
       is_led_upgraded: finalConfig.is_led_upgraded,
+      refrigerator_units: finalConfig.refrigerator_units,
+      water_pump_upgraded: finalConfig.water_pump_upgraded,
       is_recommended: false,
       what_if_query: input.message,
     });
@@ -91,21 +96,35 @@ export class AiService {
     const simulationResult = toSimulationResultContract(scenario, scenario.simulation_results);
 
     // 3. Request Gemini natural language explanation
-    const explanation = await explanationService.generateExplanation({
-      configuration: {
-        solar_kwp: Number(scenario.solar_kwp),
-        battery_kwh: Number(scenario.battery_kwh),
-        ac_units: Number(scenario.ac_units),
-        is_led_upgraded: Boolean(scenario.is_led_upgraded),
-      },
-      baseline: simulationResult.baseline,
-      energy: simulationResult.energy,
-      financial: simulationResult.financial,
-      environmental: simulationResult.environmental,
-      grid: simulationResult.grid,
-      assumptions: simulationResult.assumptions,
-      user_context_question: input.user_context_question,
-    });
+    let explanation: string;
+    let explanationUnavailable = false;
+
+    try {
+      explanation = await explanationService.generateExplanation({
+        configuration: {
+          solar_kwp: Number(scenario.solar_kwp),
+          battery_kwh: Number(scenario.battery_kwh),
+          ac_units: Number(scenario.ac_units),
+          is_led_upgraded: Boolean(scenario.is_led_upgraded),
+          refrigerator_units: Number(scenario.refrigerator_units),
+          water_pump_upgraded: Boolean(scenario.water_pump_upgraded),
+        },
+        baseline: simulationResult.baseline,
+        energy: simulationResult.energy,
+        financial: simulationResult.financial,
+        environmental: simulationResult.environmental,
+        grid: simulationResult.grid,
+        assumptions: simulationResult.assumptions,
+        user_context_question: input.user_context_question,
+      });
+    } catch (err) {
+      if (err instanceof AiError) {
+        explanation = 'Simulation completed, but the AI explanation is temporarily unavailable.';
+        explanationUnavailable = true;
+      } else {
+        throw err;
+      }
+    }
 
     // 4. Persist generated explanation to scenario record
     await scenarioRepository.updateExplanation(scenario.id, explanation);
@@ -113,6 +132,8 @@ export class AiService {
     return {
       scenario_id: scenario.id,
       explanation,
+      explanationUnavailable,
+      simulation_result: simulationResult,
     };
   }
 }

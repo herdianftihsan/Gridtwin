@@ -3,6 +3,8 @@ export interface SimulationConfig {
   readonly battery_kwh: number;
   readonly ac_units: number;
   readonly is_led_upgraded: boolean;
+  readonly refrigerator_units: number;
+  readonly water_pump_upgraded: boolean;
 }
 
 export interface SimulationContext {
@@ -43,6 +45,8 @@ export interface BaselineModelResult {
 export interface EfficiencyResult {
   readonly ac_saving_monthly: number;
   readonly led_saving_monthly: number;
+  readonly refrigerator_saving_monthly: number;
+  readonly pump_saving_monthly: number;
   readonly total_efficiency_saving_monthly: number;
   readonly monthly_demand_post_efficiency: number;
 }
@@ -97,6 +101,8 @@ export interface SimulationResult {
     readonly battery_kwh: number;
     readonly ac_units: number;
     readonly led_upgraded: boolean;
+    readonly refrigerator_units: number;
+    readonly water_pump_upgraded: boolean;
   };
   readonly baseline: {
     readonly monthly_cost: number;

@@ -27,7 +27,7 @@ export function PasswordField({ label, error, className = '', ...props }: Passwo
         <button
           type="button"
           onClick={() => setIsVisible((prev) => !prev)}
-          aria-label={isVisible ? 'Hide password' : 'Show password'}
+          aria-label={isVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1"
         >
           <AnimatePresence mode="wait" initial={false}>

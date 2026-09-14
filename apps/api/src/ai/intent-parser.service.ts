@@ -1,18 +1,26 @@
-import { geminiClient, GeminiClient } from './gemini.client.js';
+import { geminiClient, AIProvider } from './gemini.client.js';
 import { buildWhatIfPrompt } from './prompts/what-if.js';
 import { whatIfIntentSchema, WhatIfIntentOutput } from './schemas.js';
 import { AiError } from './errors.js';
+import { ValidationError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 
 export class IntentParserService {
-  constructor(private readonly client: GeminiClient = geminiClient) {}
+  constructor(private readonly provider: AIProvider = geminiClient) {}
 
   async parseWhatIfIntent(userMessage: string): Promise<WhatIfIntentOutput> {
-    const prompt = buildWhatIfPrompt(userMessage);
+    if (userMessage.length > 500) {
+      throw new ValidationError('Message cannot exceed 500 characters.');
+    }
+
+    const messages = buildWhatIfPrompt(userMessage);
     let rawResponse: string;
 
     try {
-      rawResponse = await this.client.generateContent(prompt);
+      rawResponse = await this.provider.generateStructured({
+        messages,
+        maxTokens: 150,
+      });
     } catch (err) {
       if (err instanceof AiError) {
         throw err;
@@ -34,17 +42,22 @@ export class IntentParserService {
       const validated = whatIfIntentSchema.safeParse(parsedJson);
 
       if (!validated.success) {
-        logger.warn('Gemini intent schema validation failed', {
+        logger.warn('AI intent schema validation failed', {
           issues: validated.error.issues,
           rawResponse,
         });
         throw new AiError('Invalid intent structure returned by AI model.');
       }
 
+      if (validated.data.action === 'reject') {
+        throw new ValidationError(validated.data.rejection_reason || 'Unrelated or malicious query rejected.');
+      }
+
       return validated.data;
     } catch (err) {
       if (err instanceof AiError) throw err;
-      logger.warn('Failed to parse Gemini intent JSON', { rawResponse, error: err });
+      if (err instanceof ValidationError) throw err;
+      logger.warn('Failed to parse AI intent JSON', { rawResponse, error: err });
       throw new AiError('AI model failed to generate a valid structured JSON intent.');
     }
   }

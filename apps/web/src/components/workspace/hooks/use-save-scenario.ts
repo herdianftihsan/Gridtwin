@@ -17,7 +17,7 @@ export function useSaveScenario({ projectId, onSuccess }: UseSaveScenarioOptions
   const isSubmittingRef = useRef(false);
 
   const saveScenario = useCallback(
-    async (config: SimulationConfig) => {
+    async (config: SimulationConfig, name?: string) => {
       // Guard against rapid duplicate clicks
       if (isSubmittingRef.current || isSaving) return;
 
@@ -35,19 +35,25 @@ export function useSaveScenario({ projectId, onSuccess }: UseSaveScenarioOptions
           battery_kwh: config.battery_kwh,
           ac_units: config.ac_units,
           is_led_upgraded: config.is_led_upgraded,
+          refrigerator_units: config.refrigerator_units,
+          water_pump_upgraded: config.water_pump_upgraded,
           persist: true,
+          name,
         });
 
         if (res.data) {
           const newScenario: Scenario = {
             id: res.data.scenario_id,
             project_id: projectId,
+            name,
             scenario_type: res.data.scenario_type as 'recommended' | 'custom' | 'what_if',
             is_recommended: false,
             solar_kwp: config.solar_kwp,
             battery_kwh: config.battery_kwh,
             ac_units: config.ac_units,
             is_led_upgraded: config.is_led_upgraded,
+            refrigerator_units: config.refrigerator_units,
+            water_pump_upgraded: config.water_pump_upgraded,
             simulation_result: res.data.simulation_result,
             created_at: new Date().toISOString(),
           };

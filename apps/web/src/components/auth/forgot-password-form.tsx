@@ -36,7 +36,7 @@ export function ForgotPasswordForm() {
     setErrorMessage(null);
 
     if (!email || !email.includes('@')) {
-      setErrorMessage("We couldn't send the reset link. Please check your email and try again.");
+      setErrorMessage("Kami tidak dapat mengirim tautan reset. Silakan periksa email Anda dan coba lagi.");
       return;
     }
 
@@ -78,8 +78,8 @@ export function ForgotPasswordForm() {
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Check your inbox</h2>
-          <p className="text-sm text-slate-500">We&apos;ve sent a password reset link to your email address.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Periksa kotak masuk Anda</h2>
+          <p className="text-sm text-slate-500">Kami telah mengirimkan tautan reset kata sandi ke alamat email Anda.</p>
         </div>
 
         <div className="inline-block px-4 py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700">
@@ -91,11 +91,11 @@ export function ForgotPasswordForm() {
             href="/login"
             className="block w-full py-2.5 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition-colors shadow-sm text-center"
           >
-            Back to sign in
+            Kembali ke halaman masuk
           </Link>
 
           <div className="p-4 rounded-lg bg-slate-50 border border-slate-100 text-xs text-slate-500 space-y-1">
-            <p>Didn&apos;t receive the email?</p>
+            <p>Tidak menerima email?</p>
             {canResend ? (
               <button
                 type="button"
@@ -103,11 +103,11 @@ export function ForgotPasswordForm() {
                 disabled={isLoading}
                 className="font-semibold text-slate-900 hover:text-sky-600 transition-colors cursor-pointer"
               >
-                Resend email now
+                Kirim ulang email sekarang
               </button>
             ) : (
               <p className="text-slate-400 font-mono">
-                Resend email (0:{countdown < 10 ? `0${countdown}` : countdown})
+                Kirim ulang email (0:{countdown < 10 ? `0${countdown}` : countdown})
               </p>
             )}
           </div>
@@ -126,9 +126,9 @@ export function ForgotPasswordForm() {
       </motion.div>
 
       <motion.div variants={formItemVariants} className="space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Reset your password</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Reset kata sandi Anda</h2>
         <p className="text-sm text-slate-500">
-          Enter your email and we&apos;ll send you a secure link to reset your password.
+          Masukkan email Anda dan kami akan mengirimkan tautan aman untuk mereset kata sandi Anda.
         </p>
       </motion.div>
 
@@ -153,7 +153,7 @@ export function ForgotPasswordForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <motion.div variants={formItemVariants} className="space-y-1.5">
           <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-            Email address
+            Alamat email
           </label>
           <div className="relative">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -165,7 +165,7 @@ export function ForgotPasswordForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="nama@perusahaan.com"
               disabled={isLoading}
               required
               className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all shadow-sm ${
@@ -185,10 +185,10 @@ export function ForgotPasswordForm() {
             {isLoading ? (
               <span className="inline-flex items-center justify-center gap-2">
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Sending...</span>
+                <span>Mengirim...</span>
               </span>
             ) : (
-              'Send reset link →'
+              'Kirim tautan reset →'
             )}
           </motion.button>
         </motion.div>
@@ -199,7 +199,7 @@ export function ForgotPasswordForm() {
           href="/login"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
         >
-          <span>←</span> Back to sign in
+          <span>←</span> Kembali ke halaman masuk
         </Link>
       </motion.div>
     </div>

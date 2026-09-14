@@ -16,9 +16,11 @@ const mockScenario: Scenario = {
   battery_kwh: 5,
   ac_units: 2,
   is_led_upgraded: true,
+  refrigerator_units: 0,
+  water_pump_upgraded: false,
   created_at: '2026-03-01T10:00:00Z',
   simulation_result: {
-    configuration: { pv_kwp: 4, battery_kwh: 5, ac_units: 2, led_upgraded: true },
+    configuration: { pv_kwp: 4, battery_kwh: 5, ac_units: 2, led_upgraded: true, refrigerator_units: 0, water_pump_upgraded: false },
     baseline: { monthly_cost: 4500000, monthly_kwh: 3000 },
     energy: { monthly_demand_kwh: 2796, solar_yield_monthly: 405, grid_import_monthly: 946, wasted_surplus_monthly: 0 },
     financial: { capex: 101500000, new_monthly_cost: 1420000, monthly_savings: 3080000, payback_years: 3.8 },
@@ -80,7 +82,7 @@ describe('Phase 14: Scenario Management & Comparison', () => {
     const onSave = vi.fn();
     render(
       <SaveScenarioButton
-        config={{ solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true }}
+        config={{ solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true, refrigerator_units: 0, water_pump_upgraded: false }}
         onSave={onSave}
         isSaving={true}
       />

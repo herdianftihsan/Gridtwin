@@ -9,10 +9,10 @@ export function Footer() {
             ⚡
           </div>
           <span className="font-extrabold text-white">GridTwin AI</span>
-          <span className="text-slate-400">· Climate-Tech Decision Intelligence</span>
+          <span className="text-slate-400">· Platform Keputusan Climate-Tech</span>
         </div>
         <p className="text-slate-400 text-[11px]">
-          © {new Date().getFullYear()} GridTwin AI. In compliance with Permen ESDM No. 2/2024 regulations.
+          © {new Date().getFullYear()} GridTwin AI. Sesuai dengan regulasi Permen ESDM No. 2/2024.
         </p>
       </div>
     </footer>

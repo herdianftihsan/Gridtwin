@@ -106,6 +106,8 @@ export const simulate = (
   const efficiency = calculateEfficiency(
     config.ac_units,
     config.is_led_upgraded,
+    config.refrigerator_units,
+    config.water_pump_upgraded,
     baseline.monthly_kwh
   );
 
@@ -171,6 +173,8 @@ export const simulate = (
       battery_kwh: config.battery_kwh,
       ac_units: config.ac_units,
       led_upgraded: config.is_led_upgraded,
+      refrigerator_units: config.refrigerator_units,
+      water_pump_upgraded: config.water_pump_upgraded,
     },
     baseline: {
       monthly_cost: roundCurrency(baseline.monthly_cost),

@@ -14,33 +14,44 @@ export class ScenarioRepository {
     battery_kwh: number;
     ac_units: number;
     is_led_upgraded: boolean;
+    refrigerator_units: number;
+    water_pump_upgraded: boolean;
     is_recommended?: boolean;
     name?: string | null;
     what_if_query?: string | null;
     ai_explanation?: string | null;
   }): Promise<DatabaseScenarioRow> {
-    const { data, error } = await supabaseAdmin
-      .from('scenarios')
-      .insert({
-        project_id: payload.project_id,
-        scenario_type: payload.scenario_type,
-        solar_kwp: payload.solar_kwp,
-        battery_kwh: payload.battery_kwh,
-        ac_units: payload.ac_units,
-        is_led_upgraded: payload.is_led_upgraded,
-        is_recommended: payload.is_recommended ?? false,
-        name: payload.name ?? null,
-        what_if_query: payload.what_if_query ?? null,
-        ai_explanation: payload.ai_explanation ?? null,
-      })
-      .select()
-      .single();
+    const insertPayload = {
+      project_id: payload.project_id,
+      scenario_type: payload.scenario_type,
+      solar_kwp: payload.solar_kwp,
+      battery_kwh: payload.battery_kwh,
+      ac_units: payload.ac_units,
+      is_led_upgraded: payload.is_led_upgraded,
+      refrigerator_units: payload.refrigerator_units,
+      water_pump_upgraded: payload.water_pump_upgraded,
+      is_recommended: payload.is_recommended ?? false,
+      name: payload.name ?? null,
+      what_if_query: payload.what_if_query ?? null,
+      ai_explanation: payload.ai_explanation ?? null,
+    };
 
-    if (error || !data) {
-      throw new Error(`Failed to create scenario: ${error?.message}`);
+    let result = await supabaseAdmin.from('scenarios').insert(insertPayload).select().single();
+
+    // Graceful fallback if DB migration for new columns hasn't been applied yet
+    if (result.error && (result.error.message.includes('refrigerator_units') || result.error.message.includes('water_pump_upgraded'))) {
+      const fallbackPayload = { ...insertPayload } as Record<string, unknown>;
+      delete fallbackPayload.refrigerator_units;
+      delete fallbackPayload.water_pump_upgraded;
+      
+      result = await supabaseAdmin.from('scenarios').insert(fallbackPayload).select().single();
     }
 
-    return data as DatabaseScenarioRow;
+    if (result.error || !result.data) {
+      throw new Error(`Failed to create scenario: ${result.error?.message}`);
+    }
+
+    return result.data as DatabaseScenarioRow;
   }
 
   async findById(scenarioId: string): Promise<ScenarioWithResult | null> {
@@ -128,11 +139,24 @@ export class ScenarioRepository {
     }
   }
 
+  async update(scenarioId: string, payload: { name: string }): Promise<void> {
+    const { error } = await supabaseAdmin
+      .from('scenarios')
+      .update({
+        name: payload.name,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', scenarioId);
+
+    if (error) {
+      throw new Error(`Failed to update scenario: ${error.message}`);
+    }
+  }
+
   async deleteById(scenarioId: string): Promise<void> {
-    try {
-      await supabaseAdmin.from('scenarios').delete().eq('id', scenarioId);
-    } catch {
-      // Graceful fallback
+    const { error } = await supabaseAdmin.from('scenarios').delete().eq('id', scenarioId);
+    if (error) {
+      throw new Error(`Failed to delete scenario: ${error.message}`);
     }
   }
 }

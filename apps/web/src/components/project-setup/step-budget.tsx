@@ -10,13 +10,14 @@ interface StepBudgetProps {
 }
 
 export function StepBudget({ formData, updateFormData, errors }: StepBudgetProps) {
-  const formatIDR = (val: number): string => {
+  const formatIDR = (val: number | null): string => {
+    if (val === null || isNaN(val)) return '';
     return new Intl.NumberFormat('id-ID').format(val);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '');
-    const num = raw === '' ? 1000000 : parseInt(raw, 10);
+    const num = raw === '' ? null : parseInt(raw, 10);
     updateFormData({ budget: num });
   };
 
@@ -28,17 +29,17 @@ export function StepBudget({ formData, updateFormData, errors }: StepBudgetProps
     <div className="space-y-6 text-left">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-          Set your investment limit
+          Tentukan batas investasi Anda
         </h2>
         <p className="text-sm text-slate-500">
-          Define the maximum you&apos;re willing to invest. GridTwin will optimize for the best ROI within this limit.
+          Tentukan jumlah maksimum yang bersedia Anda investasikan. GridTwin akan mengoptimalkan ROI terbaik dalam batas ini.
         </p>
       </div>
 
       <div className="p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-6">
         <div className="space-y-2">
           <label className="block text-xs font-semibold text-slate-700">
-            Maximum Investment Budget
+            Anggaran Investasi Maksimum
           </label>
           <div className="relative flex items-center justify-between bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-transparent transition-all">
             <span className="text-lg font-medium text-slate-500 mr-2">Rp</span>
@@ -47,7 +48,8 @@ export function StepBudget({ formData, updateFormData, errors }: StepBudgetProps
               inputMode="numeric"
               value={formatIDR(formData.budget)}
               onChange={handleInputChange}
-              className="w-full text-2xl font-bold text-slate-900 bg-transparent focus:outline-none tracking-tight"
+              placeholder="100.000.000"
+              className="w-full text-2xl font-bold text-slate-900 bg-transparent focus:outline-none tracking-tight placeholder-slate-300"
             />
             <span className="text-xs font-medium text-slate-400 ml-2 uppercase">IDR</span>
           </div>
@@ -62,13 +64,13 @@ export function StepBudget({ formData, updateFormData, errors }: StepBudgetProps
             min="1000000"
             max="500000000"
             step="1000000"
-            value={formData.budget}
+            value={formData.budget === null ? 50000000 : formData.budget}
             onChange={handleSliderChange}
             className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
           />
           <div className="flex justify-between text-[11px] text-slate-400 font-medium">
-            <span>1M</span>
-            <span>500M</span>
+            <span>1 Jt</span>
+            <span>500 Jt</span>
           </div>
         </div>
 
@@ -79,7 +81,7 @@ export function StepBudget({ formData, updateFormData, errors }: StepBudgetProps
             </svg>
           </div>
           <span>
-            Based on typical setups in your region, starting around Rp 50M provides optimal balance for initial solar capacity.
+            Berdasarkan pengaturan tipikal di wilayah Anda, memulai di kisaran Rp 50 Jt memberikan keseimbangan optimal untuk kapasitas solar awal.
           </span>
         </div>
       </div>

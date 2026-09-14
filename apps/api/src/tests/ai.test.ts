@@ -1,3 +1,4 @@
+import { AiTimeoutError, AiRateLimitedError, AiProviderUnavailableError } from '../ai/errors.js';
 import { describe, it, expect, beforeAll, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../app.js';
@@ -80,7 +81,7 @@ describe('Phase 7: Gemini What-If & AI Explanation Endpoints', () => {
   describe('POST /api/ai/what-if', () => {
     it('1. parses budget intent and runs optimization, returning 201 Created', async () => {
       vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
-      vi.spyOn(geminiClient, 'generateContent').mockResolvedValueOnce(
+      vi.spyOn(geminiClient, 'generateStructured').mockResolvedValueOnce(
         JSON.stringify({ action: 'optimize', budget: 30_000_000 })
       );
       vi.spyOn(scenarioRepository, 'create').mockResolvedValueOnce({
@@ -108,7 +109,7 @@ describe('Phase 7: Gemini What-If & AI Explanation Endpoints', () => {
 
     it('2. parses explicit asset configuration and executes simulate()', async () => {
       vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
-      vi.spyOn(geminiClient, 'generateContent').mockResolvedValueOnce(
+      vi.spyOn(geminiClient, 'generateStructured').mockResolvedValueOnce(
         JSON.stringify({
           action: 'simulate',
           solar_kwp: 4,
@@ -158,7 +159,7 @@ describe('Phase 7: Gemini What-If & AI Explanation Endpoints', () => {
 
     it('4. returns 502 AI_ERROR when Gemini returns malformed JSON', async () => {
       vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
-      vi.spyOn(geminiClient, 'generateContent').mockResolvedValueOnce('Invalid non-json output');
+      vi.spyOn(geminiClient, 'generateStructured').mockResolvedValueOnce('Invalid non-json output');
 
       const res = await request(app)
         .post('/api/ai/what-if')
@@ -177,7 +178,7 @@ describe('Phase 7: Gemini What-If & AI Explanation Endpoints', () => {
     it('5. generates explanation from verified data and persists to scenario with 200 OK', async () => {
       vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioWithResults);
       vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
-      vi.spyOn(geminiClient, 'generateContent').mockResolvedValueOnce(
+      vi.spyOn(geminiClient, 'generateText').mockResolvedValueOnce(
         'Sistem ini memangkas tagihan listrik hingga 20% dengan mengandalkan 4 kWp solar PV.'
       );
       const updateSpy = vi.spyOn(scenarioRepository, 'updateExplanation').mockResolvedValueOnce();
@@ -224,20 +225,65 @@ describe('Phase 7: Gemini What-If & AI Explanation Endpoints', () => {
       expect(res.body.error.code).toBe('FORBIDDEN');
     });
 
-    it('8. returns 502 AI_ERROR on upstream failure or timeout', async () => {
+    it('8. gracefully falls back when AI upstream fails', async () => {
       vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioWithResults);
       vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
-      vi.spyOn(geminiClient, 'generateContent').mockRejectedValueOnce(
-        new Error('Upstream timeout')
+      
+      vi.spyOn(geminiClient, 'generateText').mockRejectedValueOnce(
+        new AiTimeoutError()
       );
+
+      vi.spyOn(scenarioRepository, 'updateExplanation').mockResolvedValueOnce(undefined);
 
       const res = await request(app)
         .post('/api/ai/explain')
         .set('Authorization', `Bearer ${validToken}`)
         .send({ scenario_id: scenarioId });
 
-      expect(res.status).toBe(502);
-      expect(res.body.error.code).toBe('AI_ERROR');
+      console.log('RES BODY', res.body);
+      expect(res.status).toBe(200);
+      expect(res.body.data.explanationUnavailable).toBe(true);
+      expect(res.body.data.explanation).toContain('temporarily unavailable');
+    });
+
+    it('9. gracefully falls back on provider 429 rate limit', async () => {
+      vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioWithResults);
+      vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
+      
+      vi.spyOn(geminiClient, 'generateText').mockRejectedValueOnce(
+        new AiRateLimitedError()
+      );
+
+      vi.spyOn(scenarioRepository, 'updateExplanation').mockResolvedValueOnce(undefined);
+
+      const res = await request(app)
+        .post('/api/ai/explain')
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ scenario_id: scenarioId });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.explanationUnavailable).toBe(true);
+      expect(res.body.data.explanation).toContain('temporarily unavailable');
+    });
+
+    it('10. gracefully falls back on provider 5xx server error', async () => {
+      vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioWithResults);
+      vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
+      
+      vi.spyOn(geminiClient, 'generateText').mockRejectedValueOnce(
+        new AiProviderUnavailableError()
+      );
+
+      vi.spyOn(scenarioRepository, 'updateExplanation').mockResolvedValueOnce(undefined);
+
+      const res = await request(app)
+        .post('/api/ai/explain')
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ scenario_id: scenarioId });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.explanationUnavailable).toBe(true);
+      expect(res.body.data.explanation).toContain('temporarily unavailable');
     });
   });
 });

@@ -10,11 +10,11 @@ import { FinalCTA } from '../components/landing/final-cta';
 import { Footer } from '../components/landing/footer';
 
 export const metadata: Metadata = {
-  title: 'GridTwin AI — Simulate Before You Invest',
-  description: 'AI-driven energy simulation and investment analysis platform for building owners. Model solar PV, battery storage, and energy efficiency upgrades.',
+  title: 'GridTwin AI — Simulasikan Sebelum Investasi',
+  description: 'Platform simulasi energi dan analisis investasi berbasis AI untuk pemilik bangunan. Modelkan Solar PV, penyimpanan baterai, dan peningkatan efisiensi energi.',
   openGraph: {
-    title: 'GridTwin AI — Simulate Before You Invest',
-    description: 'Energy decision platform for commercial and residential building owners.',
+    title: 'GridTwin AI — Simulasikan Sebelum Investasi',
+    description: 'Platform keputusan energi untuk pemilik bangunan komersial dan residensial.',
     url: 'https://gridtwin.ai',
     siteName: 'GridTwin AI',
     type: 'website',

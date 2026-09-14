@@ -46,6 +46,7 @@ export class ProjectService {
         ? {
             id: recommendedRow.id,
             scenario_type: recommendedRow.scenario_type,
+            name: recommendedRow.name,
             is_recommended: recommendedRow.is_recommended,
             solar_kwp: Number(recommendedRow.solar_kwp),
             battery_kwh: Number(recommendedRow.battery_kwh),
@@ -63,6 +64,7 @@ export class ProjectService {
       .map((row) => ({
         id: row.id,
         scenario_type: row.scenario_type,
+        name: row.name,
         solar_kwp: Number(row.solar_kwp),
         battery_kwh: Number(row.battery_kwh),
         ac_units: Number(row.ac_units),
@@ -76,6 +78,25 @@ export class ProjectService {
       recommended_scenario: recommendedScenario,
       recent_scenarios: recentScenarios,
     };
+  };
+
+  getProjectScenarios = async (userId: string, projectId: string) => {
+    await this.assertOwnership(userId, projectId);
+    const rows = await scenarioRepository.findRecent(projectId, 100); // fetching up to 100 for history
+
+    return (rows || [])
+      .filter((row) => row && row.simulation_results !== null)
+      .map((row) => ({
+        id: row.id,
+        scenario_type: row.scenario_type,
+        name: row.name,
+        solar_kwp: Number(row.solar_kwp),
+        battery_kwh: Number(row.battery_kwh),
+        ac_units: Number(row.ac_units),
+        is_led_upgraded: Boolean(row.is_led_upgraded),
+        created_at: row.created_at,
+        simulation_result: toSimulationResultContract(row, row.simulation_results!),
+      }));
   };
 
   updateProject = async (userId: string, projectId: string, input: UpdateProjectInput) => {
