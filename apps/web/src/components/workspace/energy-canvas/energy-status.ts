@@ -18,7 +18,8 @@ export function mapSimulationToCanvas(
   const hasGridImport = energy.grid_import_monthly > 0;
 
   const buildingLabel = overrideBuildingType ?? project?.building_type ?? 'Commercial Ruko';
-  const locationLabel = overrideLocation ?? project?.location ?? 'Surabaya';
+  const rawLocation = overrideLocation ?? project?.location ?? 'Surabaya';
+  const locationLabel = typeof rawLocation === 'string' ? rawLocation : rawLocation.name;
 
   const nodes: Record<NodeKey, NodeTelemetry> = {
     solar: {

@@ -12,7 +12,7 @@ vi.mock('../../lib/api/api-client', () => ({
 
 describe('LocationSearch Component', () => {
   it('7. short query does not trigger fetch immediately if debounced, or is handled', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue({ data: [], meta: { timestamp: new Date().toISOString() } } as any);
+    vi.mocked(apiClient.get).mockResolvedValue({ data: [], meta: { timestamp: new Date().toISOString() } } as unknown as never);
     render(<LocationSearch value="" onChange={vi.fn()} />);
     
     const input = screen.getByRole('combobox');
@@ -29,9 +29,9 @@ describe('LocationSearch Component', () => {
   it('13. stale request behavior is handled by ignoring previous results', async () => {
     vi.mocked(apiClient.get).mockImplementation(async (url) => {
       if (url.includes('q=Sur')) {
-        return new Promise(resolve => setTimeout(() => resolve({ data: [{ id: 'loc_surabaya', name: 'Surabaya', province: 'Jawa Timur', administrativeLevel: 'city' }], meta: { timestamp: new Date().toISOString() } } as any), 100));
+        return new Promise(resolve => setTimeout(() => resolve({ data: [{ id: 'loc_surabaya', name: 'Surabaya', province: 'Jawa Timur', administrativeLevel: 'city' }], meta: { timestamp: new Date().toISOString() } } as unknown as never), 100));
       }
-      return { data: [], meta: { timestamp: new Date().toISOString() } } as any;
+      return { data: [], meta: { timestamp: new Date().toISOString() } } as unknown as never;
     });
 
     render(<LocationSearch value="" onChange={vi.fn()} />);

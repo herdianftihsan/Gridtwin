@@ -4,22 +4,58 @@ import { assertProjectOwnership } from './project-ownership.service.js';
 import { scenarioRepository, ScenarioWithResult } from '../repositories/scenario.repository.js';
 import { toSimulationResultContract } from '../mappers/simulation.maper.js';
 import { CreateProjectInput, UpdateProjectInput, ProjectQueryInput } from '../schemas/project.schema.js';
+import { locationService, LocationRecord } from './location.service.js';
+import { ValidationError } from '../utils/errors.js';
+
+export type EnrichedProject = ProjectRecord & {
+  location_data?: LocationRecord | undefined;
+};
 
 export class ProjectService {
   assertOwnership = async (userId: string, projectId: string): Promise<ProjectRecord> => {
     return assertProjectOwnership(projectId, userId);
   };
 
-  createProject = async (userId: string, input: CreateProjectInput): Promise<ProjectRecord> => {
-    return projectRepository.create(userId, input);
+  enrichProjectsWithLocations = async (projects: ProjectRecord[]): Promise<EnrichedProject[]> => {
+    const locationIds = Array.from(
+      new Set(
+        projects
+          .map((p) => p.location)
+          .filter((loc) => loc.startsWith('loc_'))
+      )
+    );
+
+    const locations = await locationService.findByIds(locationIds);
+    const locationMap = new Map(locations.map((loc) => [loc.id, loc]));
+
+    return projects.map((p) => ({
+      ...p,
+      location_data: p.location.startsWith('loc_') ? locationMap.get(p.location) : undefined,
+    }));
+  };
+
+  createProject = async (userId: string, input: CreateProjectInput): Promise<EnrichedProject> => {
+    if (input.location.startsWith('loc_')) {
+      const locationExists = await locationService.findById(input.location);
+      if (!locationExists) {
+        throw new ValidationError('Location not found');
+      }
+    }
+    const created = await projectRepository.create(userId, input);
+    const enriched = await this.enrichProjectsWithLocations([created]);
+    return enriched[0]!;
   };
 
   getProjects = async (userId: string, query: ProjectQueryInput) => {
-    return projectRepository.findByUserId(userId, query.page, query.limit);
+    const result = await projectRepository.findByUserId(userId, query.page, query.limit);
+    const enrichedData = await this.enrichProjectsWithLocations(result.data);
+    return { ...result, data: enrichedData };
   };
 
   getProjectDetail = async (userId: string, projectId: string) => {
     const project = await this.assertOwnership(userId, projectId);
+    const enrichedProjects = await this.enrichProjectsWithLocations([project]);
+    const enrichedProject = enrichedProjects[0]!;
 
     let recommendedRow: ScenarioWithResult | null = null;
     let recentRows: ScenarioWithResult[] = [];
@@ -74,7 +110,7 @@ export class ProjectService {
       }));
 
     return {
-      project,
+      project: enrichedProject,
       recommended_scenario: recommendedScenario,
       recent_scenarios: recentScenarios,
     };
@@ -113,7 +149,16 @@ export class ProjectService {
       await scenarioRepository.deactivateRecommended(projectId);
     }
 
-    return projectRepository.update(projectId, input);
+    if (input.location && input.location.startsWith('loc_')) {
+      const locationExists = await locationService.findById(input.location);
+      if (!locationExists) {
+        throw new ValidationError('Location not found');
+      }
+    }
+
+    const updated = await projectRepository.update(projectId, input);
+    const enriched = await this.enrichProjectsWithLocations([updated]);
+    return enriched[0]!;
   };
 
   deleteProject = async (userId: string, projectId: string): Promise<void> => {

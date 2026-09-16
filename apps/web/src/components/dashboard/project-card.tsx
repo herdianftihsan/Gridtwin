@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Project } from "../../types/api";
+import { formatLocation } from "../../lib/utils/location";
 
 interface ProjectCardProps {
   project: Project;
@@ -44,7 +45,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span className="truncate">{project.location || "Jakarta, Indonesia"}</span>
+              <span className="truncate">{formatLocation(project.location)}</span>
             </div>
           </div>
         </div>

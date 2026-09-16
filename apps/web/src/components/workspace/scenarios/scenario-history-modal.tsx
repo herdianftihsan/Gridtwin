@@ -17,6 +17,7 @@ export function ScenarioHistoryModal({ isOpen, onClose, projectId, onCompare }: 
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -27,11 +28,13 @@ export function ScenarioHistoryModal({ isOpen, onClose, projectId, onCompare }: 
 
   const loadHistory = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const res = await apiClient.get<Scenario[]>(`/api/projects/${projectId}/scenarios`);
       setScenarios(res.data || []);
     } catch (err) {
-      console.error(err);
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      setError(`Gagal memuat riwayat skenario: ${msg}`);
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +50,8 @@ export function ScenarioHistoryModal({ isOpen, onClose, projectId, onCompare }: 
         return next;
       });
     } catch (err) {
-      console.error(err);
+      const msg = err instanceof Error ? err.message : 'Gagal menghapus skenario.';
+      alert(msg);
     }
   };
 
@@ -59,7 +63,8 @@ export function ScenarioHistoryModal({ isOpen, onClose, projectId, onCompare }: 
       await apiClient.patch(`/api/scenarios/${id}`, { name: newName.trim() });
       setScenarios(prev => prev.map(s => s.id === id ? { ...s, name: newName.trim() } : s));
     } catch (err) {
-      console.error(err);
+      const msg = err instanceof Error ? err.message : 'Gagal mengganti nama skenario.';
+      alert(msg);
     }
   };
 
@@ -107,6 +112,10 @@ export function ScenarioHistoryModal({ isOpen, onClose, projectId, onCompare }: 
               {isLoading ? (
                 <div className="flex justify-center py-12">
                   <span className="w-8 h-8 border-2 border-slate-500 border-t-sky-500 rounded-full animate-spin" />
+                </div>
+              ) : error ? (
+                <div className="text-center py-12 text-red-500">
+                  <p>{error}</p>
                 </div>
               ) : scenarios.length === 0 ? (
                 <div className="text-center py-12 text-slate-500">

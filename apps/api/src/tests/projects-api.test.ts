@@ -5,6 +5,7 @@ import { supabaseAdmin } from '../config/supabase.js';
 import { projectRepository } from '../repositories/project.repository.js';
 import { scenarioRepository } from '../repositories/scenario.repository.js';
 import { simulationResultRepository } from '../repositories/simulation-result.repository.js';
+import { locationService } from '../services/location.service.js';
 import type { Express } from 'express';
 
 describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
@@ -206,6 +207,70 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
       expect(res.body).toHaveProperty('data');
       expect(res.body.data.id).toBe(projectId);
       expect(res.body.meta).toHaveProperty('timestamp');
+    });
+
+    it('POST /api/projects with a loc_ prefix validates the location ID', async () => {
+      vi.spyOn(projectRepository, 'create').mockResolvedValueOnce({
+        ...mockProject,
+        location: 'loc_123',
+      });
+      const findByIdSpy = vi.spyOn(locationService, 'findById').mockResolvedValueOnce({
+        id: 'loc_123',
+        name: 'Kota Bekasi',
+        province: 'Jawa Barat',
+        type: 'city',
+        code: '3275',
+        normalized_name: 'kota bekasi',
+        normalized_province: 'jawa barat',
+        latitude: null,
+        longitude: null,
+      });
+      const findByIdsSpy = vi.spyOn(locationService, 'findByIds').mockResolvedValueOnce([{
+        id: 'loc_123',
+        name: 'Kota Bekasi',
+        province: 'Jawa Barat',
+        type: 'city',
+        code: '3275',
+        normalized_name: 'kota bekasi',
+        normalized_province: 'jawa barat',
+        latitude: null,
+        longitude: null,
+      }]);
+
+      const res = await request(app)
+        .post('/api/projects')
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({
+          building_type: 'Ruko',
+          location: 'loc_123',
+          roof_area: 50,
+          monthly_bill: 4_500_000,
+          budget: 50_000_000,
+          objective: 'save_money',
+        });
+
+      expect(res.status).toBe(201);
+      expect(findByIdSpy).toHaveBeenCalledWith('loc_123');
+      expect(findByIdsSpy).toHaveBeenCalledWith(['loc_123']);
+    });
+
+    it('POST /api/projects rejects invalid loc_ ID with 400 VALIDATION_ERROR', async () => {
+      vi.spyOn(locationService, 'findById').mockResolvedValueOnce(null);
+
+      const res = await request(app)
+        .post('/api/projects')
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({
+          building_type: 'Ruko',
+          location: 'loc_invalid',
+          roof_area: 50,
+          monthly_bill: 4_500_000,
+          budget: 50_000_000,
+          objective: 'save_money',
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
     });
 
     it('POST /api/projects rejects invalid schema with 400 VALIDATION_ERROR', async () => {

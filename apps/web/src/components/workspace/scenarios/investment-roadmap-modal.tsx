@@ -23,6 +23,7 @@ interface InvestmentRoadmapModalProps {
 export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStage }: InvestmentRoadmapModalProps) {
   const [stages, setStages] = useState<RoadmapStage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -32,11 +33,13 @@ export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStag
 
   const loadRoadmap = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const res = await apiClient.get<RoadmapStage[]>(`/api/projects/${projectId}/roadmap`);
       setStages(res.data || []);
     } catch (err) {
-      console.error(err);
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      setError(`Gagal memuat peta jalan: ${msg}`);
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +75,10 @@ export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStag
               {isLoading ? (
                 <div className="flex justify-center py-12">
                   <span className="w-8 h-8 border-2 border-slate-500 border-t-brand-accent rounded-full animate-spin" />
+                </div>
+              ) : error ? (
+                <div className="text-center py-12 text-red-500">
+                  <p>{error}</p>
                 </div>
               ) : (
                 <div className="relative">

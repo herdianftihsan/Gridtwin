@@ -8,6 +8,7 @@ import { optimize } from "../optimization/optimize.js";
 import { SimulateInput, OptimizeInput } from "../schemas/project.schema.js";
 import { SimulationContext } from "../simulation/types.js";
 import { calculatePvConstraints } from "../simulation/solar.js";
+import { lookupPsh } from "../simulation/constants.js";
 
 export class SimulationService {
   async runSimulate(userId: string, projectId: string, input: SimulateInput) {
@@ -22,7 +23,7 @@ export class SimulationService {
       monthly_bill: Number(project.monthly_bill),
       budget: Number(project.budget),
       objective: project.objective,
-      ...(locationRecord ? { assumptions: { psh: locationRecord.psh } } : {}),
+      ...(locationRecord ? { assumptions: { psh: lookupPsh(locationRecord.name) } } : {}),
     };
 
     const simulationResult = simulate(
@@ -89,7 +90,7 @@ export class SimulationService {
       monthly_bill: Number(project.monthly_bill),
       budget: Number(project.budget),
       objective: effectiveObjective,
-      ...(locationRecord ? { assumptions: { psh: locationRecord.psh } } : {}),
+      ...(locationRecord ? { assumptions: { psh: lookupPsh(locationRecord.name) } } : {}),
     };
 
     const optimizationResult = optimize(context);
@@ -139,7 +140,7 @@ export class SimulationService {
       monthly_bill: Number(project.monthly_bill),
       budget: Number(project.budget),
       objective: project.objective,
-      ...(locationRecord ? { assumptions: { psh: locationRecord.psh } } : {}),
+      ...(locationRecord ? { assumptions: { psh: lookupPsh(locationRecord.name) } } : {}),
     };
 
     const { maxPvAllowed } = calculatePvConstraints(context.roof_area);

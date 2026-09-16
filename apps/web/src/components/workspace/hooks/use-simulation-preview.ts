@@ -67,9 +67,9 @@ export function useSimulationPreview({
 
           if (currentSeq === requestSeqRef.current) {
             if (err instanceof ApiClientError && err.code === 'INFEASIBLE_EFFICIENCY_CONFIGURATION') {
-              setSimulationError('Selected AC/LED efficiency configuration exceeds baseline demand.');
+              setSimulationError('Penghematan efisiensi AC/LED yang dipilih melebihi permintaan listrik baseline Anda.');
             } else {
-              setSimulationError((err as Error).message || 'Simulation preview failed.');
+              setSimulationError((err as Error).message || 'Pratinjau simulasi gagal.');
             }
             setIsSimulating(false);
           }

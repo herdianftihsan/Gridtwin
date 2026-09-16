@@ -23,8 +23,10 @@ export function LocationSearch({ value, onChange, error }: LocationSearchProps) 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedName, setSelectedName] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const cacheRef = useRef<Map<string, LocationResult[]>>(new Map());
 
   // Initialize query if value exists but we don't have a selected name yet
   // This handles edit mode where `value` might be 'Surabaya'
@@ -53,6 +55,16 @@ export function LocationSearch({ value, onChange, error }: LocationSearchProps) 
     if (!searchQuery || searchQuery.length < 2) {
       setResults([]);
       setIsOpen(false);
+      setSearchError(null);
+      return;
+    }
+
+    // Check Cache
+    const cachedResults = cacheRef.current.get(searchQuery);
+    if (cachedResults) {
+      setResults(cachedResults);
+      setIsOpen(true);
+      setHighlightedIndex(-1);
       return;
     }
 
@@ -62,19 +74,28 @@ export function LocationSearch({ value, onChange, error }: LocationSearchProps) 
     abortControllerRef.current = new AbortController();
 
     setIsLoading(true);
+    setSearchError(null);
     try {
       const response = await apiClient.get<LocationResult[]>(
         `/api/locations/search?q=${encodeURIComponent(searchQuery)}`,
         { signal: abortControllerRef.current.signal }
       );
       if (response.data) {
+        if (cacheRef.current.size >= 20) {
+          const firstKey = cacheRef.current.keys().next().value;
+          if (firstKey) cacheRef.current.delete(firstKey);
+        }
+        cacheRef.current.set(searchQuery, response.data);
         setResults(response.data);
         setIsOpen(true);
         setHighlightedIndex(-1);
       }
-    } catch (err: any) {
-      if (err.message?.includes('aborted')) return;
-      console.error('Location search failed', err);
+    } catch (err) {
+      const error = err as Error;
+      if (error.name === 'AbortError' || error.message?.includes('aborted')) return;
+      console.error('Location search failed', error);
+      setSearchError('Gagal mencari lokasi. Silakan coba lagi.');
+      setIsOpen(true);
     } finally {
       if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
         setIsLoading(false);
@@ -113,6 +134,7 @@ export function LocationSearch({ value, onChange, error }: LocationSearchProps) 
     setIsOpen(false);
     setResults([]);
     setHighlightedIndex(-1);
+    setSearchError(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -225,9 +247,15 @@ export function LocationSearch({ value, onChange, error }: LocationSearchProps) 
         </ul>
       )}
       
-      {isOpen && query && results.length === 0 && !isLoading && !selectedName && (
+      {isOpen && query && results.length === 0 && !isLoading && !selectedName && !searchError && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg py-3 px-4 text-sm text-slate-500 text-center">
           Lokasi tidak ditemukan. Coba nama kota atau kabupaten lain.
+        </div>
+      )}
+      
+      {isOpen && searchError && !isLoading && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-red-200 rounded-lg shadow-lg py-3 px-4 text-sm text-red-600 text-center">
+          {searchError}
         </div>
       )}
     </div>

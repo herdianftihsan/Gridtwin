@@ -43,7 +43,8 @@ export function EnergyCanvas({
   const [zoom, setZoom] = useState(0.85);
   const [positions] = useState<Record<NodeKey, NodePosition>>(DEFAULT_POSITIONS);
 
-  const displayLocation = location ?? project?.location ?? 'Surabaya';
+  const displayLocationRaw = location ?? project?.location ?? 'Surabaya';
+  const displayLocation = typeof displayLocationRaw === 'string' ? displayLocationRaw : displayLocationRaw.name;
   const displayBuilding = buildingType ?? project?.building_type ?? 'Commercial Ruko';
 
   const viewModel = useMemo(

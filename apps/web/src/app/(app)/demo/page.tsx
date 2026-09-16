@@ -254,7 +254,7 @@ export default function DemoPage() {
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
                 <span>{MOCK_PROJECT.building_type}</span>
                 <span>•</span>
-                <span>{MOCK_PROJECT.location}</span>
+                <span>{typeof MOCK_PROJECT.location === 'string' ? MOCK_PROJECT.location : MOCK_PROJECT.location.name}</span>
               </div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
                 Decision Workspace

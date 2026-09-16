@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Project, Scenario, SimulationResult } from '../../types/api';
+import { formatLocation } from '../../lib/utils/location';
 import { apiClient, ApiClientError } from '../../lib/api/api-client';
 import { SimulationConfig, WorkspaceTab } from './types';
 import { EnergyCanvas } from './energy-canvas/energy-canvas';
@@ -247,7 +248,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
             <span>{project.building_type}</span>
             <span>•</span>
-            <span>{project.location}</span>
+            <span>{formatLocation(project.location)}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
             Workspace Keputusan
@@ -338,7 +339,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             <div className={`transition-opacity duration-300 ${isStale ? 'opacity-60' : 'opacity-100'}`}>
               <EnergyCanvas
                 buildingType={project.building_type}
-                location={project.location}
+                location={formatLocation(project.location)}
                 result={currentResult}
                 isSimulating={isSimulating}
               />

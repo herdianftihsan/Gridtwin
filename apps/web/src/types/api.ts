@@ -91,7 +91,12 @@ export interface Project {
   id: string;
   user_id?: string;
   building_type: 'Ruko' | 'Residential' | 'Office';
-  location: string;
+  location: string | {
+    id: string;
+    name: string;
+    province: string;
+    type: string;
+  };
   roof_area?: number | null;
   monthly_bill: number;
   budget: number;

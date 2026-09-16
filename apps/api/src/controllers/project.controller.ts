@@ -11,7 +11,16 @@ export class ProjectController {
       const created = await projectService.createProject(userId, input);
 
       res.status(201).json({
-        data: created,
+        data: {
+          ...created,
+          location: created.location_data ? {
+            id: created.location_data.id,
+            name: created.location_data.name,
+            province: created.location_data.province,
+            type: created.location_data.type
+          } : created.location,
+          location_data: undefined, // don't leak this
+        },
         meta: { timestamp: new Date().toISOString() },
       });
     } catch (err) {
@@ -29,7 +38,12 @@ export class ProjectController {
         data: data.map((p) => ({
           id: p.id,
           building_type: p.building_type,
-          location: p.location,
+          location: p.location_data ? {
+            id: p.location_data.id,
+            name: p.location_data.name,
+            province: p.location_data.province,
+            type: p.location_data.type
+          } : p.location,
           monthly_bill: p.monthly_bill,
           created_at: p.created_at,
         })),
@@ -52,7 +66,19 @@ export class ProjectController {
       const detail = await projectService.getProjectDetail(userId, projectId);
 
       res.status(200).json({
-        data: detail,
+        data: {
+          ...detail,
+          project: {
+            ...detail.project,
+            location: detail.project.location_data ? {
+              id: detail.project.location_data.id,
+              name: detail.project.location_data.name,
+              province: detail.project.location_data.province,
+              type: detail.project.location_data.type
+            } : detail.project.location,
+            location_data: undefined,
+          }
+        },
         meta: { timestamp: new Date().toISOString() },
       });
     } catch (err) {
@@ -68,7 +94,16 @@ export class ProjectController {
       const updated = await projectService.updateProject(userId, projectId, input);
 
       res.status(200).json({
-        data: updated,
+        data: {
+          ...updated,
+          location: updated.location_data ? {
+            id: updated.location_data.id,
+            name: updated.location_data.name,
+            province: updated.location_data.province,
+            type: updated.location_data.type
+          } : updated.location,
+          location_data: undefined,
+        },
         meta: { timestamp: new Date().toISOString() },
       });
     } catch (err) {

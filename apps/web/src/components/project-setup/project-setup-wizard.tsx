@@ -130,7 +130,7 @@ export function ProjectSetupWizard() {
       </AnimatePresence>
 
       {/* Directional Step Transition Container */}
-      <div className="min-h-[340px] relative overflow-hidden">
+      <div className="min-h-[340px] relative">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={step}
