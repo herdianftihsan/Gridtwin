@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export interface AuthenticatedUser {
   id: string;
 }
@@ -9,5 +11,3 @@ declare global {
     }
   }
 }
-
-export {};
