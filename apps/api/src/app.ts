@@ -23,6 +23,9 @@ export const createApp = (): Express => {
   app.use(express.json());
 
   // Mount API Endpoints
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok' });
+  });
   app.use('/api/health', healthRouter);
   app.use('/api/projects', projectRouter);
   app.use('/api/scenarios', scenarioRouter);
