@@ -28,6 +28,25 @@ export class AuthService {
     return "An unexpected error occurred. Please try again.";
   }
 
+  private static getSiteUrl(): string {
+    let url =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      process.env.NEXT_PUBLIC_VERCEL_URL ??
+      (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+
+    // Ensure URL has http(s) prefix if provided from VERCEL_URL which might lack it
+    if (!url.startsWith("http")) {
+      url = `https://${url}`;
+    }
+
+    // Strip trailing slash
+    if (url.endsWith("/")) {
+      url = url.slice(0, -1);
+    }
+
+    return url;
+  }
+
   static async signInWithEmail(email: string, password: string): Promise<AuthResult> {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -72,10 +91,7 @@ export class AuthService {
 
   static async sendPasswordResetEmail(email: string): Promise<AuthResult> {
     try {
-      const redirectUrl =
-        typeof window !== "undefined"
-          ? `${window.location.origin}/login`
-          : "http://localhost:3000/login";
+      const redirectUrl = `${this.getSiteUrl()}/login`;
 
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: redirectUrl,
@@ -94,8 +110,7 @@ export class AuthService {
   // Parameter nextUrl ditambahkan di sini
   static async signInWithGoogle(nextUrl: string = "/setup"): Promise<AuthResult> {
     try {
-      const origin =
-        typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+      const origin = this.getSiteUrl();
 
       // Mengarahkan ke route callback yang membawa query param ?next=...
       const redirectUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`;
@@ -123,3 +138,4 @@ export class AuthService {
     useAuthStore.getState().reset();
   }
 }
+
