@@ -40,7 +40,7 @@ export const optimize = (context: OptimizationContext): OptimizationResult => {
   }
 
   // 5. Rank candidates deterministically
-  const rankedCandidates = rankCandidates(scoredCandidates);
+  const rankedCandidates = rankCandidates(scoredCandidates, context.objective);
   const bestCandidate = rankedCandidates[0]!;
 
   return {

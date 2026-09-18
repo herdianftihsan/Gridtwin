@@ -24,7 +24,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [recommendedScenario, setRecommendedScenario] = useState<Scenario | null>(null);
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('recommended');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>('balanced');
 
   const [currentConfig, setCurrentConfig] = useState<SimulationConfig>({
     solar_kwp: 4,
@@ -39,10 +39,10 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
   
   // Caching states to prevent redundant API calls
   const [cachedResults, setCachedResults] = useState<{
-    baseline: SimulationResult | null;
-    recommended: SimulationResult | null;
+    balanced: SimulationResult | null;
+    fastest_payback: SimulationResult | null;
     custom: SimulationResult | null;
-  }>({ baseline: null, recommended: null, custom: null });
+  }>({ balanced: null, fastest_payback: null, custom: null });
   const [cachedCustomConfig, setCachedCustomConfig] = useState<SimulationConfig | null>(null);
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -71,6 +71,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
 
         if (isMounted && res.data) {
           setProject(res.data.project);
+          // By default, the recommended scenario loaded from DB is mapped to 'balanced'
           if (res.data.recommended_scenario) {
             setRecommendedScenario(res.data.recommended_scenario);
             setCurrentResult(res.data.recommended_scenario.simulation_result);
@@ -84,7 +85,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             });
             setCachedResults(prev => ({
               ...prev,
-              recommended: res.data.recommended_scenario.simulation_result
+              balanced: res.data.recommended_scenario.simulation_result
             }));
           }
         }
@@ -149,13 +150,63 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
     }
   };
 
+  const handleRunOptimization = async (strategy: 'balanced' | 'fastest_payback') => {
+    if (isSimulating) return;
+    
+    try {
+      setIsSimulating(true);
+      setErrorMessage(null);
+      
+      const res = await apiClient.post<{
+        scenario_type: string;
+        simulation_result: SimulationResult;
+        configuration: SimulationConfig;
+      }>(`/api/projects/${projectId}/optimize`, {
+        objective: strategy,
+      });
+
+      if (res.data?.simulation_result) {
+        setCurrentResult(res.data.simulation_result);
+        const config = {
+          solar_kwp: res.data.simulation_result.configuration.pv_kwp,
+          battery_kwh: res.data.simulation_result.configuration.battery_kwh,
+          ac_units: res.data.simulation_result.configuration.ac_units,
+          is_led_upgraded: res.data.simulation_result.configuration.led_upgraded,
+          refrigerator_units: res.data.simulation_result.configuration.refrigerator_units ?? 0,
+          water_pump_upgraded: res.data.simulation_result.configuration.water_pump_upgraded ?? false,
+        };
+        setCurrentConfig(config);
+        
+        setCachedResults(prev => ({
+          ...prev,
+          [strategy]: res.data.simulation_result
+        }));
+
+        setRecommendedScenario({
+          ...res.data.simulation_result.configuration,
+          id: 'temp-' + Date.now(),
+          project_id: projectId,
+          scenario_type: 'recommended',
+          is_recommended: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          solar_kwp: res.data.simulation_result.configuration.pv_kwp,
+          led_upgraded: res.data.simulation_result.configuration.led_upgraded,
+        } as unknown as Scenario);
+      }
+    } catch (err) {
+      setErrorMessage((err as Error).message || 'Optimisasi gagal.');
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
   const handleConfigChange = (partial: Partial<SimulationConfig>) => {
     setActiveTab('custom');
     setCurrentConfig((prev) => ({ ...prev, ...partial }));
   };
 
   const handleTabSelect = (tab: WorkspaceTab) => {
-    // Save current custom state if we are leaving the custom tab
     if (activeTab === 'custom') {
       setCachedCustomConfig(currentConfig);
       setCachedResults(prev => ({ ...prev, custom: currentResult }));
@@ -163,33 +214,20 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
     
     setActiveTab(tab);
 
-    if (tab === 'recommended' && recommendedScenario) {
-      const recConfig: SimulationConfig = {
-        solar_kwp: recommendedScenario.solar_kwp,
-        battery_kwh: recommendedScenario.battery_kwh,
-        ac_units: recommendedScenario.ac_units,
-        is_led_upgraded: recommendedScenario.is_led_upgraded,
-        refrigerator_units: recommendedScenario.refrigerator_units ?? 0,
-        water_pump_upgraded: recommendedScenario.water_pump_upgraded ?? false,
-      };
-      setCurrentConfig(recConfig);
-      if (cachedResults.recommended) {
-        setCurrentResult(cachedResults.recommended);
-      }
-    } else if (tab === 'baseline' && project) {
-      const baseConfig: SimulationConfig = {
-        solar_kwp: 0,
-        battery_kwh: 0,
-        ac_units: 0,
-        is_led_upgraded: false,
-        refrigerator_units: 0,
-        water_pump_upgraded: false,
-      };
-      setCurrentConfig(baseConfig);
-      if (cachedResults.baseline) {
-        setCurrentResult(cachedResults.baseline);
+    if (tab === 'balanced' || tab === 'fastest_payback') {
+      if (cachedResults[tab]) {
+        setCurrentResult(cachedResults[tab]);
+        const res = cachedResults[tab]!;
+        setCurrentConfig({
+          solar_kwp: res.configuration.pv_kwp,
+          battery_kwh: res.configuration.battery_kwh,
+          ac_units: res.configuration.ac_units,
+          is_led_upgraded: res.configuration.led_upgraded,
+          refrigerator_units: res.configuration.refrigerator_units ?? 0,
+          water_pump_upgraded: res.configuration.water_pump_upgraded ?? false,
+        });
       } else {
-        handleRunSimulation(baseConfig, false, 'baseline');
+        handleRunOptimization(tab);
       }
     } else if (tab === 'custom') {
       if (cachedCustomConfig) {

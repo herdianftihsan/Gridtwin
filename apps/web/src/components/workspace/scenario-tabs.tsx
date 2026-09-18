@@ -12,8 +12,8 @@ interface ScenarioTabsProps {
 }
 
 const TABS: { id: WorkspaceTab; label: string }[] = [
-  { id: 'baseline', label: 'Awal' },
-  { id: 'recommended', label: 'Pengembalian Tercepat' },
+  { id: 'balanced', label: 'Seimbang' },
+  { id: 'fastest_payback', label: 'Balik Modal Tercepat' },
   { id: 'custom', label: 'Kustom' },
 ];
 
@@ -24,6 +24,10 @@ export function ScenarioTabs({
 }: ScenarioTabsProps) {
   return (
     <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4 text-left">
+      <div className="mb-2">
+        <h3 className="text-sm font-bold text-slate-900 mb-1">Strategi Optimisasi</h3>
+        <p className="text-xs text-slate-500">Strategi menentukan cara GridTwin memilih rekomendasi terbaik.</p>
+      </div>
       {/* Segmented Control dengan Animasi Sliding Pill Motion */}
       <div className="relative flex rounded-xl bg-slate-100 p-1">
         {TABS.map((tab) => {
@@ -33,7 +37,7 @@ export function ScenarioTabs({
               key={tab.id}
               type="button"
               onClick={() => onTabSelect(tab.id)}
-              className={`relative flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors z-10 cursor-pointer ${
+              className={`relative flex-1 py-1.5 text-[11px] font-semibold rounded-lg transition-colors z-10 cursor-pointer ${
                 isActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
@@ -50,16 +54,25 @@ export function ScenarioTabs({
         })}
       </div>
 
-      <p className="text-xs text-slate-500 leading-relaxed min-h-[32px]">
-        {activeTab === 'recommended'
-          ? 'Skenario memprioritaskan Pengembalian Modal dengan mengoptimalkan ukuran Panel Surya terhadap kurva beban siang hari.'
-          : activeTab === 'baseline'
-          ? 'Profil Awal mencerminkan tagihan listrik saat ini dengan ketergantungan 100% pada jaringan PLN.'
-          : 'Konfigurasi kustom langsung. Sesuaikan kontrol simulator untuk melihat hasilnya.'}
-      </p>
+      <div className="space-y-1 min-h-[48px]">
+        <p className="text-xs text-slate-700 leading-relaxed font-medium">
+          {activeTab === 'fastest_payback'
+            ? 'Memprioritaskan skenario dengan waktu balik modal paling singkat agar investasi lebih cepat kembali.'
+            : activeTab === 'balanced'
+            ? 'Mempertimbangkan biaya investasi, penghematan energi, dan dampak lingkungan secara seimbang.'
+            : 'Tentukan sendiri prioritas investasi, penghematan, dan energi sesuai kebutuhan bisnis Anda.'}
+        </p>
+        <p className="text-[10px] text-slate-500">
+          {activeTab === 'fastest_payback'
+            ? 'Fokus utama: waktu balik modal'
+            : activeTab === 'balanced'
+            ? 'Fokus: biaya, penghematan, dan dampak lingkungan'
+            : 'Fokus: prioritas yang Anda tentukan'}
+        </p>
+      </div>
 
       {/* Snapshot Details Table */}
-      {recommendedScenario && activeTab === 'recommended' && (
+      {recommendedScenario && (activeTab === 'balanced' || activeTab === 'fastest_payback') && (
         <div className="space-y-1.5 pt-2 border-t border-slate-100 text-xs font-medium">
           <div className="flex justify-between text-slate-600">
             <span>Kapasitas Panel Surya</span>

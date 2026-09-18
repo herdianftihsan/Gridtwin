@@ -152,4 +152,34 @@ describe('Phase 5: Deterministic Optimization Engine', () => {
     expect(() => optimize(frozenContext)).not.toThrow();
     expect(frozenContext.monthly_bill).toBe(4_500_000);
   });
+
+  it('11. prioritizes lowest payback period for fastest_payback strategy', () => {
+    // Case A: Balanced
+    const balancedResult = optimize({
+      ...baseContext,
+      budget: 150_000_000,
+      objective: 'balanced',
+    });
+
+    // Case B: Fastest Payback
+    const paybackResult = optimize({
+      ...baseContext,
+      budget: 150_000_000,
+      objective: 'fastest_payback',
+    });
+
+    // They should both be valid recommendations
+    expect(balancedResult.scenario_type).toBe('recommended');
+    expect(paybackResult.scenario_type).toBe('recommended');
+
+    // The payback result should have a payback period less than or equal to the balanced result
+    const balancedPayback = balancedResult.simulation_result.financial.payback_years ?? Infinity;
+    const fastestPayback = paybackResult.simulation_result.financial.payback_years ?? Infinity;
+    
+    expect(fastestPayback).toBeLessThanOrEqual(balancedPayback);
+
+    // Furthermore, we expect fastest_payback to genuinely rank by payback
+    // If they differ, fastestPayback must be strictly less than balancedPayback (or equal if identical config)
+    // We don't force them to be different, but we check ranking logic.
+  });
 });

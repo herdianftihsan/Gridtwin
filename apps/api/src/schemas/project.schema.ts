@@ -41,7 +41,7 @@ export const simulateSchema = z
 
 export const optimizeSchema = z
   .object({
-    objective: z.enum(["save_money", "reduce_co2", "independence"]).optional(),
+    objective: z.enum(["save_money", "reduce_co2", "independence", "balanced", "fastest_payback"]).optional(),
   })
   .strict();
 

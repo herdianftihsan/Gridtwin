@@ -8,28 +8,52 @@ import { ScoredCandidate } from './types.js';
  * 4. Deterministic initial candidate ID preservation
  */
 export const rankCandidates = (
-  candidates: readonly ScoredCandidate[]
+  candidates: readonly ScoredCandidate[],
+  objective?: 'save_money' | 'reduce_co2' | 'independence' | 'balanced' | 'fastest_payback'
 ): ScoredCandidate[] => {
   return [...candidates].sort((a, b) => {
-    // Tier 1: Final Score DESC
-    const scoreDiff = b.scores.final_score - a.scores.final_score;
-    if (Math.abs(scoreDiff) > 1e-9) {
-      return scoreDiff;
-    }
-
-    // Tier 2: Simple Payback Period ASC
-    const paybackA = a.simulation_result.financial.payback_years;
-    const paybackB = b.simulation_result.financial.payback_years;
-
-    if (paybackA !== null && paybackB !== null) {
-      const paybackDiff = paybackA - paybackB;
-      if (Math.abs(paybackDiff) > 1e-9) {
-        return paybackDiff;
+    if (objective === 'fastest_payback') {
+      // Tier 1: Simple Payback Period ASC (null treated as worse)
+      const paybackA = a.simulation_result.financial.payback_years;
+      const paybackB = b.simulation_result.financial.payback_years;
+      
+      if (paybackA !== null && paybackB !== null) {
+        const paybackDiff = paybackA - paybackB;
+        if (Math.abs(paybackDiff) > 1e-9) {
+          return paybackDiff;
+        }
+      } else if (paybackA !== null && paybackB === null) {
+        return -1; // a is better
+      } else if (paybackA === null && paybackB !== null) {
+        return 1; // b is better
       }
-    } else if (paybackA !== null && paybackB === null) {
-      return -1; // a is better (has valid payback)
-    } else if (paybackA === null && paybackB !== null) {
-      return 1; // b is better (has valid payback)
+
+      // Tier 2: Final Score DESC
+      const scoreDiff = b.scores.final_score - a.scores.final_score;
+      if (Math.abs(scoreDiff) > 1e-9) {
+        return scoreDiff;
+      }
+    } else {
+      // Tier 1: Final Score DESC
+      const scoreDiff = b.scores.final_score - a.scores.final_score;
+      if (Math.abs(scoreDiff) > 1e-9) {
+        return scoreDiff;
+      }
+
+      // Tier 2: Simple Payback Period ASC
+      const paybackA = a.simulation_result.financial.payback_years;
+      const paybackB = b.simulation_result.financial.payback_years;
+      
+      if (paybackA !== null && paybackB !== null) {
+        const paybackDiff = paybackA - paybackB;
+        if (Math.abs(paybackDiff) > 1e-9) {
+          return paybackDiff;
+        }
+      } else if (paybackA !== null && paybackB === null) {
+        return -1;
+      } else if (paybackA === null && paybackB !== null) {
+        return 1;
+      }
     }
 
     // Tier 3: CAPEX ASC

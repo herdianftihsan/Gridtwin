@@ -103,7 +103,7 @@ const INITIAL_SCENARIOS: Scenario[] = [
 ];
 
 export default function DemoPage() {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>("recommended");
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("balanced");
   const [currentConfig, setCurrentConfig] = useState<SimulationConfig>({
     solar_kwp: 4,
     battery_kwh: 5,
@@ -175,14 +175,10 @@ export default function DemoPage() {
 
   const handleTabSelect = (tab: WorkspaceTab) => {
     setActiveTab(tab);
-    if (tab === "recommended") {
+    if (tab === "balanced" || tab === "fastest_payback") {
       const recCfg = { solar_kwp: 4, battery_kwh: 5, ac_units: 2, is_led_upgraded: true, refrigerator_units: 1, water_pump_upgraded: false };
       setCurrentConfig(recCfg);
       setCurrentResult(INITIAL_RESULT);
-    } else if (tab === "baseline") {
-      const baseCfg = { solar_kwp: 0, battery_kwh: 0, ac_units: 0, is_led_upgraded: false, refrigerator_units: 0, water_pump_upgraded: false };
-      setCurrentConfig(baseCfg);
-      setCurrentResult(BASELINE_RESULT);
     }
   };
 
@@ -228,7 +224,7 @@ export default function DemoPage() {
         water_pump_upgraded: sc.water_pump_upgraded,
       });
       setCurrentResult(sc.simulation_result);
-      setActiveTab(sc.is_recommended ? "recommended" : "custom");
+      setActiveTab(sc.is_recommended ? "balanced" : "custom");
       setIsSaved(true);
     }
   };
@@ -313,7 +309,7 @@ export default function DemoPage() {
 
               <ScenarioList
                 scenarios={scenarios}
-                selectedScenarioId={activeTab === "recommended" ? scenarios[0]?.id : undefined}
+                selectedScenarioId={(activeTab === "balanced" || activeTab === "fastest_payback") ? scenarios[0]?.id : undefined}
                 onSelectScenario={handleSelectSavedScenario}
                 onCompareScenario={(sc) => setCompareScenario(sc)}
               />

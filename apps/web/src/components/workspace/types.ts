@@ -1,6 +1,6 @@
 import { Project, Scenario, SimulationResult } from '../../types/api';
 
-export type WorkspaceTab = 'baseline' | 'recommended' | 'custom';
+export type WorkspaceTab = 'balanced' | 'fastest_payback' | 'custom';
 
 export interface SimulationConfig {
   solar_kwp: number;

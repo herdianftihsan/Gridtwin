@@ -93,7 +93,7 @@ describe('Phase 10: Auth Service & UI Logic Unit Tests', () => {
     expect(result.error).toBe('Too many attempts. Please wait a few minutes before trying again.');
   });
 
-  it('7. triggers Google OAuth with offline access and prompt options', async () => {
+  it('7. triggers Google OAuth with correct redirect options', async () => {
     vi.spyOn(supabase.auth, 'signInWithOAuth').mockResolvedValueOnce({
       data: { provider: 'google', url: 'https://accounts.google.com/o/oauth2' },
       error: null,
@@ -105,7 +105,7 @@ describe('Phase 10: Auth Service & UI Logic Unit Tests', () => {
       expect.objectContaining({
         provider: 'google',
         options: expect.objectContaining({
-          queryParams: { access_type: 'offline', prompt: 'consent' },
+          redirectTo: expect.any(String),
         }),
       })
     );

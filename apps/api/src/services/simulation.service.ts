@@ -79,7 +79,7 @@ export class SimulationService {
     const project = await projectService.assertOwnership(userId, projectId);
 
     // Apply transient objective override without permanently mutating projects table
-    const effectiveObjective = input?.objective ?? project.objective;
+    const effectiveObjective = (input?.objective ?? project.objective) as SimulationContext['objective'];
 
     const locationRecord = await locationService.findById(project.location);
 

@@ -19,7 +19,10 @@ const envSchema = z.object({
       const parsed = parseInt(val || '8080', 10);
       return isNaN(parsed) ? 8080 : parsed;
     }),
-  FRONTEND_URL: z.string().default('http://localhost:3000'),
+  FRONTEND_URL: z
+    .string()
+    .default(process.env.NODE_ENV === 'production' ? 'https://gridtwin-web.vercel.app' : 'http://localhost:3000,https://gridtwin-web.vercel.app')
+    .transform((val) => val.split(',').map((url) => url.trim())),
   SUPABASE_URL: isTest
     ? z.string().url().default('https://mock.supabase.co')
     : z.string().url('SUPABASE_URL must be a valid URL'),

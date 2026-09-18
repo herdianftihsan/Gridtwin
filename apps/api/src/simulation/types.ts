@@ -13,7 +13,7 @@ export interface SimulationContext {
   readonly roof_area: number | null;
   readonly monthly_bill: number;
   readonly budget: number;
-  readonly objective: 'save_money' | 'reduce_co2' | 'independence';
+  readonly objective: 'save_money' | 'reduce_co2' | 'independence' | 'balanced' | 'fastest_payback';
   readonly assumptions?: Partial<{
     tariff: number;
     psh: number;

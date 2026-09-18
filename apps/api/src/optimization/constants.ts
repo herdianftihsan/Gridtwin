@@ -19,7 +19,7 @@ export interface ObjectiveWeights {
 }
 
 export const OBJECTIVE_WEIGHTS_MAP: Readonly<
-  Record<'save_money' | 'reduce_co2' | 'independence', ObjectiveWeights>
+  Record<'save_money' | 'reduce_co2' | 'independence' | 'balanced' | 'fastest_payback', ObjectiveWeights>
 > = Object.freeze({
   save_money: {
     cost: 0.7,
@@ -35,6 +35,16 @@ export const OBJECTIVE_WEIGHTS_MAP: Readonly<
     cost: 0.2,
     co2: 0.1,
     independence: 0.7,
+  },
+  balanced: {
+    cost: 0.34,
+    co2: 0.33,
+    independence: 0.33,
+  },
+  fastest_payback: {
+    cost: 0.7,
+    co2: 0.15,
+    independence: 0.15,
   },
 });
 
