@@ -42,7 +42,7 @@ export class LocationService {
     }
 
     // Filter and score in-memory for precise ranking
-    const scored = locations.map(loc => {
+    const scored = locations.map((loc: LocationRecord) => {
       let score = 0;
       
       const isExactName = loc.normalized_name === cleanQuery;
@@ -61,15 +61,15 @@ export class LocationService {
       }
 
       return { loc, score };
-    }).filter(item => item.score > 0);
+    }).filter((item: { loc: LocationRecord; score: number }) => item.score > 0);
 
     // Sort descending by score, then alphabetically by name
-    scored.sort((a, b) => {
+    scored.sort((a: { loc: LocationRecord; score: number }, b: { loc: LocationRecord; score: number }) => {
       if (b.score !== a.score) return b.score - a.score;
       return a.loc.name.localeCompare(b.loc.name);
     });
 
-    return scored.slice(0, limit).map(item => item.loc);
+    return scored.slice(0, limit).map((item: { loc: LocationRecord; score: number }) => item.loc);
   }
 
   public async findById(id: string): Promise<LocationRecord | null> {
