@@ -1,7 +1,7 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { config } from './env.js';
 
-export const supabaseAdmin: SupabaseClient = createClient(
+export const supabaseAdmin = createClient(
   config.SUPABASE_URL,
   config.SUPABASE_SERVICE_ROLE_KEY,
   {
