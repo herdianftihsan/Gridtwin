@@ -14,9 +14,11 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z
     .string()
-    .default('8080')
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().min(1000).max(65535)),
+    .optional()
+    .transform((val) => {
+      const parsed = parseInt(val || '8080', 10);
+      return isNaN(parsed) ? 8080 : parsed;
+    }),
   FRONTEND_URL: z.string().default('http://localhost:3000'),
   SUPABASE_URL: isTest
     ? z.string().url().default('https://mock.supabase.co')
