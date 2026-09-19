@@ -8,9 +8,10 @@ import { WhatIfResponsePayload, WhatIfStatus } from '../what-if/types';
 interface UseWhatIfOptions {
   projectId: string;
   onScenarioSaved?: (scenario: Scenario) => void;
+  isDemo?: boolean;
 }
 
-export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
+export function useWhatIf({ projectId, onScenarioSaved, isDemo }: UseWhatIfOptions) {
   const [status, setStatus] = useState<WhatIfStatus>('idle');
   const [query, setQuery] = useState('');
   const [scenarioId, setScenarioId] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
   const isSubmittingRef = useRef<boolean>(false);
 
   const executeWhatIf = useCallback(
-    async (messageText: string) => {
+    async (messageText: string, currentDemoResult?: SimulationResult) => {
       const trimmed = messageText.trim();
       if (!trimmed || isSubmittingRef.current) return;
 
@@ -43,6 +44,42 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
       setError(null);
 
       try {
+        if (isDemo) {
+          // Simulate AI reasoning and simulation delay
+          await new Promise((resolve) => setTimeout(resolve, 2500));
+          if (controller.signal.aborted) return;
+          
+          if (currentSeq === requestSeqRef.current) {
+            const demoScenId = 'demo-whatif-' + Date.now();
+            setScenarioId(demoScenId);
+            
+            // Generate a fake but slightly better result
+            const fakeResult: SimulationResult = currentDemoResult ? {
+              ...currentDemoResult,
+              configuration: {
+                ...currentDemoResult.configuration,
+                pv_kwp: currentDemoResult.configuration.pv_kwp + 2,
+                battery_kwh: currentDemoResult.configuration.battery_kwh + 2
+              },
+              financial: {
+                ...currentDemoResult.financial,
+                capex: currentDemoResult.financial.capex + 40000000,
+                monthly_savings: currentDemoResult.financial.monthly_savings + 1200000,
+                new_monthly_cost: Math.max(0, currentDemoResult.financial.new_monthly_cost - 1200000),
+                payback_years: Math.max(1, (currentDemoResult.financial.payback_years || 5) - 0.2)
+              },
+              grid: {
+                independence_pct: Math.min(95, currentDemoResult.grid.independence_pct + 15)
+              }
+            } : {} as SimulationResult;
+            
+            setResult(fakeResult);
+            setStatus('result');
+            fetchExplanation(demoScenId, trimmed, controller.signal, currentSeq);
+          }
+          return;
+        }
+
         const res = await apiClient.post<WhatIfResponsePayload>(
           '/api/ai/what-if',
           {
@@ -85,7 +122,7 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
         }
       }
     },
-    [projectId]
+    [projectId, isDemo]
   );
 
   const fetchExplanation = async (
@@ -97,6 +134,16 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
     setExplanationStatus('loading');
     setAiExplanation(null);
     try {
+      if (isDemo) {
+        await new Promise(r => setTimeout(r, 1000));
+        if (signal.aborted) return;
+        if (seq === requestSeqRef.current) {
+          setAiExplanation('Skenario demo ini memberikan peningkatan kapasitas untuk mengoptimalkan permintaan Anda. Penambahan ini menaikkan CAPEX namun secara signifikan memotong tagihan listrik jangka panjang, meningkatkan otonomi jaringan Anda.');
+          setExplanationStatus('success');
+        }
+        return;
+      }
+      
       const explainRes = await apiClient.post<{ scenario_id: string; explanation: string; explanationUnavailable: boolean }>(
         '/api/ai/explain',
         {
@@ -150,7 +197,9 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
     setStatus('saved');
 
     try {
-      await apiClient.patch(`/api/scenarios/${scenarioId}`, { name });
+      if (!isDemo) {
+        await apiClient.patch(`/api/scenarios/${scenarioId}`, { name });
+      }
 
       const savedScenario: Scenario = {
         id: scenarioId,
@@ -173,7 +222,7 @@ export function useWhatIf({ projectId, onScenarioSaved }: UseWhatIfOptions) {
       setError((err as Error).message || 'Gagal menyimpan skenario.');
       setStatus('error');
     }
-  }, [result, scenarioId, projectId, onScenarioSaved]);
+  }, [result, scenarioId, projectId, onScenarioSaved, isDemo]);
 
   useEffect(() => {
     return () => {

@@ -6,10 +6,11 @@ import { useScenarioExplanation } from '../hooks/use-scenario-explanation';
 interface ExplanationPanelProps {
   scenarioId?: string;
   className?: string;
+  isDemo?: boolean;
 }
 
-export function ExplanationPanel({ scenarioId, className = '' }: ExplanationPanelProps) {
-  const { explanation, isLoading, error, requestExplanation } = useScenarioExplanation(scenarioId);
+export function ExplanationPanel({ scenarioId, className = '', isDemo }: ExplanationPanelProps) {
+  const { explanation, isLoading, error, requestExplanation } = useScenarioExplanation(scenarioId, isDemo);
 
   useEffect(() => {
     if (scenarioId) {

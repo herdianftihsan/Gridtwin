@@ -19,7 +19,7 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const demoHref = session ? '/demo' : '/login?next=/demo';
+  const demoHref = '/demo';
   const setupHref = session ? '/setup' : '/login?next=/setup';
 
   return (

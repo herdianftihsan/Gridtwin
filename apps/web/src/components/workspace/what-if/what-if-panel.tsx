@@ -16,6 +16,7 @@ interface WhatIfPanelProps {
   projectId: string;
   currentResult: SimulationResult;
   onScenarioSaved?: (scenario: Scenario) => void;
+  isDemo?: boolean;
 }
 
 export function WhatIfPanel({
@@ -24,6 +25,7 @@ export function WhatIfPanel({
   projectId,
   currentResult,
   onScenarioSaved,
+  isDemo,
 }: WhatIfPanelProps) {
   const {
     status,
@@ -35,7 +37,7 @@ export function WhatIfPanel({
     retryExplanation,
     resetWhatIf,
     markAsSaved,
-  } = useWhatIf({ projectId, onScenarioSaved });
+  } = useWhatIf({ projectId, onScenarioSaved, isDemo });
 
   if (!isOpen) return null;
 
@@ -81,8 +83,8 @@ export function WhatIfPanel({
           <div className="flex-1 overflow-y-auto p-6 space-y-5">
 
             <div className="space-y-2">
-              <WhatIfInput onSubmit={executeWhatIf} isLoading={status === 'loading'} />
-              <WhatIfSuggestions onSelect={executeWhatIf} disabled={status === 'loading'} />
+              <WhatIfInput onSubmit={(msg) => executeWhatIf(msg, currentResult)} isLoading={status === 'loading'} />
+              <WhatIfSuggestions onSelect={(msg) => executeWhatIf(msg, currentResult)} disabled={status === 'loading'} />
             </div>
 
 

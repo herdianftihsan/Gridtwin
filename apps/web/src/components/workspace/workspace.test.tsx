@@ -65,7 +65,7 @@ const mockProjectDetail = {
   recent_scenarios: [],
 };
 
-describe('Phase 12: Decision Workspace Integration Suite', () => {
+describe('Phase 12: Workspace Keputusan Integration Suite', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     vi.mocked(apiClient.get).mockResolvedValue({
@@ -77,7 +77,7 @@ describe('Phase 12: Decision Workspace Integration Suite', () => {
     render(<WorkspaceContainer projectId="proj-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Decision Workspace')).toBeDefined();
+      expect(screen.getByText('Workspace Keputusan')).toBeDefined();
       expect(screen.getByText('Energy Canvas')).toBeDefined();
     });
 
@@ -99,7 +99,7 @@ describe('Phase 12: Decision Workspace Integration Suite', () => {
 
     render(<WorkspaceContainer projectId="proj-123" />);
 
-    await waitFor(() => expect(screen.getByText('Decision Workspace')).toBeDefined());
+    await waitFor(() => expect(screen.getByText('Workspace Keputusan')).toBeDefined());
 
     const solarInput = screen.getByLabelText('Solar PV Capacity in kWp');
     fireEvent.change(solarInput, { target: { value: '6' } });
@@ -119,9 +119,9 @@ describe('Phase 12: Decision Workspace Integration Suite', () => {
   it('3. opens and displays Decision Summary Modal on export click', async () => {
     render(<WorkspaceContainer projectId="proj-123" />);
 
-    await waitFor(() => expect(screen.getByText('Export Decision Summary')).toBeDefined());
+    await waitFor(() => expect(screen.getByText('Ekspor Ringkasan Keputusan')).toBeDefined());
 
-    fireEvent.click(screen.getByText('Export Decision Summary'));
+    fireEvent.click(screen.getByText('Ekspor Ringkasan Keputusan'));
 
     await waitFor(() => {
       expect(screen.getByText('GRIDTWIN AI · INVESTMENT ANALYSIS')).toBeDefined();

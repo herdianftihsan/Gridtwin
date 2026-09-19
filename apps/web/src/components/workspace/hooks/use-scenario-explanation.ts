@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { apiClient } from '../../../lib/api/api-client';
 
-export function useScenarioExplanation(scenarioId?: string) {
+export function useScenarioExplanation(scenarioId?: string, isDemo?: boolean) {
   const [explanation, setExplanation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +22,14 @@ export function useScenarioExplanation(scenarioId?: string) {
       setError(null);
 
       try {
+        if (isDemo) {
+          // Simulate AI delay for demo
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          if (controller.signal.aborted) return;
+          setExplanation('Berdasarkan data demo, konfigurasi ini memberikan kompromi terbaik antara penghematan energi dan biaya investasi. Panel surya dan baterai menekan impor daya pada siang hari, sedangkan efisiensi dari lampu LED dan AC yang diperbarui menjaga konsumsi dasar tetap rendah. ROI akan tercapai lebih cepat.');
+          return;
+        }
+
         const res = await apiClient.post<{ scenario_id: string; explanation: string }>(
           '/api/ai/explain',
           { scenario_id: activeId, user_context_question: userPrompt },
@@ -38,7 +46,7 @@ export function useScenarioExplanation(scenarioId?: string) {
         setIsLoading(false);
       }
     },
-    [scenarioId]
+    [scenarioId, isDemo]
   );
 
   useEffect(() => {

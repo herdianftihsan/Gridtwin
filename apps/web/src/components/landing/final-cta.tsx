@@ -7,7 +7,7 @@ import { useAuthStore } from '../../store/auth.store';
 
 export function FinalCTA() {
   const { session } = useAuthStore();
-  const demoHref = session ? '/demo' : '/login?next=/demo';
+  const demoHref = '/demo';
   const setupHref = session ? '/setup' : '/login?next=/setup';
 
   return (
