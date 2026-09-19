@@ -21,8 +21,8 @@ function AuthCallbackContent() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN") {
-        const next = searchParams.get("next") || "/setup";
-        const safeNext = next.startsWith("/") ? next : "/setup";
+        const next = searchParams.get("next") || "/dashboard";
+        const safeNext = next.startsWith("/") ? next : "/dashboard";
         router.replace(safeNext);
       }
     });

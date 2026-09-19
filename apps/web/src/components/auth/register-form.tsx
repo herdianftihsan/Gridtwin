@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { AuthService } from "../../lib/auth/auth-service";
+import { supabase } from "../../lib/auth/supabase";
 import { PasswordField } from "./password-field";
 import { GoogleButton } from "./google-button";
 import { formItemVariants, errorShakeVariants, buttonMotionProps } from "./auth-motion";
@@ -25,6 +26,32 @@ export function RegisterForm() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [, startTransition] = useTransition();
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && isMounted) {
+        router.replace(nextRoute);
+      } else if (isMounted) {
+        setIsInitializing(false);
+      }
+    };
+    checkSession();
+    return () => { isMounted = false; };
+  }, [router, nextRoute]);
+
+  if (isInitializing) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
+        <div className="w-8 h-8 border-3 border-sky-500 border-t-transparent rounded-full animate-spin" />
+        <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
+          Loading authentication...
+        </span>
+      </div>
+    );
+  }
 
   const validateInputs = (): string | null => {
     const trimmedName = name.trim();
@@ -71,7 +98,7 @@ export function RegisterForm() {
       }
 
       startTransition(() => {
-        router.push(nextRoute);
+        router.replace(nextRoute);
       });
     } catch {
       setAuthError("Terjadi kesalahan jaringan yang tidak terduga. Silakan coba lagi.");

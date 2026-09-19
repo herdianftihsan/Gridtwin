@@ -108,7 +108,7 @@ export class AuthService {
   }
 
   // Parameter nextUrl ditambahkan di sini
-  static async signInWithGoogle(nextUrl: string = "/setup"): Promise<AuthResult> {
+  static async signInWithGoogle(nextUrl: string = "/dashboard"): Promise<AuthResult> {
     try {
       const origin = this.getSiteUrl();
 
