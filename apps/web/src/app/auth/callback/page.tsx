@@ -19,8 +19,18 @@ function AuthCallbackContent() {
       return;
     }
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const next = searchParams.get("next") || "/dashboard";
+        const safeNext = next.startsWith("/") ? next : "/dashboard";
+        router.replace(safeNext);
+      }
+    };
+    checkSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || session) {
         const next = searchParams.get("next") || "/dashboard";
         const safeNext = next.startsWith("/") ? next : "/dashboard";
         router.replace(safeNext);
