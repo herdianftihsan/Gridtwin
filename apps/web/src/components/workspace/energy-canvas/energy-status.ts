@@ -25,7 +25,7 @@ export function mapSimulationToCanvas(
     solar: {
       id: 'solar',
       label: 'PANEL SURYA',
-      sublabel: hasSolar ? 'Aset Usulan' : 'Slot Tidak Aktif',
+      sublabel: hasSolar ? `Estimasi produksi: ${Math.round(energy.solar_yield_monthly)} kWh/bln` : 'Slot Tidak Aktif',
       valueDisplay: `${configuration.pv_kwp} kWp`,
       isActive: hasSolar,
       statusBadge: hasSolar ? 'Produksi Aktif' : 'Tidak Dikonfigurasi',
@@ -51,7 +51,7 @@ export function mapSimulationToCanvas(
     battery: {
       id: 'battery',
       label: 'PENYIMPANAN BATERAI',
-      sublabel: hasBattery ? 'Aset Usulan' : 'Slot Tidak Aktif',
+      sublabel: hasBattery ? 'Menyimpan sebagian surplus solar untuk digunakan kembali.' : 'Slot Tidak Aktif',
       valueDisplay: `${configuration.battery_kwh} kWh`,
       isActive: hasBattery,
       statusBadge: hasBattery ? 'Pemindahan Beban Puncak' : 'Tidak Dikonfigurasi',
@@ -64,7 +64,7 @@ export function mapSimulationToCanvas(
     grid: {
       id: 'grid',
       label: 'JARINGAN PLN',
-      sublabel: 'Koneksi Utilitas',
+      sublabel: hasGridImport ? `${(energy.monthly_demand_kwh > 0 ? (energy.grid_import_monthly / energy.monthly_demand_kwh) * 100 : 0).toFixed(1)}% kebutuhan` : 'Nol Impor',
       valueDisplay: `${Math.round(energy.grid_import_monthly)} kWh/bln`,
       isActive: hasGridImport,
       statusBadge: hasGridImport ? 'Impor Aktif' : 'Nol Impor',

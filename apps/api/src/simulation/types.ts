@@ -134,5 +134,6 @@ export interface SimulationResult {
     readonly battery_charge_efficiency: number;
     readonly battery_discharge_efficiency: number;
     readonly source_version: string;
+    readonly optimization_objective?: string;
   };
 }

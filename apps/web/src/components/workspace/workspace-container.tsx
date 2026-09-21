@@ -71,10 +71,21 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
 
         if (isMounted && res.data) {
           setProject(res.data.project);
-          // By default, the recommended scenario loaded from DB is mapped to 'balanced'
+          let defaultTab: WorkspaceTab = res.data.project.objective === 'save_money' ? 'fastest_payback' : 'balanced';
+
           if (res.data.recommended_scenario) {
             setRecommendedScenario(res.data.recommended_scenario);
             setCurrentResult(res.data.recommended_scenario.simulation_result);
+            
+            const resultObjective = res.data.recommended_scenario.simulation_result?.assumptions?.optimization_objective;
+            if (resultObjective === 'fastest_payback' || resultObjective === 'save_money') {
+              defaultTab = 'fastest_payback';
+            } else if (resultObjective === 'balanced' || resultObjective === 'reduce_co2' || resultObjective === 'independence') {
+              defaultTab = 'balanced';
+            }
+            
+            setActiveTab(defaultTab);
+            
             setCurrentConfig({
               solar_kwp: res.data.recommended_scenario.solar_kwp,
               battery_kwh: res.data.recommended_scenario.battery_kwh,
@@ -85,8 +96,10 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             });
             setCachedResults(prev => ({
               ...prev,
-              balanced: res.data.recommended_scenario.simulation_result
+              [defaultTab]: res.data.recommended_scenario!.simulation_result
             }));
+          } else {
+            setActiveTab(defaultTab);
           }
         }
       } catch (err) {

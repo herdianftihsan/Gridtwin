@@ -206,6 +206,7 @@ export const simulate = (
       battery_charge_efficiency: assumptions.battery_charge_efficiency,
       battery_discharge_efficiency: assumptions.battery_discharge_efficiency,
       source_version: assumptions.source_version,
+      optimization_objective: context.objective,
     },
   };
 };

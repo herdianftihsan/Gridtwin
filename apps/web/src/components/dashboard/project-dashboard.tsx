@@ -11,6 +11,10 @@ export function ProjectDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -38,6 +42,21 @@ export function ProjectDashboard() {
       isMounted = false;
     };
   }, []);
+
+  const handleDelete = async () => {
+    if (!deleteProjectId) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await apiClient.delete(`/api/projects/${deleteProjectId}`);
+      setProjects((prev) => prev.filter((p) => p.id !== deleteProjectId));
+      setDeleteProjectId(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Gagal menghapus proyek");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -126,10 +145,67 @@ export function ProjectDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <ProjectCard project={project} />
+            <ProjectCard project={project} onDelete={() => setDeleteProjectId(project.id)} />
           </motion.div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteProjectId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+          >
+            <div className="p-6">
+              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Hapus project ini?</h3>
+              <p className="text-sm text-slate-600 mb-6">
+                Project, seluruh skenario, dan hasil simulasi terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
+              </p>
+
+              {deleteError && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+                  {deleteError}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={() => {
+                    setDeleteProjectId(null);
+                    setDeleteError(null);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={handleDelete}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isDeleting && (
+                    <svg className="w-4 h-4 animate-spin text-white/70" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  )}
+                  Hapus Project
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

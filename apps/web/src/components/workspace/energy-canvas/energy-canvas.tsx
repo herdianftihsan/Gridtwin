@@ -42,6 +42,7 @@ export function EnergyCanvas({
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(0.85);
   const [positions] = useState<Record<NodeKey, NodePosition>>(DEFAULT_POSITIONS);
+  const [isContextOpen, setIsContextOpen] = useState(false);
 
   const displayLocationRaw = location ?? project?.location ?? 'Surabaya';
   const displayLocation = typeof displayLocationRaw === 'string' ? displayLocationRaw : displayLocationRaw.name;
@@ -81,30 +82,73 @@ export function EnergyCanvas({
       className="relative w-full h-[580px] sm:h-[640px] bg-slate-50/70 border border-slate-200/90 rounded-3xl overflow-hidden select-none shadow-xs flex flex-col justify-between p-4 sm:p-5"
     >
       {/* Top Bar Legend */}
-      <div className="flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-none">
-        <div className="flex items-center gap-2 pointer-events-auto bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs">
-          <span className="text-xs sm:text-sm font-bold tracking-tight text-slate-900">
-            Canvas Energi
-          </span>
-          <span className="text-[11px] text-slate-400 font-medium">
-            ({displayLocation})
-          </span>
+      <div className="flex flex-col gap-3 z-20 pointer-events-none mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2 pointer-events-auto bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs w-max">
+              <span className="text-xs sm:text-sm font-bold tracking-tight text-slate-900">
+                Aliran Energi Bangunan
+              </span>
+              <span className="text-[11px] text-slate-400 font-medium">
+                ({displayLocation})
+              </span>
+              <button 
+                type="button"
+                onClick={() => setIsContextOpen(!isContextOpen)}
+                className="ml-1 w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors cursor-pointer"
+                title="Bagaimana membaca hasil ini?"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 font-medium ml-1">
+              Lihat bagaimana kebutuhan energi dipenuhi oleh solar, baterai, dan jaringan PLN.
+            </p>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-3 text-[11px] font-semibold text-slate-600 bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs pointer-events-auto self-start">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-indigo-500" />
+              <span>Impor Jaringan Listrik</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span>Produksi Panel Surya</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-teal-500" />
+              <span>Penggunaan Baterai</span>
+            </div>
+          </div>
         </div>
 
-        <div className="hidden sm:flex items-center gap-3 text-[11px] font-semibold text-slate-600 bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs pointer-events-auto">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-indigo-500" />
-            <span>Impor Jaringan Listrik</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
-            <span>Produksi Panel Surya</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-teal-500" />
-            <span>Penggunaan Baterai</span>
-          </div>
-        </div>
+        {/* Context Card (Popover) */}
+        <AnimatePresence>
+          {isContextOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className="absolute top-16 left-4 sm:left-5 w-full max-w-sm p-4 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-xl pointer-events-auto z-50"
+            >
+              <div className="flex justify-between items-start mb-1.5">
+                <h4 className="text-xs font-bold text-slate-700">Bagaimana membaca hasil ini?</h4>
+                <button 
+                  type="button" 
+                  onClick={() => setIsContextOpen(false)} 
+                  className="text-slate-400 hover:text-slate-700 cursor-pointer text-xs font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Dari <span className="font-semibold text-slate-700">{Math.round(viewModel.summary.monthlyDemandKwh)}</span> kWh/bulan kebutuhan energi, sekitar <span className="font-semibold text-slate-700">{Math.round(viewModel.summary.solarYieldKwh)}</span> kWh dipenuhi oleh solar dan <span className="font-semibold text-slate-700">{Math.round(viewModel.summary.gridImportKwh)}</span> kWh masih berasal dari jaringan PLN. GridTwin memperkirakan ketergantungan terhadap PLN berkurang sebesar <span className="font-semibold text-emerald-600">{viewModel.summary.independencePct.toFixed(1)}%</span>.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Scaled Interactive Canvas Area */}

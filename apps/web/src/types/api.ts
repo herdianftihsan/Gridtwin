@@ -75,6 +75,7 @@ export interface SimulationAssumptions {
   battery_charge_efficiency: number;
   battery_discharge_efficiency: number;
   source_version: string;
+  optimization_objective?: string;
 }
 
 export interface SimulationResult {

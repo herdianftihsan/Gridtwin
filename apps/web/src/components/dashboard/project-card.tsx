@@ -5,9 +5,10 @@ import { formatLocation } from "../../lib/utils/location";
 
 interface ProjectCardProps {
   project: Project;
+  onDelete?: (e: React.MouseEvent) => void;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Tanggal tidak diketahui";
     return new Date(dateString).toLocaleDateString("id-ID", {
@@ -24,7 +25,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {/* Top Section */}
         <div className="space-y-4 relative z-10">
           <div className="flex justify-between items-start gap-3">
-            <h3 className="text-lg font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2 leading-tight">
+            <h3 className="text-lg font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2 leading-tight pr-8">
               Proyek {project.building_type}
             </h3>
             <span className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-emerald-100 text-emerald-700 border-emerald-200`}>
@@ -57,10 +58,28 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <span className="text-xs font-medium text-slate-700">{formatDate(project.created_at)}</span>
           </div>
           
-          <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(e);
+                }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                aria-label="Delete project"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
+            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </div>
         </div>
         
@@ -70,3 +89,4 @@ export function ProjectCard({ project }: ProjectCardProps) {
     </Link>
   );
 }
+

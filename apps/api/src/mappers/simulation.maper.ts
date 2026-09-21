@@ -82,6 +82,7 @@ export const toSimulationResultContract = (
       battery_charge_efficiency: Number(simResult.assumptions.battery_charge_efficiency ?? 0.95),
       battery_discharge_efficiency: Number(simResult.assumptions.battery_discharge_efficiency ?? 0.95),
       source_version: String(simResult.assumptions.source_version ?? 'mvp-1.0'),
+      ...(simResult.assumptions.optimization_objective ? { optimization_objective: String(simResult.assumptions.optimization_objective) } : {}),
     },
   };
 };
