@@ -165,7 +165,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
   };
 
   const handleRunOptimization = async (strategy: 'balanced' | 'fastest_payback') => {
-    if (isSimulating) return;
+    if (isSimulating || isSaving) return;
     
     try {
       setIsSimulating(true);
@@ -221,6 +221,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
   };
 
   const handleTabSelect = (tab: WorkspaceTab) => {
+    if (isSimulating || isSaving) return;
     if (activeTab === 'custom') {
       setCachedCustomConfig(currentConfig);
       setCachedResults(prev => ({ ...prev, custom: currentResult }));
@@ -345,6 +346,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             type="button"
             onClick={() => handleRunSimulation(currentConfig, false, activeTab)}
             disabled={isSimulating || !isStale}
+            aria-busy={isSimulating}
             className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all ${
               isStale 
                 ? 'bg-amber-500 text-white hover:bg-amber-600 cursor-pointer animate-pulse'
@@ -358,6 +360,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             type="button"
             onClick={() => handleRunSimulation(currentConfig, true, activeTab)}
             disabled={!canExportOrSave || isSaving}
+            aria-busy={isSaving}
             className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all ${
               canExportOrSave
                 ? 'bg-slate-900 text-white hover:bg-slate-800 cursor-pointer'
@@ -475,6 +478,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             activeTab={activeTab}
             onTabSelect={handleTabSelect}
             recommendedScenario={recommendedScenario}
+            disabled={isSimulating || isSaving}
           />
         </div>
       </div>

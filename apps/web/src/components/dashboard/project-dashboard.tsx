@@ -11,6 +11,7 @@ export function ProjectDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -19,6 +20,8 @@ export function ProjectDashboard() {
   useEffect(() => {
     let isMounted = true;
     const fetchProjects = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
         const response = await apiClient.get<Project[]>("/api/projects");
         if (isMounted) {
@@ -41,7 +44,7 @@ export function ProjectDashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [loadAttempt]);
 
   const handleDelete = async () => {
     if (!deleteProjectId) return;
@@ -85,8 +88,8 @@ export function ProjectDashboard() {
         <h2 className="text-xl font-bold text-slate-900 mb-2">Gagal memuat proyek</h2>
         <p className="text-sm text-slate-500 max-w-md mb-6">{error}</p>
         <button
-          onClick={() => window.location.reload()}
-          className="px-6 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors"
+          onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+          className="px-6 py-2.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
         >
           Coba Lagi
         </button>

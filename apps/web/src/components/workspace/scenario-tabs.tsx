@@ -9,6 +9,7 @@ interface ScenarioTabsProps {
   activeTab: WorkspaceTab;
   onTabSelect: (tab: WorkspaceTab) => void;
   recommendedScenario: Scenario | null;
+  disabled?: boolean;
 }
 
 const TABS: { id: WorkspaceTab; label: string }[] = [
@@ -21,6 +22,7 @@ export function ScenarioTabs({
   activeTab,
   onTabSelect,
   recommendedScenario,
+  disabled = false,
 }: ScenarioTabsProps) {
   return (
     <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm space-y-4 text-left">
@@ -37,7 +39,10 @@ export function ScenarioTabs({
               key={tab.id}
               type="button"
               onClick={() => onTabSelect(tab.id)}
-              className={`relative flex-1 py-1.5 text-[11px] font-semibold rounded-lg transition-colors z-10 cursor-pointer ${
+              disabled={disabled}
+              aria-pressed={isActive}
+              aria-label={tab.label}
+              className={`relative flex-1 py-1.5 text-[11px] font-semibold rounded-lg transition-colors z-10 ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${
                 isActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
