@@ -53,7 +53,7 @@ export function WhatIfShowcase() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.4 }}
           className="max-w-xl space-y-3"
         >
@@ -80,7 +80,7 @@ export function WhatIfShowcase() {
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={() => setSelectedId(ex.id)}
-                className={`w-full p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                className={`w-full p-4 rounded-2xl border text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 ${
                   ex.id === selectedId
                     ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-500/20 shadow-md'
                     : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
@@ -96,7 +96,7 @@ export function WhatIfShowcase() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.2 }}
             whileHover={{ y: -4 }}
             className="lg:col-span-7 p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200 shadow-md space-y-6"
           >

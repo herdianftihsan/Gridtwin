@@ -10,15 +10,20 @@ interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputElement>
 
 export function PasswordField({ label, error, className = '', ...props }: PasswordFieldProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const inputId = React.useId();
+  const errorId = `${inputId}-error`;
 
   return (
     <div className="space-y-1.5 text-left">
-      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+      <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
         {label}
       </label>
       <div className="relative">
         <input
+          id={inputId}
           type={isVisible ? 'text' : 'password'}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
           className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all pr-10 ${
             error ? 'border-red-500 focus:ring-red-500' : 'border-slate-200'
           } ${className}`}
@@ -28,7 +33,7 @@ export function PasswordField({ label, error, className = '', ...props }: Passwo
           type="button"
           onClick={() => setIsVisible((prev) => !prev)}
           aria-label={isVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded p-1"
         >
           <AnimatePresence mode="wait" initial={false}>
             {isVisible ? (
@@ -62,7 +67,7 @@ export function PasswordField({ label, error, className = '', ...props }: Passwo
           </AnimatePresence>
         </button>
       </div>
-      {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
+      {error && <p id={errorId} className="text-xs text-red-600 font-medium">{error}</p>}
     </div>
   );
 }

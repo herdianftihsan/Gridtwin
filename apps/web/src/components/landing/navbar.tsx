@@ -56,7 +56,7 @@ export function Navbar() {
               <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/login"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                 >
                   Masuk
                 </Link>
@@ -64,7 +64,7 @@ export function Navbar() {
               <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/register"
-                  className="px-4.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-900 shadow-sm transition-all cursor-pointer"
+                  className="px-4.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-900 shadow-sm transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                 >
                   Daftar
                 </Link>
@@ -74,7 +74,7 @@ export function Navbar() {
             <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href="/dashboard"
-                className="px-4.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-xs transition-all cursor-pointer"
+                className="px-4.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               >
                 Buka Dashboard
               </Link>
@@ -87,7 +87,7 @@ export function Navbar() {
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           aria-expanded={isMobileOpen}
           aria-label="Toggle Mobile Menu"
-          className="sm:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+          className="sm:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {isMobileOpen ? (
@@ -101,10 +101,10 @@ export function Navbar() {
 
       {isMobileOpen && (
         <div className="sm:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3 text-sm font-semibold text-left shadow-lg">
-          <a href="#product" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Produk</a>
-          <a href="#workflow" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Cara Kerja</a>
-          <a href="#demo" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Contoh Hasil</a>
-          <a href="#methodology" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Metodologi</a>
+          <a href="#product" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Produk</a>
+          <a href="#workflow" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Cara Kerja</a>
+          <a href="#demo" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Contoh Hasil</a>
+          <a href="#methodology" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Metodologi</a>
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2 mt-2">
             {!session ? (
               <>

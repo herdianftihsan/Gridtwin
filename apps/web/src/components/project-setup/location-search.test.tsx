@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { LocationSearch } from './location-search';
 import { apiClient } from '../../lib/api/api-client';
@@ -22,7 +21,7 @@ describe('LocationSearch Component', () => {
     expect(apiClient.get).not.toHaveBeenCalled();
     
     await waitFor(() => {
-      expect(apiClient.get).toHaveBeenCalledWith('/api/locations/search?q=Su');
+      expect(apiClient.get).toHaveBeenCalledWith('/api/locations/search?q=Su', expect.any(Object));
     });
   });
 

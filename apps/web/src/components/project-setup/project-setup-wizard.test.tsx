@@ -82,4 +82,32 @@ describe('ProjectSetupWizard budget step', () => {
     expect(screen.getByText('Masukkan batas investasi maksimum Anda')).toBeDefined();
     expect(screen.getByText('Anggaran minimum adalah Rp 1.000.000.')).toBeDefined();
   });
+
+  it('prevents duplicate project creation while the first request is pending', async () => {
+    vi.mocked(apiClient.post).mockReturnValue(new Promise(() => {}) as never);
+    await renderBudgetStep();
+    enterBudget('50000000');
+    fireEvent.click(continueButton());
+    await waitFor(() => expect(screen.getByText('Apa yang paling penting bagi Anda?')).toBeDefined());
+    fireEvent.click(screen.getByRole('button', { name: /Hemat Uang/ }));
+
+    const createButton = screen.getByRole('button', { name: /Buat Energy Twin Saya/ });
+    fireEvent.click(createButton);
+    fireEvent.click(createButton);
+
+    expect(apiClient.post).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not invite a retry if creation returns no project ID', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({ data: {}, error: null } as never);
+    await renderBudgetStep();
+    enterBudget('50000000');
+    fireEvent.click(continueButton());
+    await waitFor(() => expect(screen.getByText('Apa yang paling penting bagi Anda?')).toBeDefined());
+    fireEvent.click(screen.getByRole('button', { name: /Hemat Uang/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Buat Energy Twin Saya/ }));
+
+    expect(await screen.findByText(/Periksa Dashboard sebelum mencoba lagi/)).toBeDefined();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
 });

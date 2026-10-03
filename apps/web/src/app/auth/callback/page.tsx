@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../../lib/auth/supabase";
+import { getSafeNextRoute } from "../../../lib/auth/safe-next-route";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -22,8 +23,7 @@ function AuthCallbackContent() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const next = searchParams.get("next") || "/dashboard";
-        const safeNext = next.startsWith("/") ? next : "/dashboard";
+        const safeNext = getSafeNextRoute(searchParams.get("next"));
         router.replace(safeNext);
       }
     };
@@ -31,8 +31,7 @@ function AuthCallbackContent() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || session) {
-        const next = searchParams.get("next") || "/dashboard";
-        const safeNext = next.startsWith("/") ? next : "/dashboard";
+        const safeNext = getSafeNextRoute(searchParams.get("next"));
         router.replace(safeNext);
       }
     });

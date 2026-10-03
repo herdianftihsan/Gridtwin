@@ -23,7 +23,7 @@ describe('Phase 13: Energy Canvas & Telemetry Mapping', () => {
   it('1. maps solar active and inactive states correctly', () => {
     const activeModel = mapSimulationToCanvas(mockBaseResult);
     expect(activeModel.nodes.solar.isActive).toBe(true);
-    expect(activeModel.nodes.solar.valueDisplay).toBe('4 kWp');
+    expect(activeModel.nodes.solar.valueDisplay).toBe('405 kWh/bln');
 
     const inactiveResult = {
       ...mockBaseResult,
@@ -51,31 +51,31 @@ describe('Phase 13: Energy Canvas & Telemetry Mapping', () => {
   it('4. renders all 8 required node elements on the canvas', () => {
     render(<EnergyCanvas result={mockBaseResult} />);
 
-    expect(screen.getByText('SOLAR PV')).toBeDefined();
-    expect(screen.getByText('BUILDING LOAD')).toBeDefined();
-    expect(screen.getByText('BATTERY STORAGE')).toBeDefined();
-    expect(screen.getByText('PLN GRID')).toBeDefined();
-    expect(screen.getByText('AIR CONDITIONER')).toBeDefined();
-    expect(screen.getByText('SMART LED')).toBeDefined();
-    expect(screen.getByText('REFRIGERATION')).toBeDefined();
-    expect(screen.getByText('WATER PUMP')).toBeDefined();
+    expect(screen.getByText('PANEL SURYA')).toBeDefined();
+    expect(screen.getByText('BEBAN BANGUNAN')).toBeDefined();
+    expect(screen.getByText('PENYIMPANAN BATERAI')).toBeDefined();
+    expect(screen.getByText('JARINGAN PLN')).toBeDefined();
+    expect(screen.getByText('PENDINGIN RUANGAN (AC)')).toBeDefined();
+    expect(screen.getByText('LED PINTAR')).toBeDefined();
+    expect(screen.getByText('PENDINGINAN')).toBeDefined();
+    expect(screen.getByText('POMPA AIR')).toBeDefined();
   });
 
   it('5. opens telemetry inspector when a node is clicked', async () => {
     render(<EnergyCanvas result={mockBaseResult} />);
 
-    const solarNode = screen.getByText('SOLAR PV');
+    const solarNode = screen.getByText('PANEL SURYA');
     fireEvent.click(solarNode);
 
     await waitFor(() => {
-      expect(screen.getByText('SOLAR PV TELEMETRY')).toBeDefined();
-      expect(screen.getByText('Installed Capacity')).toBeDefined();
+      expect(screen.getByText('TELEMETRI PANEL SURYA')).toBeDefined();
+      expect(screen.getByText('Kapasitas Terpasang')).toBeDefined();
     });
   });
 
   it('6. provides accessible aria labels for keyboard navigation', () => {
     render(<EnergyCanvas result={mockBaseResult} />);
-    const solarButton = screen.getByLabelText(/SOLAR PV: 4 kWp/i);
+    const solarButton = screen.getByLabelText(/PANEL SURYA: .*Kapasitas: 4 kWp/i);
     expect(solarButton).toBeDefined();
     expect(solarButton.getAttribute('tabindex')).toBe('0');
   });

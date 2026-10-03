@@ -157,6 +157,16 @@ export function ProjectDashboard() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-project-title"
+            aria-describedby="delete-project-description"
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && !isDeleting) {
+                setDeleteProjectId(null);
+                setDeleteError(null);
+              }
+            }}
           >
             <div className="p-6">
               <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
@@ -164,13 +174,13 @@ export function ProjectDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Hapus project ini?</h3>
-              <p className="text-sm text-slate-600 mb-6">
+              <h3 id="delete-project-title" className="text-xl font-bold text-slate-900 mb-2">Hapus project ini?</h3>
+              <p id="delete-project-description" className="text-sm text-slate-600 mb-6">
                 Project, seluruh skenario, dan hasil simulasi terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
               </p>
 
               {deleteError && (
-                <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+                <div role="alert" className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100">
                   {deleteError}
                 </div>
               )}
@@ -179,6 +189,7 @@ export function ProjectDashboard() {
                 <button
                   type="button"
                   disabled={isDeleting}
+                  autoFocus
                   onClick={() => {
                     setDeleteProjectId(null);
                     setDeleteError(null);

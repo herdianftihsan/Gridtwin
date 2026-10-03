@@ -67,7 +67,7 @@ export function HeroSection() {
               >
                 <Link
                   href={setupHref}
-                  className="inline-flex items-center justify-center gap-3 w-full px-8 py-4 rounded-xl bg-white text-slate-950 font-bold text-sm hover:bg-slate-50 transition-all shadow-xl"
+                  className="inline-flex items-center justify-center gap-3 w-full px-8 py-4 rounded-xl bg-white text-slate-950 font-bold text-sm hover:bg-slate-50 transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                 >
                   <span>Mulai Simulasi</span>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,7 +82,7 @@ export function HeroSection() {
               >
                 <Link
                   href={demoHref}
-                  className="inline-flex items-center justify-center w-full px-8 py-4 rounded-xl border border-slate-800 bg-slate-900/50 text-white font-semibold text-sm hover:bg-slate-800 hover:border-slate-700 transition-all backdrop-blur-sm"
+                  className="inline-flex items-center justify-center w-full px-8 py-4 rounded-xl border border-slate-800 bg-slate-900/90 text-white font-semibold text-sm hover:bg-slate-800 hover:border-slate-700 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                 >
                   Lihat Contoh Hasil
                 </Link>
@@ -109,7 +109,7 @@ export function HeroSection() {
             className="lg:col-span-5 relative"
           >
             {/* The Product Result Preview Window */}
-            <div className="relative rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl">
+            <div className="relative rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl overflow-hidden">
               {/* Header Bar */}
               <div className="px-5 py-4 border-b border-slate-800 bg-slate-950/50 flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -165,8 +165,6 @@ export function HeroSection() {
             </div>
             
             {/* Decorative elements behind the window */}
-            <div className="absolute -z-10 -bottom-8 -right-8 w-64 h-64 bg-sky-600/20 blur-3xl rounded-full" />
-            <div className="absolute -z-10 -top-8 -left-8 w-48 h-48 bg-emerald-600/10 blur-3xl rounded-full" />
           </motion.div>
         </div>
       </div>

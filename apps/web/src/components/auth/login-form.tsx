@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { AuthService } from "../../lib/auth/auth-service";
-import { supabase } from "../../lib/auth/supabase";
+import { useAuthStore } from "../../store/auth.store";
+import { getSafeNextRoute } from "../../lib/auth/safe-next-route";
 import { PasswordField } from "./password-field";
 import { GoogleButton } from "./google-button";
 import { formItemVariants, errorShakeVariants, buttonMotionProps } from "./auth-motion";
@@ -14,31 +15,20 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const nextParam = searchParams.get("next");
-  const nextRoute = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard";
+  const nextRoute = getSafeNextRoute(searchParams.get("next"));
+  const session = useAuthStore((state) => state.session);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
-
   React.useEffect(() => {
-    let isMounted = true;
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && isMounted) {
-        router.replace(nextRoute);
-      } else if (isMounted) {
-        setIsInitializing(false);
-      }
-    };
-    checkSession();
-    return () => { isMounted = false; };
-  }, [router, nextRoute]);
+    if (isInitialized && session) router.replace(nextRoute);
+  }, [isInitialized, session, router, nextRoute]);
 
-  if (isInitializing) {
+  if (!isInitialized) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
         <div className="w-8 h-8 border-3 border-sky-500 border-t-transparent rounded-full animate-spin" />
@@ -63,15 +53,18 @@ export function LoginForm() {
     }
 
     setIsLoading(true);
-    const { error } = await AuthService.signInWithEmail(email, password);
-    setIsLoading(false);
-
-    if (error) {
-      setAuthError(error);
-      return;
+    try {
+      const { error } = await AuthService.signInWithEmail(email, password);
+      if (error) {
+        setAuthError(error);
+        return;
+      }
+      router.replace(nextRoute);
+    } catch {
+      setAuthError("Terjadi kesalahan jaringan yang tidak terduga. Silakan coba lagi.");
+    } finally {
+      setIsLoading(false);
     }
-
-    router.replace(nextRoute);
   };
 
   return (
@@ -89,6 +82,8 @@ export function LoginForm() {
             initial="initial"
             animate="animate"
             exit="exit"
+            role="alert"
+            aria-live="polite"
             className="p-3.5 rounded-lg bg-red-50 border-l-4 border-red-500 flex items-start gap-3 text-left shadow-sm"
           >
             <svg
@@ -111,11 +106,14 @@ export function LoginForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <motion.div variants={formItemVariants} className="space-y-1.5 text-left">
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+          <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
             Email
           </label>
           <input
+            id="login-email"
+            name="email"
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="nama@perusahaan.com"

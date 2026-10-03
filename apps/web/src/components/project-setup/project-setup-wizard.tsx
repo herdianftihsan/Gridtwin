@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { apiClient, ApiClientError } from '../../lib/api/api-client';
@@ -27,6 +27,7 @@ export function ProjectSetupWizard() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const isSubmitting = useRef(false);
 
   const updateFormData = (fields: Partial<ProjectSetupFormData>) => {
     setFormData((prev) => ({ ...prev, ...fields }));
@@ -73,8 +74,9 @@ export function ProjectSetupWizard() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(4) || isLoading) return;
+    if (isSubmitting.current || !validateStep(4)) return;
 
+    isSubmitting.current = true;
     setIsLoading(true);
     setApiError(null);
 
@@ -92,6 +94,8 @@ export function ProjectSetupWizard() {
 
       if (response.data?.id) {
         router.push(`/projects/${response.data.id}`);
+      } else {
+        setApiError('Proyek terkirim tanpa konfirmasi yang dapat dibuka. Periksa Dashboard sebelum mencoba lagi.');
       }
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -99,6 +103,8 @@ export function ProjectSetupWizard() {
       } else {
         setApiError('Terjadi kesalahan tak terduga saat membuat proyek Anda.');
       }
+    } finally {
+      isSubmitting.current = false;
       setIsLoading(false);
     }
   };

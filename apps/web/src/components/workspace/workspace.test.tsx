@@ -78,7 +78,7 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Workspace Keputusan')).toBeDefined();
-      expect(screen.getByText('Energy Canvas')).toBeDefined();
+      expect(screen.getByText('Aliran Energi Bangunan')).toBeDefined();
     });
 
     // Gunakan getAllByText karena nilai 4 kWp tampil pada Canvas, Slider, & Tab detail
@@ -86,7 +86,7 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
     expect(solarMatches.length).toBeGreaterThan(0);
   });
 
-  it('2. triggers debounced POST /simulate when changing solar PV capacity', async () => {
+  it('2. runs POST /simulate after changing solar PV capacity and submitting', async () => {
     vi.mocked(apiClient.post).mockResolvedValue({
       data: {
         scenario_type: 'custom',
@@ -103,6 +103,7 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
 
     const solarInput = screen.getByLabelText('Solar PV Capacity in kWp');
     fireEvent.change(solarInput, { target: { value: '6' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Jalankan Simulasi' }));
 
     await waitFor(() => {
       expect(apiClient.post).toHaveBeenCalledWith(
@@ -110,8 +111,7 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
         expect.objectContaining({
           solar_kwp: 6,
           persist: false,
-        }),
-        expect.any(Object)
+        })
       );
     });
   });
@@ -124,7 +124,7 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
     fireEvent.click(screen.getByText('Ekspor Ringkasan Keputusan'));
 
     await waitFor(() => {
-      expect(screen.getByText('GRIDTWIN AI · INVESTMENT ANALYSIS')).toBeDefined();
+      expect(screen.getByText('GRIDTWIN AI · ANALISIS INVESTASI')).toBeDefined();
     });
   });
 

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { AuthService } from "../../lib/auth/auth-service";
-import { supabase } from "../../lib/auth/supabase";
+import { useAuthStore } from "../../store/auth.store";
+import { getSafeNextRoute } from "../../lib/auth/safe-next-route";
 import { PasswordField } from "./password-field";
 import { GoogleButton } from "./google-button";
 import { formItemVariants, errorShakeVariants, buttonMotionProps } from "./auth-motion";
@@ -16,8 +17,9 @@ const MIN_PASSWORD_LENGTH = 8;
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
-  const nextRoute = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard";
+  const nextRoute = getSafeNextRoute(searchParams.get("next"));
+  const session = useAuthStore((state) => state.session);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,23 +28,11 @@ export function RegisterForm() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [, startTransition] = useTransition();
-  const [isInitializing, setIsInitializing] = useState(true);
-
   React.useEffect(() => {
-    let isMounted = true;
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && isMounted) {
-        router.replace(nextRoute);
-      } else if (isMounted) {
-        setIsInitializing(false);
-      }
-    };
-    checkSession();
-    return () => { isMounted = false; };
-  }, [router, nextRoute]);
+    if (isInitialized && session) router.replace(nextRoute);
+  }, [isInitialized, session, router, nextRoute]);
 
-  if (isInitializing) {
+  if (!isInitialized) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
         <div className="w-8 h-8 border-3 border-sky-500 border-t-transparent rounded-full animate-spin" />

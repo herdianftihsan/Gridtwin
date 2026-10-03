@@ -26,7 +26,7 @@ export function FinalCTA() {
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
             <Link
               href={setupHref}
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-slate-950 font-bold text-sm hover:bg-slate-100 transition-all shadow-lg cursor-pointer w-full"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-slate-950 font-bold text-sm hover:bg-slate-100 transition-all shadow-lg cursor-pointer w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               <span>Mulai Simulasi</span>
               <span className="text-slate-400">→</span>
@@ -35,7 +35,7 @@ export function FinalCTA() {
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
             <Link
               href={demoHref}
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl border border-slate-700 bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition-all cursor-pointer w-full"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl border border-slate-700 bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition-all cursor-pointer w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               Lihat Contoh Hasil
             </Link>

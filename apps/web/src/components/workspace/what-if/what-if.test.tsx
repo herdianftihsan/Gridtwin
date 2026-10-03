@@ -104,7 +104,7 @@ describe('Phase 15: What-if & AI Explanation UI', () => {
 
     expect(screen.getByText('Rp 3.59 Jt')).toBeDefined();
     expect(screen.getByText('Rp 2.80 Jt')).toBeDefined();
-    expect(screen.getByText('38%')).toBeDefined();
+    expect(screen.getByText('38.0%')).toBeDefined();
   });
 
   it('5. handles NO_FEASIBLE_SCENARIO error gracefully without hiding current state', async () => {
