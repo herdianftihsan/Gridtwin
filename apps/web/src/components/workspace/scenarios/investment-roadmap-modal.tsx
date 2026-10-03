@@ -138,7 +138,7 @@ export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStag
                               <div>
                                 <p className="text-xs font-medium text-slate-500 mb-1">Kemandirian Jaringan</p>
                                 <p className="text-lg font-semibold text-white">
-                                  {(r.grid.independence_pct * 100).toFixed(0)}%
+                                  {r.grid.independence_pct.toFixed(0)}%
                                 </p>
                               </div>
                             </div>

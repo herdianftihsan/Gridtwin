@@ -11,9 +11,7 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = AUTH_PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
   const isAuthRoute = PUBLIC_AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (pathname === '/' && token) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
+  // Removed redirect from '/' to '/dashboard' for authenticated users to allow access to the landing page
 
   if (isProtectedRoute && !token) {
     const loginUrl = new URL('/login', request.url);

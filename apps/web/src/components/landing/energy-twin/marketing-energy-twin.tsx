@@ -80,7 +80,7 @@ export function MarketingEnergyTwin() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative w-full bg-slate-950 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 select-none flex flex-col justify-between text-left space-y-6"
+      className="relative w-full bg-slate-950/60 backdrop-blur-xl rounded-3xl border border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 select-none flex flex-col justify-between text-left space-y-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs z-10">
         <div className="flex items-center gap-2.5 bg-slate-900/90 px-4 py-2 rounded-full border border-slate-700 shadow-xs">

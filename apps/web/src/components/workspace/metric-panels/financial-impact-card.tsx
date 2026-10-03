@@ -9,6 +9,7 @@ interface FinancialImpactCardProps {
 }
 
 export function FinancialImpactCard({ result, isSimulating = false }: FinancialImpactCardProps) {
+  const [isAssumptionsOpen, setIsAssumptionsOpen] = React.useState(false);
   const { baseline, financial, grid } = result;
 
   const formatMillions = (val: number): string => {
@@ -64,6 +65,46 @@ export function FinancialImpactCard({ result, isSimulating = false }: FinancialI
             ↑ {grid.independence_pct.toFixed(1)}%
           </div>
         </div>
+      </div>
+
+      <div className="pt-3 border-t border-slate-100 flex justify-between items-center relative">
+        <button
+          type="button"
+          onClick={() => setIsAssumptionsOpen(!isAssumptionsOpen)}
+          className="text-[11px] font-semibold text-slate-500 hover:text-sky-600 transition-colors inline-flex items-center gap-1 cursor-pointer"
+        >
+          Bagaimana GridTwin menghitung ini?
+          <svg className={`w-3.5 h-3.5 transition-transform ${isAssumptionsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {isAssumptionsOpen && (
+          <div className="absolute top-full left-0 mt-2 w-full p-4 bg-slate-800 text-slate-300 rounded-xl shadow-xl z-50 text-[11px] leading-relaxed">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-bold text-white">Parameter Asumsi</span>
+              <button type="button" onClick={() => setIsAssumptionsOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">✕</button>
+            </div>
+            <ul className="space-y-1.5">
+              <li className="flex justify-between border-b border-slate-700 pb-1">
+                <span>Tarif Listrik (PLN):</span>
+                <span className="font-semibold text-white">Rp {result.assumptions.tariff.toLocaleString('id-ID')} / kWh</span>
+              </li>
+              <li className="flex justify-between border-b border-slate-700 pb-1">
+                <span>Potensi Matahari (PSH):</span>
+                <span className="font-semibold text-white">{result.assumptions.psh} jam/hari</span>
+              </li>
+              <li className="flex justify-between border-b border-slate-700 pb-1">
+                <span>Performance Ratio PV:</span>
+                <span className="font-semibold text-white">{(result.assumptions.performance_ratio * 100).toFixed(0)}%</span>
+              </li>
+              <li className="flex justify-between pt-0.5">
+                <span>Masa Pengembalian:</span>
+                <span className="text-right">CAPEX / (Penghematan Bulanan × 12)</span>
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

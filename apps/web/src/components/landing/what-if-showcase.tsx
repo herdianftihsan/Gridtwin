@@ -58,13 +58,13 @@ export function WhatIfShowcase() {
           className="max-w-xl space-y-3"
         >
           <span className="text-xs font-bold uppercase tracking-widest text-sky-600">
-            EKSPLORASI SKENARIO
+            AI DECISION COPILOT
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Skenario Interaktif & Eksplorasi What-if
+            Bagaimana jika?
           </h2>
-          <p className="text-sm text-slate-600 font-normal leading-relaxed">
-            Eksplorasi keputusan alternatif secara fleksibel tanpa kehilangan konteks data awal.
+          <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed">
+            Eksplorasi keputusan alternatif secara fleksibel. GridTwin bertindak sebagai asisten keputusan (copilot) yang menganalisis trade-off dari setiap pertanyaan "what-if" Anda.
           </p>
         </motion.div>
 

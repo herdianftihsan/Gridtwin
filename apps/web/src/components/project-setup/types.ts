@@ -1,6 +1,5 @@
 export type BuildingType = 'Ruko' | 'Residential' | 'Office';
 export type ProjectObjective = 'save_money' | 'reduce_co2' | 'independence';
-
 export interface ProjectSetupFormData {
   location: string;
   building_type: BuildingType | '';

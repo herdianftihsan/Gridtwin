@@ -186,6 +186,157 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
     });
   });
 
+  describe('Scenario Update Ownership Guards', () => {
+    it('rejects PATCH /api/scenarios/:id without authentication', async () => {
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .send({ name: 'Renamed scenario' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects PATCH /api/scenarios/:id with a malformed token', async () => {
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', 'Basic invalid-token')
+        .send({ name: 'Renamed scenario' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects PATCH /api/scenarios/:id with an invalid token', async () => {
+      vi.spyOn(supabaseAdmin.auth, 'getUser').mockResolvedValueOnce({
+        data: { user: null },
+        error: { name: 'AuthApiError', message: 'invalid token', status: 401 },
+      } as never);
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ name: 'Renamed scenario' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns 404 when the scenario does not exist', async () => {
+      vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(null);
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch('/api/scenarios/missing-scenario')
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ name: 'Renamed scenario' });
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('NOT_FOUND');
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns 403 and does not update a scenario owned by another user', async () => {
+      vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioRow);
+      vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce({
+        ...mockProject,
+        user_id: otherUserId,
+      });
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ name: 'Unauthorized rename' });
+
+      expect(res.status).toBe(403);
+      expect(res.body.error.code).toBe('FORBIDDEN');
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns the established 404 when the scenario project is missing', async () => {
+      vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioRow);
+      vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(null);
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ name: 'Orphaned scenario' });
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('NOT_FOUND');
+      expect(res.body.error.message).toBe('Project not found');
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('derives ownership from the persisted scenario project and updates an owned scenario', async () => {
+      vi.spyOn(scenarioRepository, 'findById').mockResolvedValueOnce(mockScenarioRow);
+      const projectLookupSpy = vi.spyOn(projectRepository, 'findById').mockResolvedValueOnce(mockProject);
+      const updateSpy = vi.spyOn(scenarioRepository, 'update').mockResolvedValueOnce();
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ name: 'Updated scenario' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data).toMatchObject({
+        id: mockScenarioRow.id,
+        project_id: mockScenarioRow.project_id,
+        name: 'Updated scenario',
+      });
+      expect(res.body.meta).toHaveProperty('timestamp');
+      expect(projectLookupSpy).toHaveBeenCalledWith(mockScenarioRow.project_id);
+      expect(updateSpy).toHaveBeenCalledWith(mockScenarioRow.id, { name: 'Updated scenario' });
+    });
+
+    it.each([
+      { name: '', label: 'empty name' },
+      { name: ' '.repeat(101), label: 'overlong name' },
+    ])('rejects $label before reaching the repository', async ({ name }) => {
+      const findSpy = vi.spyOn(scenarioRepository, 'findById');
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({ name });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(findSpy).not.toHaveBeenCalled();
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects ownership field overrides before reaching the repository', async () => {
+      const findSpy = vi.spyOn(scenarioRepository, 'findById');
+      const updateSpy = vi.spyOn(scenarioRepository, 'update');
+
+      const res = await request(app)
+        .patch(`/api/scenarios/${mockScenarioRow.id}`)
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({
+          name: 'Attempted takeover',
+          project_id: 'attacker-project',
+          user_id: otherUserId,
+          owner_id: otherUserId,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(findSpy).not.toHaveBeenCalled();
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+  });
+
   // 2. Project CRUD Operations
   describe('Project CRUD Endpoints', () => {
     it('POST /api/projects creates a project with standard 201 envelope', async () => {
@@ -285,6 +436,23 @@ describe('Phase 6: Project, Simulation & Optimization API Test Suite', () => {
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe('VALIDATION_ERROR');
       expect(res.body.error).toHaveProperty('details');
+    });
+
+    it('POST /api/projects rejects a null budget at the API boundary', async () => {
+      const res = await request(app)
+        .post('/api/projects')
+        .set('Authorization', `Bearer ${validToken}`)
+        .send({
+          building_type: 'Ruko',
+          location: 'Surabaya',
+          monthly_bill: 4_500_000,
+          budget: null,
+          objective: 'save_money',
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+      expect(res.body.error.details).toHaveProperty('budget');
     });
 
     it('GET /api/projects returns paginated projects belonging to user', async () => {

@@ -35,6 +35,7 @@ export function StepBuilding({ formData, updateFormData, errors }: StepBuildingP
             onChange={(id) => updateFormData({ location: id })}
             error={errors['location']}
           />
+          <p className="text-[11px] text-slate-500">Digunakan untuk menyesuaikan estimasi potensi energi matahari.</p>
           {errors['location'] && <p className="text-xs text-red-500">{errors['location']}</p>}
         </div>
 
@@ -85,7 +86,10 @@ export function StepBuilding({ formData, updateFormData, errors }: StepBuildingP
               m²
             </span>
           </div>
-          <p className="text-[11px] text-slate-400">Perkiraan luas yang tersedia untuk panel surya.</p>
+          <p className="text-[11px] text-slate-500">
+            Digunakan untuk memperkirakan kapasitas panel yang memungkinkan. <br />
+            <span className="text-slate-400">Tidak tahu luas atap? Lanjutkan dengan estimasi.</span>
+          </p>
         </div>
       </div>
     </div>

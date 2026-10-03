@@ -127,4 +127,24 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
       expect(screen.getByText('GRIDTWIN AI · INVESTMENT ANALYSIS')).toBeDefined();
     });
   });
+
+  it('4. offers a retry when the project workspace request fails', async () => {
+    vi.mocked(apiClient.get)
+      .mockRejectedValueOnce(new Error('Network unavailable'))
+      .mockResolvedValueOnce({ data: mockProjectDetail } as never);
+
+    render(<WorkspaceContainer projectId="proj-123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Workspace Proyek Tidak Tersedia')).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Coba lagi' })).toBeDefined();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Coba lagi' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Workspace Keputusan')).toBeDefined();
+    });
+    expect(apiClient.get).toHaveBeenCalledTimes(2);
+  });
 });

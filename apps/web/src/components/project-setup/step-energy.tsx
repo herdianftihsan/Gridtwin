@@ -53,8 +53,9 @@ export function StepEnergy({ formData, updateFormData, errors }: StepEnergyProps
           )}
         </div>
 
-        <p className="text-xs text-slate-400 leading-relaxed">
-          Ini membantu GridTwin memperkirakan biaya energi Anda saat ini dan membandingkannya dengan skenario simulasi.
+        <p className="text-xs text-slate-500 leading-relaxed">
+          Gunakan rata-rata tagihan listrik 3–6 bulan terakhir.<br />
+          <span className="text-slate-400">Tidak tahu angka pastinya? Gunakan estimasi.</span>
         </p>
       </div>
     </div>

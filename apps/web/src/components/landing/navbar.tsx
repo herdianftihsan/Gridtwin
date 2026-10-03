@@ -19,9 +19,6 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const demoHref = '/demo';
-  const setupHref = session ? '/setup' : '/login?next=/setup';
-
   return (
     <header
       className={`sticky top-0 z-40 w-full transition-all duration-300 ${
@@ -47,30 +44,42 @@ export function Navbar() {
 
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-7 text-xs font-semibold text-slate-600" aria-label="Main Navigation">
-          <a href="#workflow" className="hover:text-slate-900 transition-colors py-1">Alur Kerja</a>
-          <a href="#consequences" className="hover:text-slate-900 transition-colors py-1">Dampak</a>
-          <a href="#energy-twin" className="hover:text-slate-900 transition-colors py-1">Energy Twin</a>
-          <a href="#scenarios" className="hover:text-slate-900 transition-colors py-1">Skenario What-if</a>
-          <a href="#principles" className="hover:text-slate-900 transition-colors py-1">Kecerdasan</a>
+          <a href="#product" className="hover:text-slate-900 transition-colors py-1">Produk</a>
+          <a href="#workflow" className="hover:text-slate-900 transition-colors py-1">Cara Kerja</a>
+          <a href="#demo" className="hover:text-slate-900 transition-colors py-1">Contoh Hasil</a>
+          <a href="#methodology" className="hover:text-slate-900 transition-colors py-1">Metodologi</a>
         </nav>
 
         <div className="hidden sm:flex items-center gap-3">
-          <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              href={demoHref}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              Lihat Demo
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              href={setupHref}
-              className="px-4.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-xs transition-all cursor-pointer"
-            >
-              Mulai Proyek
-            </Link>
-          </motion.div>
+          {!session ? (
+            <>
+              <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Masuk
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/register"
+                  className="px-4.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-900 shadow-sm transition-all cursor-pointer"
+                >
+                  Daftar
+                </Link>
+              </motion.div>
+            </>
+          ) : (
+            <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/dashboard"
+                className="px-4.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white shadow-xs transition-all cursor-pointer"
+              >
+                Buka Dashboard
+              </Link>
+            </motion.div>
+          )}
         </div>
 
         <button
@@ -91,18 +100,26 @@ export function Navbar() {
       </div>
 
       {isMobileOpen && (
-        <div className="sm:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3 text-sm font-semibold text-left">
-          <a href="#workflow" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Alur Kerja</a>
-          <a href="#consequences" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Dampak</a>
-          <a href="#energy-twin" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Energy Twin</a>
-          <a href="#scenarios" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Skenario What-if</a>
-          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            <Link href={demoHref} className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold">
-              Lihat Proyek Demo
-            </Link>
-            <Link href={setupHref} className="w-full text-center py-2.5 rounded-xl bg-slate-950 text-white text-xs font-semibold">
-              Mulai Proyek
-            </Link>
+        <div className="sm:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3 text-sm font-semibold text-left shadow-lg">
+          <a href="#product" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Produk</a>
+          <a href="#workflow" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Cara Kerja</a>
+          <a href="#demo" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Contoh Hasil</a>
+          <a href="#methodology" onClick={() => setIsMobileOpen(false)} className="block py-1.5 text-slate-700">Metodologi</a>
+          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2 mt-2">
+            {!session ? (
+              <>
+                <Link href="/login" className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold">
+                  Masuk
+                </Link>
+                <Link href="/register" className="w-full text-center py-2.5 rounded-xl bg-slate-950 text-white text-xs font-semibold">
+                  Daftar
+                </Link>
+              </>
+            ) : (
+              <Link href="/dashboard" className="w-full text-center py-2.5 rounded-xl bg-slate-950 text-white text-xs font-semibold">
+                Buka Dashboard
+              </Link>
+            )}
           </div>
         </div>
       )}

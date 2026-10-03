@@ -25,8 +25,8 @@ export function mapSimulationToCanvas(
     solar: {
       id: 'solar',
       label: 'PANEL SURYA',
-      sublabel: hasSolar ? `Estimasi produksi: ${Math.round(energy.solar_yield_monthly)} kWh/bln` : 'Slot Tidak Aktif',
-      valueDisplay: `${configuration.pv_kwp} kWp`,
+      sublabel: hasSolar ? `Kapasitas: ${configuration.pv_kwp} kWp` : 'Slot Tidak Aktif',
+      valueDisplay: hasSolar ? `${Math.round(energy.solar_yield_monthly)} kWh/bln` : '0 kWh/bln',
       isActive: hasSolar,
       statusBadge: hasSolar ? 'Produksi Aktif' : 'Tidak Dikonfigurasi',
       details: [

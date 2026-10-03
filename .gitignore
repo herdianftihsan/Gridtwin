@@ -26,3 +26,8 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Local AI coding-agent instructions and skills
+AGENTS.md
+.agents/
+.codex/

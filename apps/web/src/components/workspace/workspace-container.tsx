@@ -46,6 +46,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
   const [cachedCustomConfig, setCachedCustomConfig] = useState<SimulationConfig | null>(null);
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [workspaceLoadAttempt, setWorkspaceLoadAttempt] = useState(0);
   const [isSimulating, setIsSimulating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -115,7 +116,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
     return () => {
       isMounted = false;
     };
-  }, [projectId]);
+  }, [projectId, workspaceLoadAttempt]);
 
   const handleRunSimulation = async (configOverride?: SimulationConfig, persist: boolean = false, targetTab?: WorkspaceTab) => {
     if (isSimulating || isSaving) return;
@@ -280,6 +281,13 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
       <div className="min-h-[400px] flex flex-col items-center justify-center text-center p-6">
         <h3 className="text-base font-bold text-slate-900">Workspace Proyek Tidak Tersedia</h3>
         <p className="text-xs text-slate-500 mt-1 max-w-sm">{errorMessage || 'Tidak dapat memuat detail proyek.'}</p>
+        <button
+          type="button"
+          onClick={() => setWorkspaceLoadAttempt((attempt) => attempt + 1)}
+          className="mt-5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+        >
+          Coba lagi
+        </button>
       </div>
     );
   }
@@ -386,6 +394,26 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column (65%): Energy Canvas Centerpiece */}
         <div className="lg:col-span-8 space-y-6">
+          {activeTab !== 'custom' && currentResult && (
+            <div className="bg-sky-50/50 border border-sky-200/60 rounded-3xl p-5 shadow-sm">
+              <div className="flex gap-4">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-sky-100 shadow-sm shrink-0">
+                  <span className="text-sky-500 text-lg">✦</span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-sky-950 mb-1">
+                    Rekomendasi GridTwin: {activeTab === 'balanced' ? 'Skenario Seimbang' : 'Skenario Balik Modal Tercepat'}
+                  </h3>
+                  <p className="text-sm text-sky-800/90 leading-relaxed font-medium">
+                    {activeTab === 'balanced' 
+                      ? `Berdasarkan parameter bangunan Anda, skenario ini paling optimal. Dengan investasi pada ${currentResult.configuration.pv_kwp} kWp solar dan efisiensi HVAC, skenario ini menyeimbangkan penghematan energi (Rp ${(currentResult.financial.monthly_savings / 1_000_000).toFixed(1)} Jt/bln) dengan dampak lingkungan terbaik.`
+                      : `Skenario ini difokuskan pada pengembalian investasi tercepat (${currentResult.financial.payback_years?.toFixed(1)} tahun). Konfigurasi difokuskan pada efisiensi perangkat dan kapasitas solar moderat tanpa over-invest pada baterai.`
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {currentResult ? (
             <div className={`transition-opacity duration-300 ${isStale ? 'opacity-60' : 'opacity-100'}`}>
               <EnergyCanvas

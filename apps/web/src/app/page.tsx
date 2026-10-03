@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Navbar } from '../components/landing/navbar';
 import { HeroSection } from '../components/landing/hero-section';
+import { OutcomeHighlights } from '../components/landing/outcome-highlights';
+import { BuildingContext } from '../components/landing/building-context';
 import { HowItWorks } from '../components/landing/how-it-works';
 import { ConsequenceSection } from '../components/landing/consequence-section';
 import { EnergyTwinShowcase } from '../components/landing/energy-twin/energy-twin-showcase';
@@ -27,10 +29,12 @@ export default function LandingPage() {
       <Navbar />
       <main className="flex-1">
         <HeroSection />
-        <HowItWorks />
+        <OutcomeHighlights />
+        <BuildingContext />
         <ConsequenceSection />
         <EnergyTwinShowcase />
         <WhatIfShowcase />
+        <HowItWorks />
         <PrinciplesSection />
         <FinalCTA />
       </main>
