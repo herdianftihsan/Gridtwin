@@ -35,4 +35,19 @@ describe('Backend Foundation Endpoints & Envelopes', () => {
     expect(res.body.error).toHaveProperty('message');
     expect(res.body.error).toHaveProperty('details');
   });
+
+  it('rejects oversized JSON bodies with a safe validation envelope', async () => {
+    const res = await request(app)
+      .post('/api/health')
+      .send({ payload: 'x'.repeat(110_000) });
+
+    expect(res.status).toBe(413);
+    expect(res.body).toEqual({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Request body is too large.',
+        details: {},
+      },
+    });
+  });
 });

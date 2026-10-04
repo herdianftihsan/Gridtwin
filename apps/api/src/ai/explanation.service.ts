@@ -19,9 +19,7 @@ export class ExplanationService {
       if (err instanceof AiError) {
         throw err;
       }
-      throw new AiError('Failed to communicate with AI service.', {
-        reason: err instanceof Error ? err.message : String(err),
-      });
+      throw new AiError('Failed to communicate with AI service.');
     }
 
     if (!explanation || explanation.trim().length === 0) {

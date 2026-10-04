@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SimulationResult, Project } from '../../types/api';
 
 import { Portal } from '../ui/portal';
+import { useDialogFocus } from '../ui/use-dialog-focus';
 
 interface DecisionSummaryModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export function DecisionSummaryModal({
   project,
   result,
 }: DecisionSummaryModalProps) {
+  const dialogRef = useDialogFocus(isOpen, onClose);
   if (!isOpen) return null;
 
   const { configuration, baseline, financial, environmental, grid } = result;
@@ -40,6 +42,11 @@ export function DecisionSummaryModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="decision-summary-title"
+            ref={dialogRef}
+            tabIndex={-1}
             className="relative w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden text-left flex flex-col max-h-[85vh] lg:max-h-[90vh]"
           >
             {/* Modal Header */}
@@ -48,7 +55,7 @@ export function DecisionSummaryModal({
                 <span className="text-xs font-medium text-slate-500">
                   GRIDTWIN AI · ANALISIS INVESTASI
                 </span>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
+                <h2 id="decision-summary-title" className="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
                   Ringkasan Keputusan
                 </h2>
               </div>
@@ -62,7 +69,7 @@ export function DecisionSummaryModal({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-5 sm:py-6 space-y-6">
               {/* Section 1: Recommended Configuration Cards with Badges */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -75,7 +82,7 @@ export function DecisionSummaryModal({
                 </div>
 
                 {/* Asset Cards Strip */}
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-center gap-2">
+                <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-between p-4 rounded-xl bg-slate-50 border border-slate-200 text-center gap-4 sm:gap-2">
                   {/* Solar PV */}
                   <div className="flex-1 flex flex-col items-center">
                     <div className="w-10 h-10 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center mb-1.5">
@@ -129,13 +136,13 @@ export function DecisionSummaryModal({
               </div>
 
               {/* Section 2: Financial Hero Dark Banner */}
-              <div className="p-6 rounded-2xl bg-slate-900 text-white flex items-center justify-between">
+              <div className="p-5 sm:p-6 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                     BIAYA LISTRIK BULANAN
                   </div>
                   <div className="flex items-baseline gap-2.5">
-                    <span className="text-3xl font-extrabold tracking-tight">
+                    <span className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                       {formatMillions(financial.new_monthly_cost)}
                     </span>
                     <span className="text-sm text-slate-400 font-medium">
@@ -148,14 +155,14 @@ export function DecisionSummaryModal({
                   <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                     PENGHEMATAN TAHUNAN
                   </div>
-                  <div className="text-3xl font-extrabold text-emerald-400 tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight">
                     {formatMillions(financial.monthly_savings * 12)}
                   </div>
                 </div>
               </div>
 
               {/* Section 3: Financial Detail KPI Cards */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-4 rounded-xl border border-slate-200 bg-white">
                   <div className="text-xs text-slate-500 font-medium">Periode Pengembalian</div>
                   <div className="text-2xl font-bold text-slate-900 tracking-tight mt-1">
@@ -185,7 +192,7 @@ export function DecisionSummaryModal({
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                   DAMPAK LINGKUNGAN & JARINGAN
                 </span>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* CO2 Reduction Card */}
                   <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3.5">
                     <div className="w-10 h-10 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center shrink-0">
@@ -230,9 +237,9 @@ export function DecisionSummaryModal({
             </div>
 
             {/* Modal Footer */}
-            <div className="shrink-0 flex items-center justify-between px-8 py-5 border-t border-slate-100 bg-slate-50">
+            <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-4 sm:px-8 py-5 border-t border-slate-100 bg-slate-50">
               <span className="text-xs text-slate-500 font-medium">Temukan Pemasang — Segera Hadir</span>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch gap-3">
                 <button
                   type="button"
                   onClick={onClose}

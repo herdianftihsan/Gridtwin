@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SimulationResult } from '../../../types/api';
 import { apiClient } from '../../../lib/api/api-client';
 import { Portal } from '../../ui/portal';
+import { useDialogFocus } from '../../ui/use-dialog-focus';
 
 interface RoadmapStage {
   stage: number;
@@ -21,6 +22,7 @@ interface InvestmentRoadmapModalProps {
 }
 
 export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStage }: InvestmentRoadmapModalProps) {
+  const dialogRef = useDialogFocus(isOpen, onClose);
   const [stages, setStages] = useState<RoadmapStage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,13 +60,19 @@ export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStag
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col my-8 max-h-[85vh] lg:max-h-[90vh]"
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="roadmap-modal-title"
+            aria-busy={isLoading}
+            tabIndex={-1}
           >
             <div className="p-6 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10 rounded-t-2xl">
               <div>
-                <h2 className="text-xl font-bold text-white">Peta Jalan Investasi</h2>
+                <h2 id="roadmap-modal-title" className="text-xl font-bold text-white">Peta Jalan Investasi</h2>
                 <p className="text-sm text-slate-500 mt-1">Jalur bertahap menuju kemandirian energi.</p>
               </div>
-              <button onClick={onClose} className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+              <button type="button" onClick={onClose} aria-label="Tutup peta jalan investasi" className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -114,7 +122,7 @@ export function InvestmentRoadmapModal({ isOpen, onClose, projectId, onApplyStag
                               </button>
                             </div>
                             
-                            <div className="grid grid-cols-4 gap-4 p-4 bg-slate-800/30 rounded-lg border border-slate-800/50">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 p-4 bg-slate-800/30 rounded-lg border border-slate-800/50">
                               <div>
                                 <p className="text-xs font-medium text-slate-500 mb-1">Konfigurasi</p>
                                 <p className="text-sm font-medium text-slate-300">

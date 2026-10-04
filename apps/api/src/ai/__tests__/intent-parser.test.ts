@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { intentParserService } from '../intent-parser.service.js';
 import { geminiClient } from '../gemini.client.js';
 import { ValidationError } from '../../utils/errors.js';
+import { AiError } from '../errors.js';
 
 describe('Phase 8: AI Intent Parsing & Rejection Boundaries', () => {
   beforeEach(() => {
@@ -107,5 +108,19 @@ describe('Phase 8: AI Intent Parsing & Rejection Boundaries', () => {
     await expect(
       intentParserService.parseWhatIfIntent('Hello world')
     ).rejects.toThrowError(/failed to generate a valid structured JSON intent/);
+  });
+
+  it('9. redacts unexpected provider errors from public error details', async () => {
+    vi.spyOn(geminiClient, 'generateStructured').mockRejectedValueOnce(
+      new Error('provider response contained an internal credential path')
+    );
+
+    const error = await intentParserService
+      .parseWhatIfIntent('Gimana kalau budget 30 juta?')
+      .catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(AiError);
+    expect((error as AiError).details).toEqual({});
+    expect(JSON.stringify(error)).not.toContain('credential path');
   });
 });

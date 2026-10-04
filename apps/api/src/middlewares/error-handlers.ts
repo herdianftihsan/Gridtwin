@@ -6,11 +6,22 @@ import { SimulationDomainError } from '../simulation/errors.js';
 import { OptimizationDomainError } from '../optimization/errors.js';
 
 export const errorHandler: ErrorRequestHandler = (
-  err: Error,
+  err: Error & { type?: string; status?: number },
   _req: Request,
   res: Response<ApiErrorEnvelope>,
   _next: NextFunction
 ): void => {
+  if (err?.type === 'entity.too.large' || err?.status === 413) {
+    res.status(413).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Request body is too large.',
+        details: {},
+      },
+    });
+    return;
+  }
+
   // 1. Handled App Errors (instanceof + structural duck-typing)
   const isAppError =
     err instanceof AppError ||

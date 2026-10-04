@@ -171,7 +171,9 @@ describe('Phase 7: Gemini What-If & AI Explanation Endpoints', () => {
 
       expect(res.status).toBe(502);
       expect(res.body.error.code).toBe('AI_ERROR');
+      expect(res.body.error.details).toEqual({});
     });
+
   });
 
   describe('POST /api/ai/explain', () => {

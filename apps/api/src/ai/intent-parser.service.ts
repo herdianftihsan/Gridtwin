@@ -25,9 +25,7 @@ export class IntentParserService {
       if (err instanceof AiError) {
         throw err;
       }
-      throw new AiError('Failed to communicate with AI service.', {
-        reason: err instanceof Error ? err.message : String(err),
-      });
+      throw new AiError('Failed to communicate with AI service.');
     }
 
     // Strip markdown formatting if returned
@@ -44,7 +42,7 @@ export class IntentParserService {
       if (!validated.success) {
         logger.warn('AI intent schema validation failed', {
           issues: validated.error.issues,
-          rawResponse,
+          responseLength: rawResponse.length,
         });
         throw new AiError('Invalid intent structure returned by AI model.');
       }
@@ -57,7 +55,10 @@ export class IntentParserService {
     } catch (err) {
       if (err instanceof AiError) throw err;
       if (err instanceof ValidationError) throw err;
-      logger.warn('Failed to parse AI intent JSON', { rawResponse, error: err });
+      logger.warn('Failed to parse AI intent JSON', {
+        responseLength: rawResponse.length,
+        errorName: err instanceof Error ? err.name : 'UnknownError',
+      });
       throw new AiError('AI model failed to generate a valid structured JSON intent.');
     }
   }

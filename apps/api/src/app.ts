@@ -22,7 +22,8 @@ export const createApp = (): Express => {
       credentials: true,
     })
   );
-  app.use(express.json());
+  // Bound JSON payloads before they reach route handlers to prevent memory exhaustion.
+  app.use(express.json({ limit: '100kb' }));
 
   // Mount API Endpoints
   app.get('/health', (_req, res) => {

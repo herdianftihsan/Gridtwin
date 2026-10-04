@@ -9,6 +9,7 @@ import { WhatIfSuggestions } from './what-if-suggestions';
 import { WhatIfChanges } from './what-if-changes';
 import { WhatIfMetrics } from './what-if-metrics';
 import { WhatIfAiInsight } from './what-if-ai-insight';
+import { useDialogFocus } from '../../ui/use-dialog-focus';
 
 interface WhatIfPanelProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export function WhatIfPanel({
   onScenarioSaved,
   isDemo,
 }: WhatIfPanelProps) {
+  const dialogRef = useDialogFocus(isOpen, onClose);
   const {
     status,
     result,
@@ -52,6 +54,8 @@ export function WhatIfPanel({
           role="dialog"
           aria-modal="true"
           aria-labelledby="whatif-panel-title"
+          ref={dialogRef}
+          tabIndex={-1}
           className="relative w-full max-w-md bg-slate-50 h-full border-l border-slate-200 shadow-2xl flex flex-col justify-between overflow-hidden text-left"
         >
 
@@ -72,8 +76,8 @@ export function WhatIfPanel({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close What-if Panel"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Tutup panel Bagaimana jika"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"
             >
               ✕
             </button>

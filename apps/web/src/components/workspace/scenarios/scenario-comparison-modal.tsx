@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Scenario } from '../../../types/api';
 
 import { Portal } from '../../ui/portal';
+import { useDialogFocus } from '../../ui/use-dialog-focus';
 
 interface ScenarioComparisonModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export function ScenarioComparisonModal({
   onClose,
   scenarios,
 }: ScenarioComparisonModalProps) {
+  const dialogRef = useDialogFocus(isOpen, onClose);
   if (!isOpen || scenarios.length === 0) return null;
 
   const formatIDR = (n: number) => `Rp ${(n / 1_000_000).toFixed(2).replace(/\.00$/, '')} Jt`;
@@ -37,6 +39,8 @@ export function ScenarioComparisonModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="comparison-modal-title"
+            ref={dialogRef}
+            tabIndex={-1}
             className="relative w-full max-w-5xl max-h-[85vh] lg:max-h-[90vh] bg-white rounded-2xl border border-slate-200 shadow-xl flex flex-col overflow-hidden text-left"
           >
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
@@ -51,16 +55,16 @@ export function ScenarioComparisonModal({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close Comparison Modal"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label="Tutup perbandingan skenario"
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"
               >
                 ✕
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 overflow-x-auto">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
               {/* Top Summary row */}
-              <div className={`grid gap-3.5 min-w-[600px] ${scenarios.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+              <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
                 {scenarios.map((scenario, index) => {
                   const cfg = scenario.simulation_result!.configuration;
                   const isBaseline = index === 0;
@@ -80,13 +84,13 @@ export function ScenarioComparisonModal({
                 })}
               </div>
 
-              <div className="space-y-3 min-w-[600px]">
+              <div className="space-y-3">
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
                   DAMPAK FINANSIAL
                 </span>
                 
                 {/* Monthly Electricity Bill Row */}
-                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
                   {scenarios.map((scenario, index) => {
                     const fin = scenario.simulation_result!.financial;
                     const monthlySavings = baseFin.new_monthly_cost - fin.new_monthly_cost;
@@ -118,7 +122,7 @@ export function ScenarioComparisonModal({
                 </div>
 
                 {/* Annual Cost Savings Row */}
-                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
                   {scenarios.map((scenario, index) => {
                     const fin = scenario.simulation_result!.financial;
                     const monthlySavings = baseFin.new_monthly_cost - fin.new_monthly_cost;
@@ -147,7 +151,7 @@ export function ScenarioComparisonModal({
                 </div>
 
                 {/* CAPEX Row */}
-                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
                   {scenarios.map((scenario) => {
                     const fin = scenario.simulation_result!.financial;
 
@@ -192,11 +196,11 @@ export function ScenarioComparisonModal({
                 </div>
               </div>
 
-              <div className="space-y-3 min-w-[600px]">
+              <div className="space-y-3">
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
                   DAMPAK LINGKUNGAN & JARINGAN
                 </span>
-                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div className={`grid gap-3.5 ${scenarios.length === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
                   {scenarios.map((scenario) => {
                     const env = scenario.simulation_result!.environmental;
                     const grid = scenario.simulation_result!.grid;
@@ -226,7 +230,7 @@ export function ScenarioComparisonModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-sm font-semibold text-white transition-colors cursor-pointer"
+                className="px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-sm font-semibold text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
               >
                 Selesai Meninjau
               </button>

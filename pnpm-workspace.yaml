@@ -17,3 +17,5 @@ onlyBuiltDependencies:
 # avoids its blocked postinstall script on MVP; Next.js works fine without it.
 overrides:
   sharp: npm:empty-npm-package@1.0.1
+  postcss: 8.5.26
+  qs: 6.16.0
