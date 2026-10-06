@@ -14,6 +14,7 @@ import { HvacNode } from './nodes/hvac-node';
 import { LightingNode } from './nodes/lighting-node';
 import { RefrigerationNode } from './nodes/refrigeration-node';
 import { PumpNode } from './nodes/pump-node';
+import { EnergyTwinScene, EnergyTwinViewMode } from '../energy-twin/energy-twin-scene';
 
 const VIRTUAL_WIDTH = 980;
 const VIRTUAL_HEIGHT = 600;
@@ -43,6 +44,7 @@ export function EnergyCanvas({
   const [zoom, setZoom] = useState(0.85);
   const [positions] = useState<Record<NodeKey, NodePosition>>(DEFAULT_POSITIONS);
   const [isContextOpen, setIsContextOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<EnergyTwinViewMode>('classic');
 
   const displayLocationRaw = location ?? project?.location ?? 'Surabaya';
   const displayLocation = typeof displayLocationRaw === 'string' ? displayLocationRaw : displayLocationRaw.name;
@@ -79,8 +81,15 @@ export function EnergyCanvas({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[580px] sm:h-[640px] bg-slate-50/70 border border-slate-200/90 rounded-3xl overflow-hidden select-none shadow-xs flex flex-col justify-between p-4 sm:p-5"
+      className={`relative w-full select-none flex flex-col justify-between ${viewMode === '2.5d' ? 'min-h-[580px] bg-transparent border-0 overflow-visible p-0 shadow-none' : 'h-[580px] sm:h-[640px] bg-slate-50/70 border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs p-4 sm:p-5'}`}
     >
+      {viewMode === 'classic' && (
+        <div className="absolute right-4 top-4 z-30 energy-twin-segmented" role="group" aria-label="Mode tampilan Energy Twin">
+          <button type="button" aria-pressed={viewMode === 'classic'} onClick={() => setViewMode('classic')}>Classic</button>
+          <button type="button" aria-pressed={false} onClick={() => setViewMode('2.5d')}>2.5D</button>
+        </div>
+      )}
+      <div className={viewMode === '2.5d' ? 'hidden' : 'contents'}>
       {/* Top Bar Legend */}
       <div className="flex flex-col gap-3 z-20 pointer-events-none mb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -271,13 +280,24 @@ export function EnergyCanvas({
         )}
       </AnimatePresence>
 
-      {/* Pending Update Overlay */}
+      </div>
+      <div className={viewMode === 'classic' ? 'hidden' : 'contents'}>
+        <EnergyTwinScene
+          result={result}
+          project={project}
+          buildingType={displayBuilding}
+          location={displayLocation}
+          onSelectNode={setSelectedNodeId as (id: NodeKey) => void}
+          onClearSelection={() => setSelectedNodeId(null)}
+          selectedNodeId={selectedNodeId as NodeKey | null}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+        <EnergyBalanceDock summary={viewModel.summary} />
+      </div>
       {isSimulating && (
         <div className="absolute inset-0 bg-white/35 backdrop-blur-[1px] flex items-center justify-center z-40 transition-opacity">
-          <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-950 text-white text-xs font-semibold shadow-xl">
-            <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            <span>Menghitung Ulang Aliran Energi...</span>
-          </div>
+          <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-950 text-white text-xs font-semibold shadow-xl"><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Menghitung Ulang Aliran Energi...</span></div>
         </div>
       )}
     </div>
