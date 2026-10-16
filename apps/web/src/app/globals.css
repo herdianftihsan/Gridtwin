@@ -1,34 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #F1F5F9;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #64748B;
-  --color-brand-primary: #0F172A;
-  --color-brand-accent: #0EA5E9;
-  --color-energy-solar: #F59E0B;
-  --color-energy-grid: #6366F1;
-  --color-energy-battery: #14B8A6;
-  --color-energy-load: #64748B;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-danger: #EF4444;
-  --border-subtle: #E2E8F0;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-brand-primary: #0f172a;
+  --color-brand-accent: #0ea5e9;
+  --color-energy-solar: #f59e0b;
+  --color-energy-grid: #6366f1;
+  --color-energy-battery: #14b8a6;
+  --color-energy-load: #64748b;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --border-subtle: #e2e8f0;
 }
 
 body {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-/* ==========================================================================
-   SVG Energy Flow Stream Animation
-   ========================================================================== */
 
 @keyframes energy-flow-forward {
   from {
@@ -38,20 +41,382 @@ body {
     stroke-dashoffset: 0;
   }
 }
-
 .animate-energy-flow {
   animation: energy-flow-forward 1.2s linear infinite;
 }
-
 .animate-energy-flow-fast {
   animation: energy-flow-forward 0.8s linear infinite;
 }
 
-/* Accessibility: Matikan animasi otomatis jika pengguna mengaktifkan prefers-reduced-motion */
+/* Energy Twin: images, labels and routes share the 1000 x 760 scene. */
+.energy-twin-scene-shell {
+  container-type: inline-size;
+  position: relative;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8faf9;
+}
+.energy-twin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+}
+.energy-twin-eyebrow {
+  margin: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #475569;
+}
+.energy-twin-title {
+  margin: 3px 0;
+  font-size: 18px;
+  font-weight: 750;
+  color: #17252b;
+}
+.energy-twin-location {
+  margin: 0;
+  font-size: 12px;
+  color: #475569;
+}
+.energy-twin-toolbar-actions {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.energy-twin-segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+}
+.energy-twin-segmented button,
+.energy-twin-legend-toggle {
+  min-height: 32px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.energy-twin-segmented button[aria-pressed="true"] {
+  background: #263c42;
+  color: white;
+}
+.energy-twin-legend-toggle {
+  color: #475569;
+}
+.energy-twin-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 25 / 19;
+  isolation: isolate;
+  background: linear-gradient(180deg, #f8faf9 0%, #f6f6f1 58%, #f8faf9 100%);
+}
+.energy-twin-environment {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.energy-twin-paving-seams {
+  fill: none;
+  stroke: #a8b1a5;
+  stroke-width: 1;
+  stroke-opacity: 0.25;
+  stroke-linecap: round;
+}
+.energy-twin-edge-planting {
+  opacity: 0.7;
+}
+.energy-twin-image-button,
+.energy-twin-solar-image {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.energy-twin-image-button {
+  cursor: pointer;
+}
+.energy-twin-image-button img,
+.energy-twin-solar-image img {
+  object-fit: contain;
+}
+.energy-twin-building-image {
+  z-index: 1;
+}
+.energy-twin-solar-image {
+  z-index: 2;
+  pointer-events: none;
+}
+.energy-twin-battery-image,
+.energy-twin-hvac-image,
+.energy-twin-grid-image {
+  z-index: 3;
+}
+.energy-twin-image-selected {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.energy-twin-image-inactive:not(.energy-twin-building-image) {
+  filter: grayscale(1);
+}
+.energy-twin-flow-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+}
+.energy-twin-flow {
+  fill: none;
+  stroke-width: 1.9px;
+  stroke-dasharray: 6 6;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+.energy-twin-flow-dimmed {
+  opacity: 0.5;
+}
+.energy-twin-flow-animated {
+  animation: energy-twin-flow-forward 1.8s linear infinite;
+}
+@keyframes energy-twin-flow-forward {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.energy-twin-anchor-label {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, 0);
+  display: flex;
+  border: 0;
+  padding: 3px;
+  border-radius: 4px;
+  background: #f8faf9;
+  color: #263c42;
+  cursor: pointer;
+  text-align: center;
+  max-width: 30%;
+}
+.energy-twin-anchor-label > span {
+  display: flex;
+  flex-direction: column;
+}
+.energy-twin-anchor-label strong {
+  font-size: 11px;
+  font-weight: 750;
+}
+.energy-twin-anchor-label small {
+  font-size: 11px;
+  color: #475569;
+}
+.energy-twin-anchor-label .energy-twin-label-leader {
+  display: none;
+}
+.energy-twin-label-solar {
+  transform: translate(-50%, -100%);
+  color: #92400e;
+}
+.energy-twin-label-battery {
+  color: #0f766e;
+}
+.energy-twin-label-grid {
+  color: #4338ca;
+}
+.energy-twin-anchor-label-selected {
+  outline: 2px solid #0f766e;
+}
+.energy-twin-anchor-label-inactive strong {
+  color: #475569;
+}
+.energy-twin-building-loads {
+  display: contents;
+}
+.energy-twin-load-hotspot {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+}
+.energy-twin-load-hotspot i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #334155;
+  border: 1px solid white;
+}
+.energy-twin-load-hotspot span {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  padding: 3px 5px;
+  background: white;
+  color: #334155;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.energy-twin-load-hotspot:hover span,
+.energy-twin-load-hotspot:focus-visible span {
+  display: block;
+}
+.energy-twin-load-selected i {
+  background: #0f766e;
+  outline: 2px solid white;
+}
+.energy-twin-load-inactive i {
+  background: white;
+  border-color: #64748b;
+}
+.energy-twin-surplus {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  color: #475569;
+  font-size: 11px;
+}
+.energy-twin-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  color: #475569;
+  font-size: 11px;
+}
+.energy-twin-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.energy-twin-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.energy-twin-legend-swatch {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.energy-twin-legend-solar {
+  background: #d97706;
+}
+.energy-twin-legend-grid {
+  background: #6366f1;
+}
+.energy-twin-legend-battery {
+  background: #0f766e;
+}
+.energy-twin-legend-load {
+  background: #64748b;
+}
+.energy-twin-inspector {
+  margin: 0 16px 16px;
+  padding-top: 12px;
+  border-top: 1px solid #cbd5e1;
+}
+.energy-twin-inspector-slot {
+  min-height: 156px;
+}
+.energy-twin-inspector-slot:empty {
+  min-height: 156px;
+}
+.energy-twin-inspector-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+}
+.energy-twin-inspector-header button {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.energy-twin-inspector-details {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+.energy-twin-inspector-details div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.energy-twin-inspector-details strong {
+  color: #17252b;
+  text-align: right;
+}
+.energy-twin-scene-shell button:focus-visible,
+.energy-twin-segmented button:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 3px;
+}
+.energy-twin-status-short {
+  display: none;
+}
+@container (max-width: 750px) {
+  .energy-twin-flow {
+    stroke-width: 1.75px;
+  }
+  .energy-twin-anchor-label strong,
+  .energy-twin-anchor-label small {
+    font-size: 10px;
+  }
+  .energy-twin-anchor-label {
+    max-width: 28%;
+  }
+  .energy-twin-label-hvac small {
+    display: none;
+  }
+}
+@container (max-width: 400px) {
+  .energy-twin-flow {
+    stroke-width: 1.5px;
+  }
+  .energy-twin-anchor-label small {
+    display: none;
+  }
+  .energy-twin-anchor-label .energy-twin-equipment-status {
+    display: block;
+    font-size: 9px;
+  }
+  .energy-twin-status-full {
+    display: none;
+  }
+  .energy-twin-status-short {
+    display: inline;
+  }
+  .energy-twin-title {
+    font-size: 16px;
+  }
+  .energy-twin-toolbar {
+    padding: 12px;
+  }
+  .energy-twin-scene-caption {
+    display: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .animate-energy-flow,
-  .animate-energy-flow-fast {
+  .animate-energy-flow-fast,
+  .energy-twin-flow-animated {
     animation: none !important;
-    stroke-dasharray: none !important;
   }
 }

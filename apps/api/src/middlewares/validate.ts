@@ -22,3 +22,14 @@ export const validateQuery =
       next(error);
     }
   };
+
+export const validateParams =
+  (schema: ZodSchema) =>
+  async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    try {
+      req.params = (await schema.parseAsync(req.params)) as never;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };

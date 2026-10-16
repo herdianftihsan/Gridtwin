@@ -36,7 +36,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
   });
 
   const [currentResult, setCurrentResult] = useState<SimulationResult | null>(null);
-  
+
   // Caching states to prevent redundant API calls
   const [cachedResults, setCachedResults] = useState<{
     balanced: SimulationResult | null;
@@ -77,16 +77,16 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
           if (res.data.recommended_scenario) {
             setRecommendedScenario(res.data.recommended_scenario);
             setCurrentResult(res.data.recommended_scenario.simulation_result);
-            
+
             const resultObjective = res.data.recommended_scenario.simulation_result?.assumptions?.optimization_objective;
             if (resultObjective === 'fastest_payback' || resultObjective === 'save_money') {
               defaultTab = 'fastest_payback';
             } else if (resultObjective === 'balanced' || resultObjective === 'reduce_co2' || resultObjective === 'independence') {
               defaultTab = 'balanced';
             }
-            
+
             setActiveTab(defaultTab);
-            
+
             setCurrentConfig({
               solar_kwp: res.data.recommended_scenario.solar_kwp,
               battery_kwh: res.data.recommended_scenario.battery_kwh,
@@ -122,7 +122,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
     if (isSimulating || isSaving) return;
     const configToRun = configOverride || currentConfig;
     const tabToUpdate = targetTab || activeTab;
-    
+
     try {
       if (persist) {
         setIsSaving(true);
@@ -130,7 +130,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
         setIsSimulating(true);
       }
       setErrorMessage(null);
-      
+
       const res = await apiClient.post<{
         scenario_type: string;
         simulation_result: SimulationResult;
@@ -141,7 +141,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
 
       if (res.data?.simulation_result) {
         setCurrentResult(res.data.simulation_result);
-        
+
         // Update cache
         setCachedResults(prev => ({
           ...prev,
@@ -166,11 +166,11 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
 
   const handleRunOptimization = async (strategy: 'balanced' | 'fastest_payback') => {
     if (isSimulating || isSaving) return;
-    
+
     try {
       setIsSimulating(true);
       setErrorMessage(null);
-      
+
       const res = await apiClient.post<{
         scenario_type: string;
         simulation_result: SimulationResult;
@@ -190,7 +190,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
           water_pump_upgraded: res.data.simulation_result.configuration.water_pump_upgraded ?? false,
         };
         setCurrentConfig(config);
-        
+
         setCachedResults(prev => ({
           ...prev,
           [strategy]: res.data.simulation_result
@@ -226,7 +226,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
       setCachedCustomConfig(currentConfig);
       setCachedResults(prev => ({ ...prev, custom: currentResult }));
     }
-    
+
     setActiveTab(tab);
 
     if (tab === 'balanced' || tab === 'fastest_payback') {
@@ -298,9 +298,9 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
       {/* Workspace Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <button 
+          <button
             type="button"
-            onClick={() => router.push('/dashboard')} 
+            onClick={() => router.push('/dashboard')}
             className="text-xs font-semibold text-slate-500 hover:text-slate-800 mb-3 inline-flex items-center gap-1 transition-colors cursor-pointer"
           >
             ← Kembali ke Proyek
@@ -348,14 +348,14 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
             disabled={isSimulating || !isStale}
             aria-busy={isSimulating}
             className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all ${
-              isStale 
+              isStale
                 ? 'bg-amber-500 text-white hover:bg-amber-600 cursor-pointer animate-pulse'
                 : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             }`}
           >
             {isSimulating ? 'Menyimulasikan...' : isStale ? 'Jalankan Simulasi' : 'Disimulasikan'}
           </button>
-          
+
           <button
             type="button"
             onClick={() => handleRunSimulation(currentConfig, true, activeTab)}
@@ -380,7 +380,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
           >
-            Ekspor Ringkasan Keputusan
+            Ringkasan Keputusan
           </button>
         </div>
       </div>
@@ -408,7 +408,7 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
                     Rekomendasi GridTwin: {activeTab === 'balanced' ? 'Skenario Seimbang' : 'Skenario Balik Modal Tercepat'}
                   </h3>
                   <p className="text-sm text-sky-800/90 leading-relaxed font-medium">
-                    {activeTab === 'balanced' 
+                    {activeTab === 'balanced'
                       ? `Berdasarkan parameter bangunan Anda, skenario ini paling optimal. Dengan investasi pada ${currentResult.configuration.pv_kwp} kWp solar dan efisiensi HVAC, skenario ini menyeimbangkan penghematan energi (Rp ${(currentResult.financial.monthly_savings / 1_000_000).toFixed(1)} Jt/bln) dengan dampak lingkungan terbaik.`
                       : `Skenario ini difokuskan pada pengembalian investasi tercepat (${currentResult.financial.payback_years?.toFixed(1)} tahun). Konfigurasi difokuskan pada efisiensi perangkat dan kapasitas solar moderat tanpa over-invest pada baterai.`
                     }
@@ -561,6 +561,11 @@ export function WorkspaceContainer({ projectId }: WorkspaceContainerProps) {
           onClose={() => setIsSummaryOpen(false)}
           project={project}
           result={currentResult}
+          scenarioId={
+            activeTab === 'balanced' || activeTab === 'fastest_payback'
+              ? recommendedScenario?.id
+              : undefined
+          }
         />
       )}
     </div>

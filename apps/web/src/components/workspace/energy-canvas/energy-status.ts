@@ -7,7 +7,7 @@ export function mapSimulationToCanvas(
   overrideBuildingType?: string,
   overrideLocation?: string
 ): CanvasViewModel {
-  const { configuration, energy, financial, grid } = result;
+  const { configuration, energy, financial, grid, assumptions } = result;
 
   const hasSolar = configuration.pv_kwp > 0;
   const hasBattery = configuration.battery_kwh > 0;
@@ -57,7 +57,7 @@ export function mapSimulationToCanvas(
       statusBadge: hasBattery ? 'Pemindahan Beban Puncak' : 'Tidak Dikonfigurasi',
       details: [
         { label: 'Kapasitas Dapat Digunakan', value: `${configuration.battery_kwh} kWh` },
-        { label: 'Efisiensi Siklus Penuh', value: '90.2% (Gabungan)' },
+        { label: 'Efisiensi Siklus Penuh', value: `${(assumptions.battery_charge_efficiency * assumptions.battery_discharge_efficiency * 100).toFixed(1)}% (Gabungan)` },
         { label: 'Peran Penyimpanan', value: 'Dukungan Beban Puncak Malam Hari' },
       ],
     },
@@ -83,7 +83,7 @@ export function mapSimulationToCanvas(
       statusBadge: hasAc ? 'Inverter Aktif' : 'Baseline Standar',
       details: [
         { label: 'Unit Ditingkatkan', value: `${configuration.ac_units} Unit Inverter` },
-        { label: 'Dampak Efisiensi', value: 'Pengurangan Beban Termal 30%' },
+        { label: 'Status Simulasi', value: hasAc ? 'Konfigurasi inverter aktif' : 'Konfigurasi standar' },
       ],
     },
     led: {
@@ -95,7 +95,7 @@ export function mapSimulationToCanvas(
       statusBadge: isLed ? 'Efisiensi Tinggi' : 'Baseline Standar',
       details: [
         { label: 'Status Pencahayaan', value: isLed ? 'LED Solid-State Pintar' : 'Lampu Standar' },
-        { label: 'Dampak Efisiensi', value: 'Pengurangan Beban Pencahayaan 60%' },
+        { label: 'Status Simulasi', value: isLed ? 'Konfigurasi LED aktif' : 'Konfigurasi standar' },
       ],
     },
     refrigerator: {
@@ -107,7 +107,7 @@ export function mapSimulationToCanvas(
       statusBadge: hasRefrigerator ? 'Efisiensi Tinggi' : 'Baseline Standar',
       details: [
         { label: 'Unit Ditingkatkan', value: `${configuration.refrigerator_units} Unit Efisiensi Tinggi` },
-        { label: 'Dampak Efisiensi', value: 'Pengurangan Beban 360 kWh/thn per Unit' },
+        { label: 'Status Simulasi', value: hasRefrigerator ? 'Konfigurasi efisiensi aktif' : 'Konfigurasi standar' },
       ],
     },
     pump: {
@@ -119,7 +119,7 @@ export function mapSimulationToCanvas(
       statusBadge: hasPump ? 'Pompa Pintar Aktif' : 'Baseline Standar',
       details: [
         { label: 'Status Pompa', value: hasPump ? 'Pompa Kecepatan Variabel' : 'Standar Kecepatan Tetap' },
-        { label: 'Dampak Efisiensi', value: 'Pengurangan Beban 480 kWh/thn' },
+        { label: 'Status Simulasi', value: hasPump ? 'Konfigurasi pompa efisiensi aktif' : 'Konfigurasi standar' },
       ],
     },
   };
