@@ -1,8 +1,8 @@
-import { Project, SimulationResult } from '../../../types/api';
-import { mapSimulationToCanvas } from '../energy-canvas/energy-status';
-import { CanvasViewModel, NodeKey, NodeTelemetry } from '../energy-canvas/types';
+import { Project, SimulationResult } from "../../../types/api";
+import { mapSimulationToCanvas } from "../energy-canvas/energy-status";
+import { CanvasViewModel, NodeKey, NodeTelemetry } from "../energy-canvas/types";
 
-export type EnergyTwinAssetKind = 'source' | 'building' | 'storage' | 'grid' | 'load';
+export type EnergyTwinAssetKind = "source" | "building" | "storage" | "grid" | "load";
 
 export interface EnergyTwinAsset {
   id: NodeKey;
@@ -12,8 +12,8 @@ export interface EnergyTwinAsset {
 
 export interface EnergyTwinFlow {
   id: string;
-  from: NodeKey | 'building';
-  to: NodeKey | 'surplus';
+  from: NodeKey | "building";
+  to: NodeKey | "surplus";
   color: string;
   active: boolean;
   animated: boolean;
@@ -31,7 +31,7 @@ export interface EnergyTwinViewModel {
   };
   assets: EnergyTwinAsset[];
   flows: EnergyTwinFlow[];
-  summary: CanvasViewModel['summary'];
+  summary: CanvasViewModel["summary"];
 }
 
 const BUILDING_SHELLS: Record<string, { width: number; depth: number; floors: number }> = {
@@ -41,8 +41,8 @@ const BUILDING_SHELLS: Record<string, { width: number; depth: number; floors: nu
 };
 
 function getLocation(project?: Project | null, overrideLocation?: string): string {
-  const rawLocation = overrideLocation ?? project?.location ?? 'Surabaya';
-  return typeof rawLocation === 'string' ? rawLocation : rawLocation.name;
+  const rawLocation = overrideLocation ?? project?.location ?? "Surabaya";
+  return typeof rawLocation === "string" ? rawLocation : rawLocation.name;
 }
 
 export function mapSimulationToEnergyTwin(
@@ -51,67 +51,99 @@ export function mapSimulationToEnergyTwin(
   overrideBuildingType?: string,
   overrideLocation?: string,
 ): EnergyTwinViewModel {
-  const canvasModel = mapSimulationToCanvas(result, project, overrideBuildingType, overrideLocation);
-  const buildingType = overrideBuildingType ?? project?.building_type ?? 'Ruko';
+  const canvasModel = mapSimulationToCanvas(
+    result,
+    project,
+    overrideBuildingType,
+    overrideLocation,
+  );
+  const buildingType = overrideBuildingType ?? project?.building_type ?? "Ruko";
   const shell = BUILDING_SHELLS[buildingType] || { width: 0.78, depth: 0.58, floors: 3 };
   const { configuration, energy } = result;
 
   const assets: EnergyTwinAsset[] = (Object.keys(canvasModel.nodes) as NodeKey[]).map((id) => ({
     id,
-    kind: id === 'building' ? 'building' : id === 'solar' ? 'source' : id === 'battery' ? 'storage' : id === 'grid' ? 'grid' : 'load',
+    kind:
+      id === "building"
+        ? "building"
+        : id === "solar"
+          ? "source"
+          : id === "battery"
+            ? "storage"
+            : id === "grid"
+              ? "grid"
+              : "load",
     telemetry: canvasModel.nodes[id],
   }));
 
+  const ac = assets.find((asset) => asset.id === "ac")!;
+  if (configuration.ac_units === 0) {
+    ac.telemetry = { ...ac.telemetry, valueDisplay: "Standar (tanpa peningkatan inverter)" };
+  }
+  const battery = assets.find((asset) => asset.id === "battery")!;
+  battery.telemetry = {
+    ...battery.telemetry,
+    statusBadge: configuration.battery_kwh > 0 ? "Dikonfigurasi" : "Tidak Dikonfigurasi",
+    details: battery.telemetry.details.filter((detail) => detail.label !== "Peran Penyimpanan"),
+  };
+  if (configuration.battery_kwh === 0) {
+    battery.telemetry = {
+      ...battery.telemetry,
+      details: [{ label: "Kapasitas Dikonfigurasi", value: "0 kWh" }],
+    };
+  }
+
   const flows: EnergyTwinFlow[] = [
     {
-      id: 'solar-building',
-      from: 'solar',
-      to: 'building',
-      color: '#F59E0B',
+      id: "solar-building",
+      from: "solar",
+      to: "building",
+      color: "#F59E0B",
       active: configuration.pv_kwp > 0 && energy.solar_yield_monthly > 0,
       animated: configuration.pv_kwp > 0 && energy.solar_yield_monthly > 0,
       valueKwh: energy.solar_yield_monthly,
-      label: 'Solar ke bangunan',
+      label: "Solar ke bangunan",
     },
     {
-      id: 'solar-battery',
-      from: 'solar',
-      to: 'battery',
-      color: '#F59E0B',
-      active: configuration.pv_kwp > 0 && configuration.battery_kwh > 0 && energy.solar_yield_monthly > 0,
-      animated: configuration.pv_kwp > 0 && configuration.battery_kwh > 0 && energy.solar_yield_monthly > 0,
-      valueKwh: energy.wasted_surplus_monthly,
-      label: 'Surplus solar ke baterai',
+      id: "solar-battery",
+      from: "solar",
+      to: "battery",
+      color: "#F59E0B",
+      // Monthly aggregates do not establish battery charge or discharge direction.
+      active: false,
+      animated: false,
+      valueKwh: 0,
+      label: "Surplus solar ke baterai",
     },
     {
-      id: 'battery-building',
-      from: 'battery',
-      to: 'building',
-      color: '#14B8A6',
-      active: configuration.battery_kwh > 0 && energy.grid_import_monthly < energy.monthly_demand_kwh,
-      animated: configuration.battery_kwh > 0 && energy.grid_import_monthly < energy.monthly_demand_kwh,
-      valueKwh: Math.max(0, energy.monthly_demand_kwh - energy.grid_import_monthly),
-      label: 'Baterai ke bangunan',
+      id: "battery-building",
+      from: "battery",
+      to: "building",
+      color: "#14B8A6",
+      active: false,
+      animated: false,
+      valueKwh: 0,
+      label: "Baterai ke bangunan",
     },
     {
-      id: 'grid-building',
-      from: 'grid',
-      to: 'building',
-      color: '#6366F1',
+      id: "grid-building",
+      from: "grid",
+      to: "building",
+      color: "#6366F1",
       active: energy.grid_import_monthly > 0,
       animated: energy.grid_import_monthly > 0,
       valueKwh: energy.grid_import_monthly,
-      label: 'Jaringan PLN ke bangunan',
+      label: "Jaringan PLN ke bangunan",
     },
     {
-      id: 'building-surplus',
-      from: 'building',
-      to: 'surplus',
-      color: '#64748B',
+      id: "building-surplus",
+      from: "building",
+      to: "surplus",
+      color: "#64748B",
       active: energy.wasted_surplus_monthly > 0,
       animated: false,
       valueKwh: energy.wasted_surplus_monthly,
-      label: 'Surplus tidak terpakai',
+      label: "Surplus tidak terpakai",
     },
   ];
 

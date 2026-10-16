@@ -9,6 +9,7 @@ import { projectRouter } from './routes/project.routes.js';
 import { scenarioRouter } from './routes/scenario.routes.js';
 import { aiRouter } from './routes/ai.routes.js';
 import { locationRouter } from './routes/location.routes.js';
+import { shareRouter } from './routes/share.routes.js';
 import { errorHandler } from './middlewares/error-handlers.js';
 import { NotFoundError } from './utils/errors.js';
 
@@ -34,6 +35,7 @@ export const createApp = (): Express => {
   app.use('/api/scenarios', scenarioRouter);
   app.use('/api/ai', aiRouter);
   app.use('/api/locations', locationRouter);
+  app.use('/api/shares', shareRouter);
 
   // 404 Route Catcher
   app.use((_req, _res, next) => {

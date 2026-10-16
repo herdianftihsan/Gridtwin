@@ -129,3 +129,74 @@ export interface ProjectDetailResponse {
   recommended_scenario: (Scenario & { simulation_result: SimulationResult }) | null;
   recent_scenarios: Array<Scenario & { simulation_result: SimulationResult }>;
 }
+
+export interface DecisionBriefSnapshot {
+  project: {
+    building_type: 'Ruko' | 'Residential' | 'Office';
+    location: string;
+  };
+  scenario: {
+    name: string;
+    is_recommended: boolean;
+    scenario_type: 'baseline' | 'recommended' | 'custom' | 'what_if';
+  };
+  configuration: {
+    pv_kwp: number;
+    battery_kwh: number;
+    ac_units: number;
+    led_upgraded: boolean;
+    refrigerator_units: number;
+    water_pump_upgraded: boolean;
+  };
+  baseline: {
+    monthly_cost: number;
+    monthly_kwh: number;
+  };
+  financial: {
+    capex: number;
+    new_monthly_cost: number;
+    monthly_savings: number;
+    annual_savings: number;
+    payback_years: number | null;
+    estimated_roi_10yr_pct: number | null;
+  };
+  environmental: {
+    co2_reduction_kg_yr: number;
+    co2_reduction_pct: number;
+  };
+  grid: {
+    independence_pct: number;
+  };
+  assumptions: {
+    tariff: number;
+    psh: number;
+    performance_ratio: number;
+    battery_charge_efficiency: number;
+    battery_discharge_efficiency: number;
+    source_version: string;
+    optimization_objective?: string;
+  };
+  disclaimer: string;
+  generated_at: string;
+}
+
+export interface PublicDecisionShareResponse {
+  snapshot: DecisionBriefSnapshot;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface CreateDecisionShareResponse {
+  id: string;
+  share_token: string;
+  share_url: string;
+  expires_at: string;
+  created_at: string;
+}
+
+export interface ActiveShareSummary {
+  id: string;
+  expires_at: string;
+  created_at: string;
+  is_active: boolean;
+}

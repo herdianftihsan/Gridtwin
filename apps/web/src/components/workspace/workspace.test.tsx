@@ -119,9 +119,9 @@ describe('Phase 12: Workspace Keputusan Integration Suite', () => {
   it('3. opens and displays Decision Summary Modal on export click', async () => {
     render(<WorkspaceContainer projectId="proj-123" />);
 
-    await waitFor(() => expect(screen.getByText('Ekspor Ringkasan Keputusan')).toBeDefined());
+    await waitFor(() => expect(screen.getByText('Ringkasan Keputusan')).toBeDefined());
 
-    fireEvent.click(screen.getByText('Ekspor Ringkasan Keputusan'));
+    fireEvent.click(screen.getByText('Ringkasan Keputusan'));
 
     await waitFor(() => {
       expect(screen.getByText('GRIDTWIN AI · ANALISIS INVESTASI')).toBeDefined();

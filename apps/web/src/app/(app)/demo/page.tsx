@@ -432,7 +432,7 @@ export default function DemoPage() {
                   : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
-              Ekspor Ringkasan Keputusan
+              Ringkasan Keputusan
             </button>
           </div>
         </div>
@@ -499,6 +499,7 @@ export default function DemoPage() {
             onClose={() => setIsSummaryOpen(false)}
             project={MOCK_PROJECT}
             result={currentResult}
+            isDemo={true}
           />
         )}
       </div>
