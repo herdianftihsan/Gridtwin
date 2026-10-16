@@ -40,6 +40,9 @@ importers:
       '@google/genai':
         specifier: ^2.22.0
         version: 2.22.0(supports-color@7.2.0)
+      '@gridtwin/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@supabase/auth-js':
         specifier: ^2.112.3
         version: 2.112.3
