@@ -13,7 +13,9 @@
     "dev:web": "pnpm --filter @gridtwin/web dev",
     "lint": "eslint .",
     "typecheck": "pnpm --filter @gridtwin/shared build && pnpm --filter @gridtwin/shared --filter @gridtwin/api --filter @gridtwin/web run typecheck",
-    "test": "pnpm --filter @gridtwin/shared build && vitest run",
+    "test": "pnpm --filter @gridtwin/shared build && vitest run && pnpm --filter @gridtwin/web test",
+    "test:api": "pnpm --filter @gridtwin/shared build && vitest run",
+    "test:web": "pnpm --filter @gridtwin/web test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

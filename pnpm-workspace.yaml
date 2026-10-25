@@ -6,7 +6,7 @@ allowBuilds:
   '@google/genai': false
   esbuild: false
   protobufjs: false
-  sharp: set this to true or false
+  sharp: false
 
 # Dependencies allowed to run postinstall build scripts (pnpm 10+ policy).
 # - esbuild: required by vitest/vite bundling.
